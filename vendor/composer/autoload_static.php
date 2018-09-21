@@ -122,6 +122,7 @@ class ComposerStaticInitDrupal8
             'GuzzleHttp\\' => 11,
             'Grasmash\\YamlExpander\\' => 22,
             'Grasmash\\Expander\\' => 18,
+            'GraphQL\\' => 8,
         ),
         'D' => 
         array (
@@ -356,6 +357,10 @@ class ComposerStaticInitDrupal8
         'Grasmash\\Expander\\' => 
         array (
             0 => __DIR__ . '/..' . '/grasmash/expander/src',
+        ),
+        'GraphQL\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/webonyx/graphql-php/src',
         ),
         'Drush\\Internal\\' => 
         array (
