@@ -1,0 +1,786 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="ccf11eb9-af24-41b3-9d82-444ec8d002bd" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/symfony2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/z-portfolio.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.lando.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/PROD_sep-21-18.sql.gz" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sites/default/files/.htaccess" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sites/default/files/php/twig/.htaccess" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sites/default/files/private/.htaccess" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sites/default/files/skipped.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sites/default/settings.local.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/core/.env.example" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/.eslintignore" beforeDir="false" afterPath="$PROJECT_DIR$/core/.eslintignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/core/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/.prettierignore" beforeDir="false" afterPath="$PROJECT_DIR$/core/.prettierignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/assets/vendor/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/core/assets/vendor/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/profiles/demo_umami/modules/demo_umami_content/default_content/.htaccess" beforeDir="false" afterPath="$PROJECT_DIR$/core/profiles/demo_umami/modules/demo_umami_content/default_content/.htaccess" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/profiles/demo_umami/modules/demo_umami_content/default_content/articles.csv" beforeDir="false" afterPath="$PROJECT_DIR$/core/profiles/demo_umami/modules/demo_umami_content/default_content/articles.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/profiles/demo_umami/modules/demo_umami_content/default_content/pages.csv" beforeDir="false" afterPath="$PROJECT_DIR$/core/profiles/demo_umami/modules/demo_umami_content/default_content/pages.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/profiles/demo_umami/modules/demo_umami_content/default_content/recipes.csv" beforeDir="false" afterPath="$PROJECT_DIR$/core/profiles/demo_umami/modules/demo_umami_content/default_content/recipes.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/scripts/drupal" beforeDir="false" afterPath="$PROJECT_DIR$/core/scripts/drupal" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/tests/Drupal/Tests/Component/DependencyInjection/Fixture/container_test_file_service_test_service_function.data" beforeDir="false" afterPath="$PROJECT_DIR$/core/tests/Drupal/Tests/Component/DependencyInjection/Fixture/container_test_file_service_test_service_function.data" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pantheon.yml" beforeDir="false" afterPath="$PROJECT_DIR$/pantheon.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/asm89/stack-cors/composer.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/composer/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/autoload_classmap.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/composer/autoload_classmap.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/autoload_files.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/composer/autoload_files.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/autoload_namespaces.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/composer/autoload_namespaces.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/autoload_psr4.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/composer/autoload_psr4.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/autoload_static.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/composer/autoload_static.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installed.json" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/composer/installed.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/.editorconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/.travis.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/CHANGELOG.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/CONTRIBUTING.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/composer/installers/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/_config.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/phpunit.xml.dist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/src/Composer/Installers/DrupalInstaller.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/composer/installers/src/Composer/Installers/DrupalInstaller.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/src/Composer/Installers/Installer.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/composer/installers/src/Composer/Installers/Installer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/src/Composer/Installers/MediaWikiInstaller.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/composer/installers/src/Composer/Installers/MediaWikiInstaller.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/src/Composer/Installers/OctoberInstaller.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/composer/installers/src/Composer/Installers/OctoberInstaller.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/tests/Composer/Installers/Test/AsgardInstallerTest.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/tests/Composer/Installers/Test/BitrixInstallerTest.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/tests/Composer/Installers/Test/CakePHPInstallerTest.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/tests/Composer/Installers/Test/CraftInstallerTest.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/tests/Composer/Installers/Test/DokuWikiInstallerTest.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/tests/Composer/Installers/Test/GravInstallerTest.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/tests/Composer/Installers/Test/InstallerTest.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/tests/Composer/Installers/Test/MayaInstallerTest.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/tests/Composer/Installers/Test/MediaWikiInstallerTest.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/tests/Composer/Installers/Test/OctoberInstallerTest.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/tests/Composer/Installers/Test/OntoWikiInstallerTest.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/tests/Composer/Installers/Test/PimcoreInstallerTest.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/tests/Composer/Installers/Test/PiwikInstallerTest.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/tests/Composer/Installers/Test/SiteDirectInstallerTest.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/tests/Composer/Installers/Test/SyDESInstallerTest.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/tests/Composer/Installers/Test/TestCase.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/tests/Composer/Installers/Test/VgmcpInstallerTest.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/tests/Composer/Installers/Test/YawikInstallerTest.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/installers/tests/bootstrap.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/composer/semver/composer.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/annotations/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/annotations/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/annotations/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/annotations/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/annotations/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/annotations/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/annotations/lib/Doctrine/Common/Annotations/AnnotationReader.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/annotations/lib/Doctrine/Common/Annotations/AnnotationReader.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/annotations/lib/Doctrine/Common/Annotations/AnnotationRegistry.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/annotations/lib/Doctrine/Common/Annotations/AnnotationRegistry.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/annotations/lib/Doctrine/Common/Annotations/CachedReader.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/annotations/lib/Doctrine/Common/Annotations/CachedReader.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/annotations/lib/Doctrine/Common/Annotations/DocParser.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/annotations/lib/Doctrine/Common/Annotations/DocParser.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/annotations/lib/Doctrine/Common/Annotations/FileCacheReader.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/annotations/lib/Doctrine/Common/Annotations/FileCacheReader.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/annotations/lib/Doctrine/Common/Annotations/PhpParser.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/annotations/lib/Doctrine/Common/Annotations/PhpParser.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/annotations/lib/Doctrine/Common/Annotations/TokenParser.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/annotations/lib/Doctrine/Common/Annotations/TokenParser.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/.coveralls.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/.travis.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/build.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/build.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/ApcCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/ApcCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/ApcuCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/ApcuCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/ArrayCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/ArrayCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/Cache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/Cache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/CacheProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/CacheProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/ChainCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/ChainCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/ClearableCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/ClearableCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/CouchbaseCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/CouchbaseCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/FileCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/FileCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/FilesystemCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/FilesystemCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/FlushableCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/FlushableCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/MemcacheCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/MemcacheCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/MemcachedCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/MemcachedCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/MongoDBCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/MongoDBCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/MultiGetCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/MultiGetCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/MultiPutCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/MultiPutCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/PhpFileCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/PhpFileCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/PredisCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/PredisCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/RedisCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/RedisCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/RiakCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/RiakCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/SQLite3Cache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/SQLite3Cache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/Version.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/Version.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/VoidCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/VoidCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/WinCacheCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/WinCacheCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/XcacheCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/XcacheCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/ZendDataCache.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/cache/lib/Doctrine/Common/Cache/ZendDataCache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/cache/phpunit.xml.dist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/collections/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/collections/.travis.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/collections/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/collections/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/collections/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/collections/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/collections/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/collections/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/collections/lib/Doctrine/Common/Collections/AbstractLazyCollection.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/collections/lib/Doctrine/Common/Collections/AbstractLazyCollection.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/collections/lib/Doctrine/Common/Collections/ArrayCollection.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/collections/lib/Doctrine/Common/Collections/ArrayCollection.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/collections/lib/Doctrine/Common/Collections/Collection.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/collections/lib/Doctrine/Common/Collections/Collection.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/collections/lib/Doctrine/Common/Collections/Criteria.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/collections/lib/Doctrine/Common/Collections/Criteria.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/collections/lib/Doctrine/Common/Collections/Expr/ClosureExpressionVisitor.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/collections/lib/Doctrine/Common/Collections/Expr/ClosureExpressionVisitor.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/collections/lib/Doctrine/Common/Collections/Expr/Comparison.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/collections/lib/Doctrine/Common/Collections/Expr/Comparison.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/collections/lib/Doctrine/Common/Collections/Expr/CompositeExpression.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/collections/lib/Doctrine/Common/Collections/Expr/CompositeExpression.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/collections/lib/Doctrine/Common/Collections/ExpressionBuilder.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/collections/lib/Doctrine/Common/Collections/ExpressionBuilder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/collections/phpunit.xml.dist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/UPGRADE_TO_2_1" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/UPGRADE_TO_2_1" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/UPGRADE_TO_2_2" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/UPGRADE_TO_2_2" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/ClassLoader.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/ClassLoader.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/EventManager.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/EventManager.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Persistence/Event/PreUpdateEventArgs.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Persistence/Event/PreUpdateEventArgs.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Persistence/ManagerRegistry.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Persistence/ManagerRegistry.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Persistence/Mapping/AbstractClassMetadataFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Persistence/Mapping/AbstractClassMetadataFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Persistence/Mapping/ClassMetadataFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Persistence/Mapping/ClassMetadataFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Persistence/Mapping/Driver/FileDriver.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Persistence/Mapping/Driver/FileDriver.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Persistence/Mapping/Driver/PHPDriver.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Persistence/Mapping/Driver/PHPDriver.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Persistence/ObjectManagerDecorator.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Persistence/ObjectManagerDecorator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Persistence/ObjectRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Persistence/ObjectRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Persistence/PersistentObject.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Persistence/PersistentObject.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Proxy/AbstractProxyFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Proxy/AbstractProxyFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Proxy/Autoloader.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Proxy/Autoloader.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Proxy/Exception/InvalidArgumentException.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Proxy/Exception/InvalidArgumentException.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Proxy/Exception/UnexpectedValueException.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Proxy/Exception/UnexpectedValueException.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Proxy/ProxyGenerator.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Proxy/ProxyGenerator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Reflection/StaticReflectionParser.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Reflection/StaticReflectionParser.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Util/ClassUtils.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Util/ClassUtils.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Util/Debug.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Util/Debug.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Version.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/common/lib/Doctrine/Common/Version.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/inflector/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/inflector/.travis.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/inflector/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/inflector/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/inflector/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/inflector/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/inflector/lib/Doctrine/Common/Inflector/Inflector.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/doctrine/inflector/lib/Doctrine/Common/Inflector/Inflector.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/inflector/phpunit.xml.dist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/doctrine/lexer/composer.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/easyrdf/easyrdf/composer.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/egulias/email-validator/composer.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/egulias/email-validator/composer.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/Client.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/Client.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/ClientInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/ClientInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/Cookie/CookieJar.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/Cookie/CookieJar.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/Cookie/SessionCookieJar.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/Cookie/SessionCookieJar.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/Cookie/SetCookie.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/Cookie/SetCookie.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/Exception/GuzzleException.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/Exception/GuzzleException.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/Handler/CurlFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/Handler/CurlFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/Handler/CurlMultiHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/Handler/CurlMultiHandler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/Handler/StreamHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/Handler/StreamHandler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/HandlerStack.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/HandlerStack.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/MessageFormatter.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/MessageFormatter.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/Middleware.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/Middleware.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/UriTemplate.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/UriTemplate.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/functions.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/functions.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/guzzlehttp/promises/composer.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/guzzlehttp/psr7/composer.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/masterminds/html5/composer.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/paragonie/random_compat/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/paragonie/random_compat/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/paragonie/random_compat/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/paragonie/random_compat/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/paragonie/random_compat/dist/random_compat.phar.pubkey" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/paragonie/random_compat/dist/random_compat.phar.pubkey" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/paragonie/random_compat/dist/random_compat.phar.pubkey.asc" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/paragonie/random_compat/dist/random_compat.phar.pubkey.asc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/paragonie/random_compat/lib/byte_safe_strings.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/paragonie/random_compat/lib/byte_safe_strings.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/paragonie/random_compat/lib/cast_to_int.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/paragonie/random_compat/lib/cast_to_int.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/paragonie/random_compat/lib/error_polyfill.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/paragonie/random_compat/lib/error_polyfill.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/paragonie/random_compat/lib/random.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/paragonie/random_compat/lib/random.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/paragonie/random_compat/lib/random_bytes_com_dotnet.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/paragonie/random_compat/lib/random_bytes_com_dotnet.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/paragonie/random_compat/lib/random_bytes_dev_urandom.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/paragonie/random_compat/lib/random_bytes_dev_urandom.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/paragonie/random_compat/lib/random_bytes_libsodium.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/paragonie/random_compat/lib/random_bytes_libsodium.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/paragonie/random_compat/lib/random_bytes_libsodium_legacy.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/paragonie/random_compat/lib/random_bytes_libsodium_legacy.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/paragonie/random_compat/lib/random_bytes_mcrypt.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/paragonie/random_compat/lib/random_bytes_mcrypt.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/paragonie/random_compat/lib/random_int.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/paragonie/random_compat/lib/random_int.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/paragonie/random_compat/psalm.xml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/paragonie/random_compat/psalm.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/psr/container/composer.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/psr/http-message/composer.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/psr/log/composer.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/stack/builder/composer.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/stack/builder/composer.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony-cmf/routing/composer.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/class-loader/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/class-loader/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/class-loader/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/class-loader/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/console/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/console/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/console/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/console/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/debug/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/debug/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/Debug.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/debug/Debug.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/DebugClassLoader.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/debug/DebugClassLoader.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/ErrorHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/debug/ErrorHandler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/Exception/ClassNotFoundException.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/debug/Exception/ClassNotFoundException.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/Exception/ContextErrorException.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/Exception/FatalErrorException.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/debug/Exception/FatalErrorException.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/Exception/FatalThrowableError.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/debug/Exception/FatalThrowableError.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/Exception/FlattenException.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/debug/Exception/FlattenException.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/Exception/SilencedErrorContext.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/debug/Exception/SilencedErrorContext.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/Exception/UndefinedFunctionException.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/debug/Exception/UndefinedFunctionException.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/Exception/UndefinedMethodException.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/debug/Exception/UndefinedMethodException.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/ExceptionHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/debug/ExceptionHandler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/FatalErrorHandler/ClassNotFoundFatalErrorHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/debug/FatalErrorHandler/ClassNotFoundFatalErrorHandler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/debug/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/Resources/ext/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/Resources/ext/config.m4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/Resources/ext/config.w32" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/Resources/ext/php_symfony_debug.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/Resources/ext/symfony_debug.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/Resources/ext/tests/001.phpt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/Resources/ext/tests/002.phpt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/Resources/ext/tests/002_1.phpt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/Resources/ext/tests/003.phpt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/debug/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/debug/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/dependency-injection/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/dependency-injection/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/dependency-injection/Compiler/AnalyzeServiceReferencesPass.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/dependency-injection/Compiler/AnalyzeServiceReferencesPass.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/dependency-injection/Compiler/ResolveReferencesToAliasesPass.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/dependency-injection/Compiler/ResolveReferencesToAliasesPass.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/dependency-injection/Container.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/dependency-injection/Container.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/dependency-injection/ContainerBuilder.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/dependency-injection/ContainerBuilder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/dependency-injection/Dumper/PhpDumper.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/dependency-injection/Dumper/PhpDumper.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/dependency-injection/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/dependency-injection/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/dependency-injection/Loader/schema/dic/services/services-1.0.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/dependency-injection/Loader/schema/dic/services/services-1.0.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/event-dispatcher/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/event-dispatcher/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/event-dispatcher/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/event-dispatcher/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/BinaryFileResponse.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/BinaryFileResponse.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Request.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Request.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Response.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Response.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/HttpCache/SubRequestHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/HttpCache/SubRequestHandler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Kernel.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Kernel.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-ctype/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/polyfill-ctype/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-ctype/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/polyfill-ctype/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-iconv/Iconv.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/polyfill-iconv/Iconv.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-iconv/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/polyfill-iconv/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-iconv/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/polyfill-iconv/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring/Mbstring.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring/Mbstring.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-php70/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/polyfill-php70/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-php70/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/polyfill-php70/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/process/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/process/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/process/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/process/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/psr-http-message-bridge/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/psr-http-message-bridge/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/psr-http-message-bridge/.travis.yml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/psr-http-message-bridge/.travis.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/psr-http-message-bridge/CHANGELOG" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/psr-http-message-bridge/Factory/DiactorosFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/psr-http-message-bridge/Factory/DiactorosFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/psr-http-message-bridge/Factory/HttpFoundationFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/psr-http-message-bridge/Factory/HttpFoundationFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/psr-http-message-bridge/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/psr-http-message-bridge/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/psr-http-message-bridge/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/psr-http-message-bridge/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/routing/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/routing/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/routing/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/routing/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/routing/Loader/schema/routing/routing-1.0.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/routing/Loader/schema/routing/routing-1.0.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/serializer/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/serializer/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/serializer/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/serializer/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/serializer/Mapping/Loader/schema/dic/serializer-mapping/serializer-mapping-1.0.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/serializer/Mapping/Loader/schema/dic/serializer-mapping/serializer-mapping-1.0.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/translation/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/translation/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/translation/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/translation/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/translation/Loader/schema/dic/xliff-core/xliff-core-1.2-strict.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/translation/Loader/schema/dic/xliff-core/xliff-core-1.2-strict.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/translation/Loader/schema/dic/xliff-core/xliff-core-2.0.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/translation/Loader/schema/dic/xliff-core/xliff-core-2.0.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/translation/Loader/schema/dic/xliff-core/xml.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/translation/Loader/schema/dic/xliff-core/xml.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/translation/Resources/schemas/xliff-core-1.2-strict.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/translation/Resources/schemas/xliff-core-1.2-strict.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/validator/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/validator/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/Loader/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/Loader/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/yaml/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/yaml/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/yaml/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/yaml/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/symfony/yaml/Parser.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/symfony/yaml/Parser.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/twig/twig/.editorconfig" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/twig/twig/.editorconfig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/twig/twig/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/twig/twig/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/twig/twig/CHANGELOG" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/twig/twig/CHANGELOG" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/twig/twig/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/twig/twig/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/twig/twig/README.rst" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/twig/twig/README.rst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/twig/twig/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/twig/twig/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/Environment.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/Environment.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/ExpressionParser.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/ExpressionParser.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/Extension/Core.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/Extension/Core.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/Loader/Filesystem.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/Loader/Filesystem.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/Node/Expression/Call.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/Node/Expression/Call.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/Node/Expression/Name.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/Node/Expression/Name.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/NodeTraverser.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/NodeTraverser.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/Test/IntegrationTestCase.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/Test/IntegrationTestCase.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/Token.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/Token.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/TokenParser/Sandbox.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/TokenParser/Sandbox.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/TokenParser/Use.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/twig/twig/lib/Twig/TokenParser/Use.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/wikimedia/composer-merge-plugin/composer.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/composer.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/AbstractSerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/AbstractSerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/CallbackStream.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/CallbackStream.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/HeaderSecurity.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/HeaderSecurity.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/MessageTrait.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/MessageTrait.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/PhpInputStream.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/PhpInputStream.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/RelativeStream.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/RelativeStream.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Request.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Request.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Request/ArraySerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Request/ArraySerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Request/Serializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Request/Serializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/RequestTrait.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/RequestTrait.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/ArraySerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/ArraySerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/EmitterInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/EmitterInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/HtmlResponse.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/HtmlResponse.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/InjectContentTypeTrait.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/InjectContentTypeTrait.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/JsonResponse.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/JsonResponse.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/RedirectResponse.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/RedirectResponse.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/SapiEmitter.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/SapiEmitter.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/SapiEmitterTrait.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/SapiEmitterTrait.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/SapiStreamEmitter.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/SapiStreamEmitter.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/Serializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/Serializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/TextResponse.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Response/TextResponse.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Server.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Server.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/ServerRequest.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/ServerRequest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/ServerRequestFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/ServerRequestFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Stream.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Stream.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/UploadedFile.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/UploadedFile.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Uri.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-diactoros/src/Uri.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/CONDUCT.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/CONTRIBUTING.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/LICENSE.md" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/LICENSE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/doc/book/configuration.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/doc/book/escaping-css.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/doc/book/escaping-html-attributes.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/doc/book/escaping-html.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/doc/book/escaping-javascript.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/doc/book/escaping-url.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/doc/book/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/doc/book/index.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/doc/book/intro.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/doc/book/theory-of-operation.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/mkdocs.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/src/Escaper.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-escaper/src/Escaper.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/CONTRIBUTING.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/LICENSE.md" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/LICENSE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/doc/book/consuming-atom-entry.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/doc/book/consuming-atom.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/doc/book/consuming-rss.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/doc/book/find-feeds.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/doc/book/http-clients.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/doc/book/importing.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/doc/book/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/doc/book/index.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/doc/book/intro.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/doc/book/pubsubhubbub.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/doc/book/reader.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/doc/book/security.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/doc/book/writer.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/mkdocs.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/PubSubHubbub/AbstractCallback.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/PubSubHubbub/AbstractCallback.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/PubSubHubbub/HttpResponse.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/PubSubHubbub/HttpResponse.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/PubSubHubbub/Model/Subscription.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/PubSubHubbub/Model/Subscription.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/PubSubHubbub/PubSubHubbub.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/PubSubHubbub/PubSubHubbub.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/PubSubHubbub/Publisher.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/PubSubHubbub/Publisher.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/PubSubHubbub/Subscriber.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/PubSubHubbub/Subscriber.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/PubSubHubbub/Subscriber/Callback.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/PubSubHubbub/Subscriber/Callback.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/AbstractEntry.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/AbstractEntry.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/AbstractFeed.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/AbstractFeed.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Collection/Category.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Collection/Category.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Entry/AbstractEntry.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Entry/AbstractEntry.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Entry/Atom.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Entry/Atom.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Entry/Rss.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Entry/Rss.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/AbstractEntry.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/AbstractEntry.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/Atom/Entry.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/Atom/Entry.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/Atom/Feed.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/Atom/Feed.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/DublinCore/Entry.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/DublinCore/Entry.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/DublinCore/Feed.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/DublinCore/Feed.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/Podcast/Entry.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/Podcast/Entry.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/Podcast/Feed.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/Podcast/Feed.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/Slash/Entry.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/Slash/Entry.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/Syndication/Feed.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/Syndication/Feed.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/Thread/Entry.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/Thread/Entry.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/WellFormedWeb/Entry.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Extension/WellFormedWeb/Entry.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/ExtensionManager.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/ExtensionManager.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/ExtensionPluginManager.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/ExtensionPluginManager.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Feed/AbstractFeed.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Feed/AbstractFeed.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Feed/Atom.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Feed/Atom.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Feed/FeedInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Feed/FeedInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Feed/Rss.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Feed/Rss.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/FeedSet.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/FeedSet.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Http/ZendHttpClientDecorator.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Http/ZendHttpClientDecorator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Reader.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/Reader.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/StandaloneExtensionManager.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Reader/StandaloneExtensionManager.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Uri.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Uri.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/AbstractFeed.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/AbstractFeed.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Deleted.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Deleted.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Entry.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Entry.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/AbstractRenderer.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/AbstractRenderer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/Atom/Renderer/Feed.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/Atom/Renderer/Feed.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/Content/Renderer/Entry.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/Content/Renderer/Entry.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/DublinCore/Renderer/Entry.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/DublinCore/Renderer/Entry.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/DublinCore/Renderer/Feed.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/DublinCore/Renderer/Feed.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/ITunes/Entry.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/ITunes/Entry.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/ITunes/Feed.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/ITunes/Feed.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/ITunes/Renderer/Entry.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/ITunes/Renderer/Entry.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/ITunes/Renderer/Feed.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/ITunes/Renderer/Feed.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/Slash/Renderer/Entry.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/Slash/Renderer/Entry.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/Threading/Renderer/Entry.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/Threading/Renderer/Entry.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/WellFormedWeb/Renderer/Entry.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Extension/WellFormedWeb/Renderer/Entry.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/ExtensionManager.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/ExtensionManager.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/ExtensionPluginManager.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/ExtensionPluginManager.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Feed.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Feed.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/FeedFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/FeedFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/AbstractRenderer.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/AbstractRenderer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/Entry/Atom.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/Entry/Atom.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/Entry/Atom/Deleted.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/Entry/Atom/Deleted.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/Entry/AtomDeleted.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/Entry/AtomDeleted.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/Entry/Rss.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/Entry/Rss.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/Feed/AbstractAtom.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/Feed/AbstractAtom.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/Feed/Atom.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/Feed/Atom.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/Feed/Atom/AbstractAtom.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/Feed/Atom/AbstractAtom.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/Feed/Atom/Source.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/Feed/Atom/Source.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/Feed/AtomSource.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/Feed/AtomSource.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/Feed/Rss.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Renderer/Feed/Rss.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/StandaloneExtensionManager.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/StandaloneExtensionManager.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Writer.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-feed/src/Writer/Writer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/CONDUCT.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/CONTRIBUTING.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/LICENSE.md" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/LICENSE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/benchmark/ExtractPriorityQueue.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/benchmark/InsertPriorityQueue.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/benchmark/RemovePriorityQueue.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/doc/book/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/doc/book/index.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/doc/book/migration.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/doc/bookdown.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/mkdocs.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/AbstractOptions.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/AbstractOptions.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/ArrayObject.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/ArrayObject.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/ArrayUtils.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/ArrayUtils.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/ErrorHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/ErrorHandler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/FastPriorityQueue.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/FastPriorityQueue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/Glob.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/Glob.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/Guard/ArrayOrTraversableGuardTrait.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/Guard/ArrayOrTraversableGuardTrait.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/JsonSerializable.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/JsonSerializable.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/Message.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/Message.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/Parameters.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/Parameters.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/PriorityList.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/PriorityList.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/PriorityQueue.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/PriorityQueue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/SplPriorityQueue.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/SplPriorityQueue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/StringUtils.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/StringUtils.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/StringWrapper/AbstractStringWrapper.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/StringWrapper/AbstractStringWrapper.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/StringWrapper/Iconv.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/StringWrapper/Iconv.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/StringWrapper/Intl.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/StringWrapper/Intl.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/StringWrapper/MbString.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/StringWrapper/MbString.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/StringWrapper/Native.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/zendframework/zend-stdlib/src/StringWrapper/Native.php" afterDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings" synchronizationState="SYNCHRONIZE">
+    <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
+  </component>
+  <component name="DrupalConfiguration" enabled="true" version="8">
+    <drupalPath />
+  </component>
+  <component name="FUSProjectUsageTrigger">
+    <session id="666651899">
+      <usages-collector id="statistics.lifecycle.project">
+        <counts>
+          <entry key="project.open.time.1" value="1" />
+          <entry key="project.opened" value="1" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.open">
+        <counts>
+          <entry key="gitignore" value="2" />
+          <entry key="json" value="1" />
+          <entry key="yml" value="3" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.open">
+        <counts>
+          <entry key="Git file" value="2" />
+          <entry key="JSON" value="1" />
+          <entry key="YAML" value="3" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.edit">
+        <counts>
+          <entry key="json" value="4" />
+          <entry key="yml" value="5" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.edit">
+        <counts>
+          <entry key="JSON" value="4" />
+          <entry key="YAML" value="5" />
+        </counts>
+      </usages-collector>
+    </session>
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/composer.json">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="594">
+              <caret line="72" column="5" selection-start-line="72" selection-start-column="5" selection-end-line="72" selection-end-column="5" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/pantheon.yml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="88">
+              <caret line="4" column="16" selection-start-line="4" selection-start-column="16" selection-end-line="4" selection-end-column="16" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/composer.json" />
+        <option value="$PROJECT_DIR$/../maxs-z-web-developer-portfolio/pantheon.yml" />
+        <option value="$PROJECT_DIR$/pantheon.yml" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="NodePackageJsonFileManager">
+    <packageJsonPaths>
+      <path value="$PROJECT_DIR$/core/assets/vendor/jquery.ui/package.json" />
+      <path value="$PROJECT_DIR$/core/package.json" />
+    </packageJsonPaths>
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration">
+    <include_path>
+      <path value="$PROJECT_DIR$/vendor/wikimedia/composer-merge-plugin" />
+      <path value="$PROJECT_DIR$/vendor/egulias/email-validator" />
+      <path value="$PROJECT_DIR$/vendor/twig/twig" />
+      <path value="$PROJECT_DIR$/vendor/easyrdf/easyrdf" />
+      <path value="$PROJECT_DIR$/vendor/composer" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/lexer" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/inflector" />
+      <path value="$PROJECT_DIR$/vendor/stack/builder" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/annotations" />
+      <path value="$PROJECT_DIR$/vendor/masterminds/html5" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/collections" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/common" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/cache" />
+      <path value="$PROJECT_DIR$/vendor/paragonie/random_compat" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring" />
+      <path value="$PROJECT_DIR$/vendor/symfony/translation" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-ctype" />
+      <path value="$PROJECT_DIR$/vendor/symfony/event-dispatcher" />
+      <path value="$PROJECT_DIR$/vendor/symfony/routing" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php70" />
+      <path value="$PROJECT_DIR$/vendor/symfony/http-kernel" />
+      <path value="$PROJECT_DIR$/vendor/symfony/serializer" />
+      <path value="$PROJECT_DIR$/vendor/asm89/stack-cors" />
+      <path value="$PROJECT_DIR$/vendor/symfony/yaml" />
+      <path value="$PROJECT_DIR$/vendor/symfony/psr-http-message-bridge" />
+      <path value="$PROJECT_DIR$/vendor/symfony/http-foundation" />
+      <path value="$PROJECT_DIR$/vendor/symfony/class-loader" />
+      <path value="$PROJECT_DIR$/vendor/guzzlehttp/promises" />
+      <path value="$PROJECT_DIR$/vendor/guzzlehttp/psr7" />
+      <path value="$PROJECT_DIR$/vendor/guzzlehttp/guzzle" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-diactoros" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-stdlib" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-feed" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-escaper" />
+      <path value="$PROJECT_DIR$/vendor/symfony/validator" />
+      <path value="$PROJECT_DIR$/vendor/psr/log" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-iconv" />
+      <path value="$PROJECT_DIR$/vendor/symfony-cmf/routing" />
+      <path value="$PROJECT_DIR$/vendor/psr/http-message" />
+      <path value="$PROJECT_DIR$/vendor/symfony/dependency-injection" />
+      <path value="$PROJECT_DIR$/vendor/psr/container" />
+      <path value="$PROJECT_DIR$/vendor/symfony/debug" />
+      <path value="$PROJECT_DIR$/vendor/symfony/process" />
+      <path value="$PROJECT_DIR$/vendor/symfony/console" />
+      <path value="$PROJECT_DIR$/vendor/oomphinc/composer-installers-extender" />
+      <path value="$PROJECT_DIR$/vendor/cweagans/composer-patches" />
+      <path value="$PROJECT_DIR$/vendor/consolidation/annotated-command" />
+      <path value="$PROJECT_DIR$/vendor/consolidation/site-alias" />
+      <path value="$PROJECT_DIR$/vendor/consolidation/log" />
+      <path value="$PROJECT_DIR$/vendor/consolidation/output-formatters" />
+      <path value="$PROJECT_DIR$/vendor/webmozart/assert" />
+      <path value="$PROJECT_DIR$/vendor/webmozart/path-util" />
+      <path value="$PROJECT_DIR$/vendor/grasmash/expander" />
+      <path value="$PROJECT_DIR$/vendor/grasmash/yaml-expander" />
+      <path value="$PROJECT_DIR$/vendor/container-interop/container-interop" />
+      <path value="$PROJECT_DIR$/vendor/jakub-onderka/php-console-color" />
+      <path value="$PROJECT_DIR$/vendor/jakub-onderka/php-console-highlighter" />
+      <path value="$PROJECT_DIR$/vendor/consolidation/self-update" />
+      <path value="$PROJECT_DIR$/vendor/consolidation/robo" />
+      <path value="$PROJECT_DIR$/vendor/consolidation/config" />
+      <path value="$PROJECT_DIR$/vendor/g1a/composer-test-scenarios" />
+      <path value="$PROJECT_DIR$/vendor/symfony/config" />
+      <path value="$PROJECT_DIR$/vendor/symfony/var-dumper" />
+      <path value="$PROJECT_DIR$/vendor/symfony/finder" />
+      <path value="$PROJECT_DIR$/vendor/symfony/filesystem" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php72" />
+      <path value="$PROJECT_DIR$/vendor/chi-teck/drupal-code-generator" />
+      <path value="$PROJECT_DIR$/vendor/dnoegel/php-xdg-base-dir" />
+      <path value="$PROJECT_DIR$/vendor/dflydev/dot-access-data" />
+      <path value="$PROJECT_DIR$/vendor/webflo/drupal-finder" />
+      <path value="$PROJECT_DIR$/vendor/league/container" />
+      <path value="$PROJECT_DIR$/vendor/nikic/php-parser" />
+      <path value="$PROJECT_DIR$/vendor/drush/drush" />
+      <path value="$PROJECT_DIR$/vendor/psy/psysh" />
+    </include_path>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="1912" />
+    <option name="y" value="-8" />
+    <option name="width" value="1936" />
+    <option name="height" value="1056" />
+  </component>
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="z-portfolio" type="b2602c69:ProjectViewProjectNode" />
+              <item name="z-portfolio" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ccf11eb9-af24-41b3-9d82-444ec8d002bd" name="Default Changelist" comment="" />
+      <created>1537548389343</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1537548389343</updated>
+      <workItem from="1537548390697" duration="2012000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="2012000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="1912" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Favorites" side_tool="true" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Database Changes" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" />
+      <window_info anchor="bottom" id="RNConsole" />
+      <window_info anchor="bottom" id="Terminal" />
+      <window_info anchor="bottom" id="Event Log" side_tool="true" visible="true" weight="0.18612334" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="right" id="Database" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://F:/Projects/Z-portfolio/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1166">
+          <caret line="53" column="20" selection-start-line="53" selection-start-column="20" selection-end-line="53" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="638">
+          <caret line="29" selection-start-line="29" selection-end-line="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/composer.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="594">
+          <caret line="72" column="5" selection-start-line="72" selection-start-column="5" selection-end-line="72" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../maxs-z-web-developer-portfolio/pantheon.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="88">
+          <caret line="4" column="16" selection-start-line="4" selection-start-column="16" selection-end-line="4" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pantheon.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="88">
+          <caret line="4" column="16" selection-start-line="4" selection-start-column="16" selection-end-line="4" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

@@ -27,7 +27,6 @@ sites/simpletest
 ############
 *.7z
 *.dmg
-*.gz
 *.bz2
 *.iso
 *.jar
@@ -39,7 +38,6 @@ sites/simpletest
 # Logs and databases #
 ######################
 *.log
-*.sql
 
 # OS generated files #
 ######################
