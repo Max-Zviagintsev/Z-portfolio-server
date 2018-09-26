@@ -72,6 +72,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/webflo/drupal-finder" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/webmozart/assert" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/webmozart/path-util" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/webonyx/graphql-php" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/wikimedia/composer-merge-plugin" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/zendframework/zend-diactoros" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/zendframework/zend-escaper" />

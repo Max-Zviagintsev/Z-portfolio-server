@@ -1782,35 +1782,39 @@
         "description": "Drupal is an open source content management platform powering millions of websites and applications."
     },
     {
-        "name": "drupal/graphql",
-        "version": "3.0.0-rc2",
-        "version_normalized": "3.0.0.0-RC2",
+        "name": "drupal/jsonapi",
+        "version": "1.23.0",
+        "version_normalized": "1.23.0.0",
         "source": {
             "type": "git",
-            "url": "https://git.drupal.org/project/graphql",
-            "reference": "8.x-3.0-rc2"
+            "url": "https://git.drupal.org/project/jsonapi",
+            "reference": "8.x-1.23"
         },
         "dist": {
             "type": "zip",
-            "url": "https://ftp.drupal.org/files/projects/graphql-8.x-3.0-rc2.zip",
-            "reference": "8.x-3.0-rc2",
-            "shasum": "99c229003fddc058fe7f213f9753ad7109c3e4d7"
+            "url": "https://ftp.drupal.org/files/projects/jsonapi-8.x-1.23.zip",
+            "reference": "8.x-1.23",
+            "shasum": "4fb88736a9ad90a995bdc9c3ab90e7731b6d89e5"
         },
         "require": {
-            "drupal/core": "~8.0",
-            "webonyx/graphql-php": "^0.12.5"
+            "drupal/core": "^8.4.3"
+        },
+        "require-dev": {
+            "drupal/schemata": "1.x-dev#8325d172e1d6880aa24073f8f751ef089282cf9a",
+            "drupal/schemata_json_schema": "*",
+            "justinrainbow/json-schema": "^5.2"
         },
         "type": "drupal-module",
         "extra": {
             "branch-alias": {
-                "dev-3.x": "3.x-dev"
+                "dev-1.x": "1.x-dev"
             },
             "drupal": {
-                "version": "8.x-3.0-rc2",
-                "datestamp": "1537443780",
+                "version": "8.x-1.23",
+                "datestamp": "1532084496",
                 "security-coverage": {
-                    "status": "not-covered",
-                    "message": "RC releases are not covered by Drupal security advisories."
+                    "status": "covered",
+                    "message": "Covered by Drupal's security advisory policy"
                 }
             }
         },
@@ -1821,18 +1825,78 @@
         ],
         "authors": [
             {
-                "name": "fubhy",
-                "homepage": "https://www.drupal.org/user/761344"
+                "name": "Wim Leers",
+                "homepage": "https://www.drupal.org/user/99777"
             },
             {
-                "name": "pmelab",
-                "homepage": "https://www.drupal.org/user/555322"
+                "name": "dawehner",
+                "homepage": "https://www.drupal.org/user/99340"
+            },
+            {
+                "name": "e0ipso",
+                "homepage": "https://www.drupal.org/user/550110"
+            },
+            {
+                "name": "gabesullice",
+                "homepage": "https://www.drupal.org/user/2287430"
             }
         ],
-        "description": "Exposes your Drupal data model through a GraphQL schema.",
-        "homepage": "http://drupal.org/project/graphql",
+        "description": "Provides a JSON API standards-compliant API for accessing and manipulating Drupal content and configuration entities.",
+        "homepage": "https://www.drupal.org/project/jsonapi",
         "support": {
-            "source": "http://cgit.drupalcode.org/graphql"
+            "source": "http://cgit.drupalcode.org/jsonapi"
+        }
+    },
+    {
+        "name": "drupal/jsonapi_extras",
+        "version": "2.9.0",
+        "version_normalized": "2.9.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://git.drupal.org/project/jsonapi_extras",
+            "reference": "8.x-2.9"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://ftp.drupal.org/files/projects/jsonapi_extras-8.x-2.9.zip",
+            "reference": "8.x-2.9",
+            "shasum": "fa6b89a523ab112282cbd49cf7c5d3ad27bc28f0"
+        },
+        "require": {
+            "drupal/core": "^8.5",
+            "drupal/jsonapi": "^1.22",
+            "e0ipso/shaper": "^1"
+        },
+        "type": "drupal-module",
+        "extra": {
+            "branch-alias": {
+                "dev-2.x": "2.x-dev"
+            },
+            "drupal": {
+                "version": "8.x-2.9",
+                "datestamp": "1535790180",
+                "security-coverage": {
+                    "status": "covered",
+                    "message": "Covered by Drupal's security advisory policy"
+                }
+            }
+        },
+        "installation-source": "dist",
+        "notification-url": "https://packages.drupal.org/8/downloads",
+        "license": [
+            "GPL-2.0+"
+        ],
+        "authors": [
+            {
+                "name": "Mateu Aguiló Bosch",
+                "homepage": "https://www.drupal.org/user/550110",
+                "email": "mateu.aguilo.bosch@gmail.com"
+            }
+        ],
+        "description": "JSON API Extras provides a means to override and provide limited configurations to the default zero-configuration implementation provided by the JSON API module.",
+        "homepage": "https://www.drupal.org/project/jsonapi_extras",
+        "support": {
+            "source": "http://cgit.drupalcode.org/jsonapi_extras"
         }
     },
     {
@@ -1938,6 +2002,50 @@
         ],
         "description": "Drush is a command line shell and scripting interface for Drupal, a veritable Swiss Army knife designed to make life easier for those of us who spend some of our working hours hacking away at the command prompt.",
         "homepage": "http://www.drush.org"
+    },
+    {
+        "name": "e0ipso/shaper",
+        "version": "1.2.2",
+        "version_normalized": "1.2.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/e0ipso/shaper.git",
+            "reference": "a9b1420201ca3d0831d91879f72bf90e1186fd32"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/e0ipso/shaper/zipball/a9b1420201ca3d0831d91879f72bf90e1186fd32",
+            "reference": "a9b1420201ca3d0831d91879f72bf90e1186fd32",
+            "shasum": ""
+        },
+        "require": {
+            "justinrainbow/json-schema": "^5.2"
+        },
+        "require-dev": {
+            "php-coveralls/php-coveralls": "^2.0",
+            "phpunit/phpcov": "^5.0",
+            "phpunit/phpunit": "^7.0.2"
+        },
+        "time": "2018-04-23T08:52:32+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Shaper\\": "src",
+                "Shaper\\Tests\\": "tests/src"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "GPL-2.0"
+        ],
+        "authors": [
+            {
+                "name": "Mateu Aguiló Bosch",
+                "email": "mateu.aguilo.bosch@gmail.com"
+            }
+        ],
+        "description": "Lightweight library to handle in and out transformations in PHP."
     },
     {
         "name": "easyrdf/easyrdf",
@@ -2467,6 +2575,74 @@
                 "email": "acci@acci.cz",
                 "homepage": "http://www.acci.cz/"
             }
+        ]
+    },
+    {
+        "name": "justinrainbow/json-schema",
+        "version": "5.2.7",
+        "version_normalized": "5.2.7.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/justinrainbow/json-schema.git",
+            "reference": "8560d4314577199ba51bf2032f02cd1315587c23"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/justinrainbow/json-schema/zipball/8560d4314577199ba51bf2032f02cd1315587c23",
+            "reference": "8560d4314577199ba51bf2032f02cd1315587c23",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "require-dev": {
+            "friendsofphp/php-cs-fixer": "^2.1",
+            "json-schema/json-schema-test-suite": "1.2.0",
+            "phpunit/phpunit": "^4.8.35"
+        },
+        "time": "2018-02-14T22:26:30+00:00",
+        "bin": [
+            "bin/validate-json"
+        ],
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "5.0.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "JsonSchema\\": "src/JsonSchema/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Bruno Prieto Reis",
+                "email": "bruno.p.reis@gmail.com"
+            },
+            {
+                "name": "Justin Rainbow",
+                "email": "justin.rainbow@gmail.com"
+            },
+            {
+                "name": "Igor Wiedler",
+                "email": "igor@wiedler.ch"
+            },
+            {
+                "name": "Robert Schönthal",
+                "email": "seroscho@googlemail.com"
+            }
+        ],
+        "description": "A library to validate a json schema.",
+        "homepage": "https://github.com/justinrainbow/json-schema",
+        "keywords": [
+            "json",
+            "schema"
         ]
     },
     {
@@ -4807,53 +4983,6 @@
             }
         ],
         "description": "A robust cross-platform utility for normalizing, comparing and modifying file paths."
-    },
-    {
-        "name": "webonyx/graphql-php",
-        "version": "v0.12.6",
-        "version_normalized": "0.12.6.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/webonyx/graphql-php.git",
-            "reference": "4c545e5ec4fc37f6eb36c19f5a0e7feaf5979c95"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/webonyx/graphql-php/zipball/4c545e5ec4fc37f6eb36c19f5a0e7feaf5979c95",
-            "reference": "4c545e5ec4fc37f6eb36c19f5a0e7feaf5979c95",
-            "shasum": ""
-        },
-        "require": {
-            "ext-mbstring": "*",
-            "php": ">=5.6"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "^4.8",
-            "psr/http-message": "^1.0",
-            "react/promise": "2.*"
-        },
-        "suggest": {
-            "psr/http-message": "To use standard GraphQL server",
-            "react/promise": "To leverage async resolving on React PHP platform"
-        },
-        "time": "2018-09-02T14:59:54+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "GraphQL\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "description": "A PHP port of GraphQL reference implementation",
-        "homepage": "https://github.com/webonyx/graphql-php",
-        "keywords": [
-            "api",
-            "graphql"
-        ]
     },
     {
         "name": "wikimedia/composer-merge-plugin",

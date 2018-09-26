@@ -85,6 +85,8 @@ class ComposerStaticInitDrupal8
             'Symfony\\Component\\ClassLoader\\' => 30,
             'Symfony\\Cmf\\Component\\Routing\\' => 30,
             'Symfony\\Bridge\\PsrHttpMessage\\' => 30,
+            'Shaper\\Tests\\' => 13,
+            'Shaper\\' => 7,
             'SelfUpdate\\' => 11,
         ),
         'R' => 
@@ -111,6 +113,10 @@ class ComposerStaticInitDrupal8
         array (
             'League\\Container\\' => 17,
         ),
+        'J' => 
+        array (
+            'JsonSchema\\' => 11,
+        ),
         'I' => 
         array (
             'Interop\\Container\\' => 18,
@@ -122,7 +128,6 @@ class ComposerStaticInitDrupal8
             'GuzzleHttp\\' => 11,
             'Grasmash\\YamlExpander\\' => 22,
             'Grasmash\\Expander\\' => 18,
-            'GraphQL\\' => 8,
         ),
         'D' => 
         array (
@@ -294,6 +299,14 @@ class ComposerStaticInitDrupal8
         array (
             0 => __DIR__ . '/..' . '/symfony/psr-http-message-bridge',
         ),
+        'Shaper\\Tests\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/e0ipso/shaper/tests/src',
+        ),
+        'Shaper\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/e0ipso/shaper/src',
+        ),
         'SelfUpdate\\' => 
         array (
             0 => __DIR__ . '/..' . '/consolidation/self-update/src',
@@ -334,6 +347,10 @@ class ComposerStaticInitDrupal8
         array (
             0 => __DIR__ . '/..' . '/league/container/src',
         ),
+        'JsonSchema\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/justinrainbow/json-schema/src/JsonSchema',
+        ),
         'Interop\\Container\\' => 
         array (
             0 => __DIR__ . '/..' . '/container-interop/container-interop/src/Interop/Container',
@@ -357,10 +374,6 @@ class ComposerStaticInitDrupal8
         'Grasmash\\Expander\\' => 
         array (
             0 => __DIR__ . '/..' . '/grasmash/expander/src',
-        ),
-        'GraphQL\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/webonyx/graphql-php/src',
         ),
         'Drush\\Internal\\' => 
         array (

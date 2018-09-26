@@ -76,6 +76,7 @@
       <path value="$PROJECT_DIR$/vendor/nikic/php-parser" />
       <path value="$PROJECT_DIR$/vendor/drush/drush" />
       <path value="$PROJECT_DIR$/vendor/psy/psysh" />
+      <path value="$PROJECT_DIR$/vendor/webonyx/graphql-php" />
     </include_path>
   </component>
 </project>
