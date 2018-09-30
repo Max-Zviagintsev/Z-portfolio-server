@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
  *       "delete" = "Drupal\jsonapi_extras\Form\JsonapiResourceConfigDeleteForm"
  *     },
  *     "route_provider" = {
- *       "html" = "Drupal\jsonapi_extras\JsonapiResourceConfigHtmlRouteProvider",
+ *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider"
  *     },
  *   },
  *   config_prefix = "jsonapi_resource_config",
@@ -118,7 +118,9 @@ class JsonapiResourceConfig extends ConfigEntityBase {
       \Drupal::service('jsonapi.resource_type.repository')->reset();
       \Drupal::service('router.builder')->setRebuildNeeded();
     }
-    catch (ServiceNotFoundException $exception) {}
+    catch (ServiceNotFoundException $exception) {
+      // This is intentionally empty.
+    }
   }
 
 }

@@ -191,8 +191,8 @@ class ConfigurableResourceTypeRepository extends ResourceTypeRepository {
    * Resets the internal caches for resource types and resource configs.
    */
   public function reset() {
-    $this->all = NULL;
-    $this->resourceConfigs = NULL;
+    $this->all = [];
+    $this->resourceConfigs = [];
   }
 
 }

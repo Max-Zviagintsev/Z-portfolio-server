@@ -22,7 +22,8 @@
         "drupal/adminimal_admin_toolbar": "1.8",
         "drupal/backup_migrate": "4.0",
         "drupal/jsonapi": "1.23",
-        "drupal/jsonapi_extras": "^2.9"
+        "drupal/jsonapi_extras": "2.x-dev",
+        "drupal/jsonapi_defaults": "1.x-dev"
     },
     "require-dev": {},
     "extra": {

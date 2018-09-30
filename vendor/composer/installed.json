@@ -1848,19 +1848,64 @@
         }
     },
     {
+        "name": "drupal/jsonapi_defaults",
+        "version": "dev-1.x",
+        "version_normalized": "dev-1.x",
+        "source": {
+            "type": "git",
+            "url": "https://git.drupal.org/project/jsonapi_defaults",
+            "reference": "10bcb0a0013f2c9cd5d3f85d674b6ba0ca5c2cab"
+        },
+        "require": {
+            "drupal/core": "~8.0",
+            "drupal/jsonapi": "^1.1",
+            "drupal/jsonapi_extras": "1.x-dev || 2.x-dev"
+        },
+        "type": "drupal-module",
+        "extra": {
+            "branch-alias": {
+                "dev-1.x": "1.x-dev"
+            },
+            "drupal": {
+                "version": "8.x-1.x-dev",
+                "datestamp": "1522312380",
+                "security-coverage": {
+                    "status": "not-covered",
+                    "message": "Project has not opted into security advisory coverage!"
+                }
+            },
+            "patches_applied": []
+        },
+        "installation-source": "source",
+        "notification-url": "https://packages.drupal.org/8/downloads",
+        "license": [
+            "GPL-2.0+"
+        ],
+        "authors": [
+            {
+                "name": "Martin Kolar",
+                "homepage": "https://www.drupal.org/u/mkolar"
+            },
+            {
+                "name": "Karel Majzlik",
+                "homepage": "https://www.drupal.org/u/karlos007"
+            }
+        ],
+        "description": "JSON API Defaults",
+        "homepage": "https://www.drupal.org/project/jsonapi_defaults",
+        "support": {
+            "source": "http://git.drupal.org/project/jsonapi_defaults.git",
+            "issues": "https://www.drupal.org/project/issues/jsonapi_defaults"
+        }
+    },
+    {
         "name": "drupal/jsonapi_extras",
-        "version": "2.9.0",
-        "version_normalized": "2.9.0.0",
+        "version": "dev-2.x",
+        "version_normalized": "dev-2.x",
         "source": {
             "type": "git",
             "url": "https://git.drupal.org/project/jsonapi_extras",
-            "reference": "8.x-2.9"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://ftp.drupal.org/files/projects/jsonapi_extras-8.x-2.9.zip",
-            "reference": "8.x-2.9",
-            "shasum": "fa6b89a523ab112282cbd49cf7c5d3ad27bc28f0"
+            "reference": "8cbaa2ba163d726de73b7a494d6351f6c90d581a"
         },
         "require": {
             "drupal/core": "^8.5",
@@ -1873,15 +1918,15 @@
                 "dev-2.x": "2.x-dev"
             },
             "drupal": {
-                "version": "8.x-2.9",
-                "datestamp": "1535790180",
+                "version": "8.x-2.9+2-dev",
+                "datestamp": "1537112280",
                 "security-coverage": {
-                    "status": "covered",
-                    "message": "Covered by Drupal's security advisory policy"
+                    "status": "not-covered",
+                    "message": "Dev releases are not covered by Drupal security advisories."
                 }
             }
         },
-        "installation-source": "dist",
+        "installation-source": "source",
         "notification-url": "https://packages.drupal.org/8/downloads",
         "license": [
             "GPL-2.0+"

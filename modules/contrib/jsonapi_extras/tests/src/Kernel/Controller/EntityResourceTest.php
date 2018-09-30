@@ -6,7 +6,7 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Core\Config\ConfigException;
 use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi\Controller\EntityResource;
-use Drupal\jsonapi\JsonApiResource\JsonApiDocumentTopLevel;
+use Drupal\jsonapi\Resource\JsonApiDocumentTopLevel;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
 use Drupal\user\Entity\Role;
@@ -16,9 +16,12 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * @coversDefaultClass \Drupal\jsonapi\Controller\EntityResource
  * @covers \Drupal\jsonapi_extras\Normalizer\ConfigEntityNormalizer
- * @requires function \Drupal\jsonapi\ResourceType\ResourceType::isMutable
  * @group jsonapi_extras
  * @group legacy
+ *
+ * When upgrading JSON API Extras to work with JSON API 2.x revert to this patch
+ * instead.
+ * @see https://www.drupal.org/project/jsonapi_extras/issues/2995804#comment-12752336
  *
  * @internal
  */
@@ -36,13 +39,6 @@ class EntityResourceTest extends KernelTestBase {
   ];
 
   /**
-   * The EntityResource under test.
-   *
-   * @var \Drupal\jsonapi\Controller\EntityResource
-   */
-  protected $entityResource;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp() {
@@ -54,15 +50,6 @@ class EntityResourceTest extends KernelTestBase {
     Role::create([
       'id' => RoleInterface::ANONYMOUS_ID,
     ])->save();
-
-    $this->entityResource = new EntityResource(
-      $this->container->get('entity_type.manager'),
-      $this->container->get('entity_field.manager'),
-      $this->container->get('jsonapi.link_manager'),
-      $this->container->get('jsonapi.resource_type.repository'),
-      $this->container->get('renderer'),
-      $this->container->get('entity.repository')
-    );
   }
 
   /**
@@ -78,7 +65,15 @@ class EntityResourceTest extends KernelTestBase {
       ->grantPermission('administer content types')
       ->save();
     $resource_type = new ResourceType('node', 'article', NULL);
-    $response = $this->entityResource->createIndividual($resource_type, $node_type, new Request());
+    $entity_resource = new EntityResource(
+      $resource_type,
+      $this->container->get('entity_type.manager'),
+      $this->container->get('entity_field.manager'),
+      $this->container->get('plugin.manager.field.field_type'),
+      $this->container->get('jsonapi.link_manager'),
+      $this->container->get('jsonapi.resource_type.repository')
+    );
+    $response = $entity_resource->createIndividual($node_type, new Request());
     // As a side effect, the node type will also be saved.
     $this->assertNotEmpty($node_type->id());
     $this->assertInstanceOf(JsonApiDocumentTopLevel::class, $response->getResponseData());
@@ -117,7 +112,15 @@ class EntityResourceTest extends KernelTestBase {
     $request = new Request([], [], [], [], [], [], $payload);
 
     $resource_type = new ResourceType('node', 'article', NULL);
-    $response = $this->entityResource->patchIndividual($resource_type, $node_type, $parsed_node_type, $request);
+    $entity_resource = new EntityResource(
+      $resource_type,
+      $this->container->get('entity_type.manager'),
+      $this->container->get('entity_field.manager'),
+      $this->container->get('plugin.manager.field.field_type'),
+      $this->container->get('jsonapi.link_manager'),
+      $this->container->get('jsonapi.resource_type.repository')
+    );
+    $response = $entity_resource->patchIndividual($node_type, $parsed_node_type, $request);
 
     // As a side effect, the node will also be saved.
     $this->assertInstanceOf(JsonApiDocumentTopLevel::class, $response->getResponseData());
@@ -182,7 +185,15 @@ class EntityResourceTest extends KernelTestBase {
       ->grantPermission('administer content types')
       ->save();
     $resource_type = new ResourceType('node', 'article', NULL);
-    $response = $this->entityResource->deleteIndividual($resource_type, $node_type, new Request());
+    $entity_resource = new EntityResource(
+      $resource_type,
+      $this->container->get('entity_type.manager'),
+      $this->container->get('entity_field.manager'),
+      $this->container->get('plugin.manager.field.field_type'),
+      $this->container->get('jsonapi.link_manager'),
+      $this->container->get('jsonapi.resource_type.repository')
+    );
+    $response = $entity_resource->deleteIndividual($node_type, new Request());
     // As a side effect, the node will also be deleted.
     $count = $this->container->get('entity_type.manager')
       ->getStorage('node_type')
