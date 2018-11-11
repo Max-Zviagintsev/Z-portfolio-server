@@ -21,12 +21,15 @@ interface ResourceTypeRepositoryInterface {
    * Gets a specific JSON API resource type based on entity type ID and bundle.
    *
    * @param string $entity_type_id
-   *   The entity type id.
+   *   The entity type ID.
    * @param string $bundle
-   *   The id for the bundle to find.
+   *   The ID for the bundle to find. If the entity type does not have a bundle,
+   *   then the entity type ID again.
    *
    * @return \Drupal\jsonapi\ResourceType\ResourceType
    *   The requested JSON API resource type, if it exists. NULL otherwise.
+   *
+   * @see \Drupal\Core\Entity\EntityInterface::bundle()
    */
   public function get($entity_type_id, $bundle);
 

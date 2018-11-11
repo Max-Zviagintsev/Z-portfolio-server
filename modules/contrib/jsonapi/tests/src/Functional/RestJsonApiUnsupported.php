@@ -74,12 +74,14 @@ class RestJsonApiUnsupported extends ResourceTestBase {
     $node = Node::create(['type' => 'camelids']);
     $node->setTitle('Llama')
       ->setOwnerId(0)
-      ->setPublished(TRUE)
+      ->setPublished()
       ->save();
   }
 
   /**
-   * Deploying a REST resource using api_json format results in 406 responses.
+   * Deploying a REST resource using api_json format results in 400 responses.
+   *
+   * @see \Drupal\jsonapi\EventSubscriber\JsonApiRequestValidator::validateQueryParams()
    */
   public function testApiJsonNotSupportedInRest() {
     $this->assertSame(['json', 'xml'], $this->container->getParameter('serializer.formats'));
@@ -92,7 +94,15 @@ class RestJsonApiUnsupported extends ResourceTestBase {
     $request_options = [];
 
     $response = $this->request('GET', $url, $request_options);
-    $this->assertResourceErrorResponse(406, FALSE, $response);
+    $this->assertResourceErrorResponse(
+      400,
+      FALSE,
+      $response,
+      ['4xx-response', 'config:user.role.anonymous', 'http_response', 'node:1'],
+      ['url.query_args:_format', 'user.permissions'],
+      'MISS',
+      'MISS'
+    );
   }
 
   /**

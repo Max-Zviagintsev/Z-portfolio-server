@@ -26,6 +26,18 @@ final class Serializer extends SymfonySerializer {
   protected $fallbackNormalizer;
 
   /**
+   * {@inheritdoc}
+   */
+  public function __construct(array $normalizers = [], array $encoders = []) {
+    foreach ($normalizers as $normalizer) {
+      if (strpos(get_class($normalizer), 'Drupal\jsonapi\Normalizer') !== 0) {
+        throw new \LogicException('JSON API does not allow adding more normalizers!');
+      }
+    }
+    parent::__construct($normalizers, $encoders);
+  }
+
+  /**
    * Adds a secondary normalizer.
    *
    * This normalizer will be attempted when JSON API has no applicable
@@ -42,10 +54,10 @@ final class Serializer extends SymfonySerializer {
    * {@inheritdoc}
    */
   public function normalize($data, $format = NULL, array $context = []) {
-    if ($this->selfSupportsNormalization($data, $format)) {
+    if ($this->selfSupportsNormalization($data, $format, $context)) {
       return parent::normalize($data, $format, $context);
     }
-    if ($this->fallbackNormalizer->supportsNormalization($data, $format)) {
+    if ($this->fallbackNormalizer->supportsNormalization($data, $format, $context)) {
       return $this->fallbackNormalizer->normalize($data, $format, $context);
     }
     return parent::normalize($data, $format, $context);
@@ -55,7 +67,7 @@ final class Serializer extends SymfonySerializer {
    * {@inheritdoc}
    */
   public function denormalize($data, $type, $format = NULL, array $context = []) {
-    if ($this->selfSupportsDenormalization($data, $type, $format)) {
+    if ($this->selfSupportsDenormalization($data, $type, $format, $context)) {
       return parent::denormalize($data, $type, $format, $context);
     }
     return $this->fallbackNormalizer->denormalize($data, $type, $format, $context);
@@ -64,8 +76,8 @@ final class Serializer extends SymfonySerializer {
   /**
    * {@inheritdoc}
    */
-  public function supportsNormalization($data, $format = NULL) {
-    return $this->selfSupportsNormalization($data, $format) || $this->fallbackNormalizer->supportsNormalization($data, $format);
+  public function supportsNormalization($data, $format = NULL, array $context = []) {
+    return $this->selfSupportsNormalization($data, $format, $context) || $this->fallbackNormalizer->supportsNormalization($data, $format, $context);
   }
 
   /**
@@ -75,19 +87,21 @@ final class Serializer extends SymfonySerializer {
    *   Data to normalize.
    * @param string $format
    *   The format being (de-)serialized from or into.
+   * @param array $context
+   *   (optional) Options available to the normalizer.
    *
    * @return bool
    *   Whether this class supports normalization for the given data.
    */
-  private function selfSupportsNormalization($data, $format = NULL) {
-    return parent::supportsNormalization($data, $format);
+  private function selfSupportsNormalization($data, $format = NULL, array $context = []) {
+    return parent::supportsNormalization($data, $format, $context);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function supportsDenormalization($data, $type, $format = NULL) {
-    return $this->selfSupportsDenormalization($data, $type, $format) || $this->fallbackNormalizer->supportsDenormalization($data, $type, $format);
+  public function supportsDenormalization($data, $type, $format = NULL, array $context = []) {
+    return $this->selfSupportsDenormalization($data, $type, $format, $context) || $this->fallbackNormalizer->supportsDenormalization($data, $type, $format, $context);
   }
 
   /**
@@ -99,12 +113,14 @@ final class Serializer extends SymfonySerializer {
    *   The class to which the data should be denormalized.
    * @param string $format
    *   The format being deserialized from.
+   * @param array $context
+   *   (optional) Options available to the denormalizer.
    *
    * @return bool
    *   Whether this class supports normalization for the given data and type.
    */
-  private function selfSupportsDenormalization($data, $type, $format = NULL) {
-    return parent::supportsDenormalization($data, $type, $format);
+  private function selfSupportsDenormalization($data, $type, $format = NULL, array $context = []) {
+    return parent::supportsDenormalization($data, $type, $format, $context);
   }
 
 }

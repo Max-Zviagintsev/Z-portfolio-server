@@ -3,6 +3,9 @@
 namespace Drupal\Tests\jsonapi\Kernel\Query;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\jsonapi\Normalizer\EntityConditionGroupNormalizer;
+use Drupal\jsonapi\Normalizer\EntityConditionNormalizer;
+use Drupal\jsonapi\Normalizer\FilterNormalizer;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\jsonapi\Kernel\JsonapiKernelTestBase;
@@ -64,7 +67,11 @@ class FilterTest extends JsonapiKernelTestBase {
       ['colors' => ['orange'], 'shapes' => ['square'], 'title' => 'DONT_FIND'],
     ]);
 
-    $this->normalizer = $this->container->get('serializer.normalizer.filter.jsonapi');
+    $this->normalizer = new FilterNormalizer(
+      $this->container->get('jsonapi.field_resolver'),
+      new EntityConditionNormalizer(),
+      new EntityConditionGroupNormalizer()
+    );
     $this->nodeStorage = $this->container->get('entity_type.manager')->getStorage('node');
   }
 

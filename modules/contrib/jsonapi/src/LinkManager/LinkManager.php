@@ -2,13 +2,13 @@
 
 namespace Drupal\jsonapi\LinkManager;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Url;
 use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi\Query\OffsetPage;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
+use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
 
 /**
  * Class to generate links and queries for entities.
@@ -29,12 +29,10 @@ class LinkManager {
   /**
    * Instantiates a LinkManager object.
    *
-   * @param \Symfony\Component\Routing\Matcher\RequestMatcherInterface|null $_router
-   *   Unused. Kept for backwards compatibility.
    * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
    *   The Url generator.
    */
-  public function __construct(RequestMatcherInterface $_router = NULL, UrlGeneratorInterface $url_generator) {
+  public function __construct(UrlGeneratorInterface $url_generator) {
     $this->urlGenerator = $url_generator;
   }
 
@@ -60,7 +58,7 @@ class LinkManager {
     }
 
     $route_parameters += [
-      $resource_type->getEntityTypeId() => $entity_id,
+      'entity' => $entity_id,
     ];
     $route_key = sprintf('jsonapi.%s.%s', $resource_type->getTypeName(), $key);
     return $this->urlGenerator->generateFromRoute($route_key, $route_parameters, ['absolute' => TRUE], TRUE)->getGeneratedUrl();
@@ -119,22 +117,23 @@ class LinkManager {
       $size = OffsetPage::SIZE_MAX;
     }
     if ($size <= 0) {
-      throw new BadRequestHttpException(sprintf('The page size needs to be a positive integer.'));
+      $cacheability = (new CacheableMetadata())->addCacheContexts(['url.query_args:page']);
+      throw new CacheableBadRequestHttpException($cacheability, sprintf('The page size needs to be a positive integer.'));
     }
     $query = (array) $request->query->getIterator();
     $links = [];
     // Check if this is not the last page.
     if ($link_context['has_next_page']) {
-      $links['next'] = $this->getRequestLink($request, $this->getPagerQueries('next', $offset, $size, $query));
+      $links['next']['href'] = $this->getRequestLink($request, $this->getPagerQueries('next', $offset, $size, $query));
 
       if (!empty($total)) {
-        $links['last'] = $this->getRequestLink($request, $this->getPagerQueries('last', $offset, $size, $query, $total));
+        $links['last']['href'] = $this->getRequestLink($request, $this->getPagerQueries('last', $offset, $size, $query, $total));
       }
     }
     // Check if this is not the first page.
     if ($offset > 0) {
-      $links['first'] = $this->getRequestLink($request, $this->getPagerQueries('first', $offset, $size, $query));
-      $links['prev'] = $this->getRequestLink($request, $this->getPagerQueries('prev', $offset, $size, $query));
+      $links['first']['href'] = $this->getRequestLink($request, $this->getPagerQueries('first', $offset, $size, $query));
+      $links['prev']['href'] = $this->getRequestLink($request, $this->getPagerQueries('prev', $offset, $size, $query));
     }
 
     return $links;

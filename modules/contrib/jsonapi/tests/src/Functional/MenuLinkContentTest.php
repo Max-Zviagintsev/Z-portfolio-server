@@ -4,7 +4,6 @@ namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Core\Url;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
-use Drupal\Tests\rest\Functional\BcTimestampNormalizerUnixTestTrait;
 
 /**
  * JSON API integration test for the "MenuLinkContent" content entity type.
@@ -12,8 +11,6 @@ use Drupal\Tests\rest\Functional\BcTimestampNormalizerUnixTestTrait;
  * @group jsonapi
  */
 class MenuLinkContentTest extends ResourceTestBase {
-
-  use BcTimestampNormalizerUnixTestTrait;
 
   /**
    * {@inheritdoc}
@@ -77,31 +74,28 @@ class MenuLinkContentTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => 'http://jsonapi.org/format/1.0/',
+            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
           ],
         ],
         'version' => '1.0',
       ],
       'links' => [
-        'self' => $self_url,
+        'self' => ['href' => $self_url],
       ],
       'data' => [
         'id' => $this->entity->uuid(),
         'type' => 'menu_link_content--menu_link_content',
         'links' => [
-          'self' => $self_url,
+          'self' => ['href' => $self_url],
         ],
         'attributes' => [
           'bundle' => 'menu_link_content',
-          'id' => 1,
           'link' => [
             'uri' => 'https://nl.wikipedia.org/wiki/Llama',
             'title' => NULL,
             'options' => [],
           ],
-          'changed' => $this->entity->getChangedTime(),
-          // @todo uncomment this in https://www.drupal.org/project/jsonapi/issues/2929932
-          /* 'changed' => $this->formatExpectedTimestampItemValues($this->entity->getChangedTime()), */
+          'changed' => (new \DateTime())->setTimestamp($this->entity->getChangedTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
           'default_langcode' => TRUE,
           'description' => 'Llama Gabilondo',
           'enabled' => TRUE,
@@ -112,8 +106,8 @@ class MenuLinkContentTest extends ResourceTestBase {
           'parent' => NULL,
           'rediscover' => FALSE,
           'title' => 'Llama Gabilondo',
-          'uuid' => $this->entity->uuid(),
           'weight' => 0,
+          'drupal_internal__id' => 1,
         ],
       ],
     ];

@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\file\Entity\File;
 use Drupal\jsonapi\LinkManager\LinkManager;
+use Drupal\jsonapi_extras\ResourceType\ConfigurableResourceTypeRepository;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\taxonomy\Entity\Term;
@@ -253,7 +254,9 @@ class EntityToJsonApiTest extends JsonapiKernelTestBase {
     static::assertNotEmpty($structured['data']['type']);
     static::assertNotEmpty($structured['data']['id']);
     static::assertNotEmpty($structured['data']['attributes']);
-    static::assertInternalType('string', $structured['links']['self']);
+    if (!ConfigurableResourceTypeRepository::isJsonApi2x()) {
+      static::assertInternalType('string', $structured['links']['self']);
+    }
   }
 
   /**

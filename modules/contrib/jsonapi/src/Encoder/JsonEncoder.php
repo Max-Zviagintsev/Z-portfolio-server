@@ -31,12 +31,6 @@ class JsonEncoder extends SerializationJsonEncoder {
     if ($data instanceof ValueExtractorInterface) {
       $data = $data->rasterizeValue();
     }
-    // Allows wrapping the encoded output. This is so we can use the same
-    // encoder and normalizers when serializing HttpExceptions to match the
-    // JSON API specification.
-    if (!empty($context['data_wrapper'])) {
-      $data = [$context['data_wrapper'] => $data];
-    }
     return parent::encode($data, $format, $context);
   }
 

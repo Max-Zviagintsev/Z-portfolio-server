@@ -83,19 +83,19 @@ class ImageStyleTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => 'http://jsonapi.org/format/1.0/',
+            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
           ],
         ],
         'version' => '1.0',
       ],
       'links' => [
-        'self' => $self_url,
+        'self' => ['href' => $self_url],
       ],
       'data' => [
         'id' => $this->entity->uuid(),
         'type' => 'image_style--image_style',
         'links' => [
-          'self' => $self_url,
+          'self' => ['href' => $self_url],
         ],
         'attributes' => [
           'dependencies' => [],
@@ -113,9 +113,8 @@ class ImageStyleTest extends ResourceTestBase {
           ],
           'label' => 'Camelids',
           'langcode' => 'en',
-          'name' => 'camelids',
           'status' => TRUE,
-          'uuid' => $this->entity->uuid(),
+          'drupal_internal__name' => 'camelids',
         ],
       ],
     ];

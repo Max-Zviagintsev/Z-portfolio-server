@@ -4,16 +4,15 @@ namespace Drupal\Tests\jsonapi\Unit\LinkManager;
 
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Utility\UnroutedUrlAssemblerInterface;
 use Drupal\jsonapi\LinkManager\LinkManager;
 use Drupal\jsonapi\Query\OffsetPage;
 use Drupal\Tests\UnitTestCase;
 use Prophecy\Argument;
-use Symfony\Cmf\Component\Routing\ChainRouterInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * @coversDefaultClass \Drupal\jsonapi\LinkManager\LinkManager
@@ -35,10 +34,9 @@ class LinkManagerTest extends UnitTestCase {
    */
   protected function setUp() {
     parent::setUp();
-    $router = $this->prophesize(ChainRouterInterface::class);
     $url_generator = $this->prophesize(UrlGeneratorInterface::class);
     $url_generator->generateFromRoute(Argument::cetera())->willReturnArgument(2);
-    $this->linkManager = new LinkManager($router->reveal(), $url_generator->reveal());
+    $this->linkManager = new LinkManager($url_generator->reveal());
   }
 
   /**
@@ -52,14 +50,22 @@ class LinkManagerTest extends UnitTestCase {
         return $args[0] . '?' . UrlHelper::buildQuery($args[1]['query']);
       });
 
+    $cache_contexts_manager = $this->getMockBuilder('Drupal\Core\Cache\Context\CacheContextsManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $cache_contexts_manager->method('assertValidTokens')->willReturn(TRUE);
+
     $container = new ContainerBuilder();
+    $container->set('cache_contexts_manager', $cache_contexts_manager);
     $container->set('unrouted_url_assembler', $assembler->reveal());
     \Drupal::setContainer($container);
 
     // Add the extra stuff to the expected query.
     $pages = array_filter($pages);
     $pages = array_map(function ($page) {
-      return 'https://example.com/drupal/jsonapi/node/article/07c870e9-491b-4173-8e2b-4e059400af72?amet=pax&page%5Boffset%5D=' . $page['offset'] . '&page%5Blimit%5D=' . $page['limit'];
+      return [
+        'href' => 'https://example.com/drupal/jsonapi/node/article/07c870e9-491b-4173-8e2b-4e059400af72?amet=pax&page%5Boffset%5D=' . $page['offset'] . '&page%5Blimit%5D=' . $page['limit'],
+      ];
     }, $pages);
 
     $request = $this->prophesize(Request::class);
@@ -156,7 +162,7 @@ class LinkManagerTest extends UnitTestCase {
    * @dataProvider getPagerLinksErrorProvider
    */
   public function testGetPagerLinksError($offset, $size, $has_next_page, $total, $include_count, array $pages) {
-    $this->setExpectedException(BadRequestHttpException::class);
+    $this->setExpectedException(CacheableBadRequestHttpException::class);
     $this->testGetPagerLinks($offset, $size, $has_next_page, $total, $include_count, $pages);
   }
 

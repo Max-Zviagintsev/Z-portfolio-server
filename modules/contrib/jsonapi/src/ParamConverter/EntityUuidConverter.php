@@ -24,7 +24,9 @@ class EntityUuidConverter extends EntityConverter {
    */
   public function convert($value, $definition, $name, array $defaults) {
     $entity_type_id = $this->getEntityTypeFromDefaults($definition, $name, $defaults);
-    if ($storage = $this->entityManager->getStorage($entity_type_id)) {
+    // @see https://www.drupal.org/project/drupal/issues/2624770
+    $entity_type_manager = isset($this->entityTypeManager) ? $this->entityTypeManager : $this->entityManager;
+    if ($storage = $entity_type_manager->getStorage($entity_type_id)) {
       if (!$entities = $storage->loadByProperties(['uuid' => $value])) {
         return NULL;
       }
@@ -32,7 +34,9 @@ class EntityUuidConverter extends EntityConverter {
       // If the entity type is translatable, ensure we return the proper
       // translation object for the current context.
       if ($entity instanceof EntityInterface && $entity instanceof TranslatableInterface) {
-        $entity = $this->entityManager->getTranslationFromContext($entity, NULL, ['operation' => 'entity_upcast']);
+        // @see https://www.drupal.org/project/drupal/issues/2624770
+        $entity_repository = isset($this->entityRepository) ? $this->entityRepository : $this->entityManager;
+        $entity = $entity_repository->getTranslationFromContext($entity, NULL, ['operation' => 'entity_upcast']);
       }
       return $entity;
     }

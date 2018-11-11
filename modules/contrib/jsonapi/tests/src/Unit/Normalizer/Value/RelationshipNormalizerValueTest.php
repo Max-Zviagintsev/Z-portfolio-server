@@ -76,13 +76,11 @@ class RelationshipNormalizerValueTest extends UnitTestCase {
     $uid_raw = 1;
     $uid1 = $this->prophesize(RelationshipItemNormalizerValue::class);
     $uid1->rasterizeValue()->willReturn(['type' => 'user', 'id' => $uid_raw++]);
-    $uid1->getInclude()->willReturn(NULL);
     $uid1->getCacheContexts()->willReturn(['ccfoo']);
     $uid1->getCacheTags()->willReturn(['ctfoo']);
     $uid1->getCacheMaxAge()->willReturn(15);
     $uid2 = $this->prophesize(RelationshipItemNormalizerValue::class);
     $uid2->rasterizeValue()->willReturn(['type' => 'user', 'id' => $uid_raw]);
-    $uid2->getInclude()->willReturn(NULL);
     $uid2->getCacheContexts()->willReturn(['ccbar']);
     $uid2->getCacheTags()->willReturn(['ctbar']);
     $uid2->getCacheMaxAge()->willReturn(10);
@@ -93,7 +91,6 @@ class RelationshipNormalizerValueTest extends UnitTestCase {
       'id' => $img_id,
       'meta' => ['alt' => 'Cute llama', 'title' => 'My spirit animal'],
     ]);
-    $img1->getInclude()->willReturn(NULL);
     $img1->getCacheContexts()->willReturn(['ccimg1']);
     $img1->getCacheTags()->willReturn(['ctimg1']);
     $img1->getCacheMaxAge()->willReturn(100);
@@ -103,14 +100,13 @@ class RelationshipNormalizerValueTest extends UnitTestCase {
       'id' => $img_id,
       'meta' => ['alt' => 'Adorable llama', 'title' => 'My spirit animal 😍'],
     ]);
-    $img2->getInclude()->willReturn(NULL);
     $img2->getCacheContexts()->willReturn(['ccimg2']);
     $img2->getCacheTags()->willReturn(['ctimg2']);
     $img2->getCacheMaxAge()->willReturn(50);
 
     $links = [
-      'self' => 'dummy_entity_link',
-      'related' => 'dummy_entity_link',
+      'self' => ['href' => 'dummy_entity_link'],
+      'related' => ['href' => 'dummy_entity_link'],
     ];
     return [
       'single cardinality' => [[$uid1->reveal()], 1, [

@@ -74,19 +74,19 @@ class EntityViewDisplayTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => 'http://jsonapi.org/format/1.0/',
+            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
           ],
         ],
         'version' => '1.0',
       ],
       'links' => [
-        'self' => $self_url,
+        'self' => ['href' => $self_url],
       ],
       'data' => [
         'id' => $this->entity->uuid(),
         'type' => 'entity_view_display--entity_view_display',
         'links' => [
-          'self' => $self_url,
+          'self' => ['href' => $self_url],
         ],
         'attributes' => [
           'bundle' => 'camelids',
@@ -105,12 +105,11 @@ class EntityViewDisplayTest extends ResourceTestBase {
             ],
           ],
           'hidden' => [],
-          'id' => 'node.camelids.default',
           'langcode' => 'en',
           'mode' => 'default',
           'status' => TRUE,
           'targetEntityType' => 'node',
-          'uuid' => $this->entity->uuid(),
+          'drupal_internal__id' => 'node.camelids.default',
         ],
       ],
     ];
@@ -133,30 +132,6 @@ class EntityViewDisplayTest extends ResourceTestBase {
    */
   protected function getExpectedUnauthorizedAccessMessage($method) {
     return "The 'administer node display' permission is required.";
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testGetIndividual() {
-    // @todo Remove when JSON API requires Drupal 8.5 or newer.
-    // @see https://www.drupal.org/project/drupal/issues/2866666
-    if (floatval(\Drupal::VERSION) < 8.5) {
-      $this->markTestSkipped('EntityViewisplay entities had a dysfunctional access control handler until 8.5, this is necessary for this test coverage to work.');
-    }
-    return parent::testGetIndividual();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testCollection() {
-    // @todo Remove when JSON API requires Drupal 8.5 or newer.
-    // @see https://www.drupal.org/project/drupal/issues/2866666
-    if (floatval(\Drupal::VERSION) < 8.5) {
-      $this->markTestSkipped('EntityViewisplay entities had a dysfunctional access control handler until 8.5, this is necessary for this test coverage to work.');
-    }
-    return parent::testCollection();
   }
 
   /**

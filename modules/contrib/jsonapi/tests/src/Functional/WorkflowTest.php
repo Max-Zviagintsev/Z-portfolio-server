@@ -71,19 +71,19 @@ class WorkflowTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => 'http://jsonapi.org/format/1.0/',
+            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
           ],
         ],
         'version' => '1.0',
       ],
       'links' => [
-        'self' => $self_url,
+        'self' => ['href' => $self_url],
       ],
       'data' => [
         'id' => $this->entity->uuid(),
         'type' => 'workflow--workflow',
         'links' => [
-          'self' => $self_url,
+          'self' => ['href' => $self_url],
         ],
         'attributes' => [
           'dependencies' => [
@@ -91,11 +91,10 @@ class WorkflowTest extends ResourceTestBase {
               'workflow_type_test',
             ],
           ],
-          'id' => 'rest_workflow',
           'label' => 'REST Worklow',
           'langcode' => 'en',
           'status' => TRUE,
-          'type' => 'workflow_type_complex_test',
+          'workflow_type' => 'workflow_type_complex_test',
           'type_settings' => [
             'states' => [
               'draft' => [
@@ -111,7 +110,7 @@ class WorkflowTest extends ResourceTestBase {
             'transitions' => [],
             'example_setting' => 'foo',
           ],
-          'uuid' => $this->entity->uuid(),
+          'drupal_internal__id' => 'rest_workflow',
         ],
       ],
     ];

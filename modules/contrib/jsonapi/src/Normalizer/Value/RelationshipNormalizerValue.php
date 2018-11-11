@@ -107,7 +107,7 @@ class RelationshipNormalizerValue extends FieldNormalizerValue {
    * @see https://github.com/json-api/json-api/pull/1156#issuecomment-325377995
    * @see https://www.drupal.org/project/jsonapi/issues/2864680
    */
-  protected static function ensureUniqueResourceIdentifierObjects(array $resource_identifier_objects) {
+  public static function ensureUniqueResourceIdentifierObjects(array $resource_identifier_objects) {
     if (count($resource_identifier_objects) <= 1) {
       return $resource_identifier_objects;
     }
@@ -149,22 +149,23 @@ class RelationshipNormalizerValue extends FieldNormalizerValue {
    *   An array of links to be rasterized.
    */
   protected function getLinks($field_name) {
+    $relationship_field_name = $this->resourceType->getPublicName($field_name);
     $route_parameters = [
-      'related' => $this->resourceType->getPublicName($field_name),
+      'related' => $relationship_field_name,
     ];
-    $links['self'] = $this->linkManager->getEntityLink(
+    $links['self']['href'] = $this->linkManager->getEntityLink(
       $this->hostEntityId,
       $this->resourceType,
       $route_parameters,
-      'relationship'
+      "$relationship_field_name.relationship.get"
     );
     $resource_types = $this->resourceType->getRelatableResourceTypesByField($field_name);
     if (static::hasNonInternalResourceType($resource_types)) {
-      $links['related'] = $this->linkManager->getEntityLink(
+      $links['related']['href'] = $this->linkManager->getEntityLink(
         $this->hostEntityId,
         $this->resourceType,
         $route_parameters,
-        'related'
+        "$relationship_field_name.related"
       );
     }
     return $links;

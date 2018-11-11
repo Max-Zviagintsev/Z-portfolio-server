@@ -121,44 +121,37 @@ class FileTest extends ResourceTestBase {
    */
   protected function getExpectedDocument() {
     $self_url = Url::fromUri('base:/jsonapi/file/file/' . $this->entity->uuid())->setAbsolute()->toString(TRUE)->getGeneratedUrl();
-    $normalization = [
+    return [
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => 'http://jsonapi.org/format/1.0/',
+            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
           ],
         ],
         'version' => '1.0',
       ],
       'links' => [
-        'self' => $self_url,
+        'self' => ['href' => $self_url],
       ],
       'data' => [
         'id' => $this->entity->uuid(),
         'type' => 'file--file',
         'links' => [
-          'self' => $self_url,
+          'self' => ['href' => $self_url],
         ],
         'attributes' => [
-          'changed' => $this->entity->getChangedTime(),
-          // @todo uncomment this in https://www.drupal.org/project/jsonapi/issues/2929932
-          /* 'changed' => $this->formatExpectedTimestampItemValues($this->entity->getChangedTime()), */
-          'created' => (int) $this->entity->getCreatedTime(),
-          // @todo uncomment this in https://www.drupal.org/project/jsonapi/issues/2929932
-          /* 'created' => $this->formatExpectedTimestampItemValues((int) $this->entity->getCreatedTime()), */
-          'fid' => 1,
+          'created' => (new \DateTime())->setTimestamp($this->entity->getCreatedTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
+          'changed' => (new \DateTime())->setTimestamp($this->entity->getChangedTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
           'filemime' => 'text/plain',
           'filename' => 'drupal.txt',
           'filesize' => (int) $this->entity->getSize(),
           'langcode' => 'en',
           'status' => TRUE,
-          // @todo Decide what to do with this in https://www.drupal.org/project/jsonapi/issues/2926463
-          'url' => base_path() . $this->siteDirectory . '/files/drupal.txt',
           'uri' => [
             'url' => base_path() . $this->siteDirectory . '/files/drupal.txt',
             'value' => 'public://drupal.txt',
           ],
-          'uuid' => $this->entity->uuid(),
+          'drupal_internal__fid' => 1,
         ],
         'relationships' => [
           'uid' => [
@@ -167,19 +160,13 @@ class FileTest extends ResourceTestBase {
               'type' => 'user--user',
             ],
             'links' => [
-              'related' => $self_url . '/uid',
-              'self' => $self_url . '/relationships/uid',
+              'related' => ['href' => $self_url . '/uid'],
+              'self' => ['href' => $self_url . '/relationships/uid'],
             ],
           ],
         ],
       ],
     ];
-    // @todo Remove this modification when JSON API requires Drupal 8.5 or newer, and do an early return above instead.
-    if (floatval(\Drupal::VERSION) < 8.5) {
-      $normalization['data']['attributes']['uri'] = $normalization['data']['attributes']['uri']['url'];
-    }
-    return $normalization;
-
   }
 
   /**
@@ -216,18 +203,6 @@ class FileTest extends ResourceTestBase {
       return "Only the file owner can update or delete the file entity.";
     }
     return parent::getExpectedUnauthorizedAccessMessage($method);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testGetIndividual() {
-    // @todo Remove when JSON API requires Drupal 8.5 or newer.
-    // @see https://www.drupal.org/project/drupal/issues/2866666
-    if (floatval(\Drupal::VERSION) < 8.5) {
-      $this->markTestSkipped('File entities had a dysfunctional access control handler until 8.5, this is necessary for this test coverage to work.');
-    }
-    return parent::testGetIndividual();
   }
 
 }

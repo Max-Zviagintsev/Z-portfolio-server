@@ -2,10 +2,11 @@
 
 namespace Drupal\jsonapi\Normalizer;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\jsonapi\Query\Sort;
 use Drupal\jsonapi\Context\FieldResolver;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
 
 /**
  * The normalizer used for JSON API sorts.
@@ -63,7 +64,8 @@ class SortNormalizer implements DenormalizerInterface {
    */
   protected function expand($sort) {
     if (empty($sort)) {
-      throw new BadRequestHttpException('You need to provide a value for the sort parameter.');
+      $cacheability = (new CacheableMetadata())->addCacheContexts(['url.query_args:sort']);
+      throw new CacheableBadRequestHttpException($cacheability, 'You need to provide a value for the sort parameter.');
     }
 
     // Expand a JSON API compliant sort into a more expressive sort parameter.
@@ -118,13 +120,14 @@ class SortNormalizer implements DenormalizerInterface {
    *   The expanded sort item.
    */
   protected function expandItem($sort_index, array $sort_item) {
+    $cacheability = (new CacheableMetadata())->addCacheContexts(['url.query_args:sort']);
     $defaults = [
       Sort::DIRECTION_KEY => 'ASC',
       Sort::LANGUAGE_KEY => NULL,
     ];
 
     if (!isset($sort_item[Sort::PATH_KEY])) {
-      throw new BadRequestHttpException('You need to provide a field name for the sort parameter.');
+      throw new CacheableBadRequestHttpException($cacheability, 'You need to provide a field name for the sort parameter.');
     }
 
     $expected_keys = [
@@ -137,7 +140,7 @@ class SortNormalizer implements DenormalizerInterface {
 
     // Verify correct sort keys.
     if (count(array_diff($expected_keys, array_keys($expanded))) > 0) {
-      throw new BadRequestHttpException('You have provided an invalid set of sort keys.');
+      throw new CacheableBadRequestHttpException($cacheability, 'You have provided an invalid set of sort keys.');
     }
 
     return $expanded;

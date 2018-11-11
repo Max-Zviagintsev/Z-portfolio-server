@@ -25,9 +25,11 @@ use Drupal\Core\TypedData\TypedDataInternalPropertiesHelper;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\jsonapi\JsonApiResource\NullEntityCollection;
 use Drupal\jsonapi\Normalizer\HttpExceptionNormalizer;
-use Drupal\jsonapi\Resource\JsonApiDocumentTopLevel;
+use Drupal\jsonapi\JsonApiResource\JsonApiDocumentTopLevel;
 use Drupal\jsonapi\ResourceResponse;
+use Drupal\jsonapi\Serializer\Serializer;
 use Drupal\path\Plugin\Field\FieldType\PathItem;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\Role;
@@ -36,7 +38,6 @@ use Drupal\user\RoleInterface;
 use Drupal\user\UserInterface;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -70,6 +71,15 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @var string
    */
   protected static $resourceTypeName = NULL;
+
+  /**
+   * The JSON API resource type for the tested entity type plus bundle.
+   *
+   * Necessary for looking up public (alias) or internal (actual) field names.
+   *
+   * @var \Drupal\jsonapi\ResourceType\ResourceType
+   */
+  protected $resourceType;
 
   /**
    * The fields that are protected against modification during PATCH requests.
@@ -121,6 +131,25 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @see ::getInvalidNormalizedEntityToCreate()
    */
   protected static $labelFieldName = NULL;
+
+  /**
+   * Whether anonymous users can view labels of this resource type.
+   *
+   * @var bool
+   */
+  protected static $anonymousUsersCanViewLabels = FALSE;
+
+  /**
+   * The standard `jsonapi` top-level document member.
+   *
+   * @var array
+   */
+  protected static $jsonApiMember = [
+    'version' => '1.0',
+    'meta' => [
+      'links' => ['self' => ['href' => 'http://jsonapi.org/format/1.0/']],
+    ],
+  ];
 
   /**
    * The entity being tested.
@@ -182,14 +211,16 @@ abstract class ResourceTestBase extends BrowserTestBase {
     assert([] === $user_role->getPermissions(), 'The authenticated user role has no permissions at all.');
 
     // Create an account, which tests will use. Also ensure the @current_user
-    // service uses this account, to ensure the @jsonapi.entity.to_jsonapi
-    // service that we use to generate expectations matching that of this user.
+    // service this account, to ensure certain access check logic in tests works
+    // as expected.
     $this->account = $this->createUser();
     $this->container->get('current_user')->setAccount($this->account);
 
     // Create an entity.
     $this->entityStorage = $this->container->get('entity_type.manager')->getStorage(static::$entityTypeId);
     $this->entity = $this->setUpFields($this->createEntity(), $this->account);
+
+    $this->resourceType = $this->container->get('jsonapi.resource_type.repository')->getByTypeName(static::$resourceTypeName);
   }
 
   /**
@@ -251,28 +282,24 @@ abstract class ResourceTestBase extends BrowserTestBase {
       ])
       ->save();
 
-    // @todo Do this unconditionally when JSON API requires Drupal 8.5 or newer.
-    if (floatval(\Drupal::VERSION) >= 8.5) {
-      // Add multi-value field.
-      FieldStorageConfig::create([
-        'entity_type' => static::$entityTypeId,
-        'field_name' => 'field_rest_test_multivalue',
-        'type' => 'string',
-      ])
-        ->setCardinality(3)
-        ->save();
-      FieldConfig::create([
-        'entity_type' => static::$entityTypeId,
-        'field_name' => 'field_rest_test_multivalue',
-        'bundle' => $entity_bundle,
-      ])
-        ->setLabel('Test field: multi-value')
-        ->setTranslatable(FALSE)
-        ->save();
-    }
+    // Add multi-value field.
+    FieldStorageConfig::create([
+      'entity_type' => static::$entityTypeId,
+      'field_name' => 'field_rest_test_multivalue',
+      'type' => 'string',
+    ])
+      ->setCardinality(3)
+      ->save();
+    FieldConfig::create([
+      'entity_type' => static::$entityTypeId,
+      'field_name' => 'field_rest_test_multivalue',
+      'bundle' => $entity_bundle,
+    ])
+      ->setLabel('Test field: multi-value')
+      ->setTranslatable(FALSE)
+      ->save();
 
-    \Drupal::service('jsonapi.resource_type.repository')->clearCachedDefinitions();
-    \Drupal::service('router.builder')->rebuild();
+    \Drupal::service('router.builder')->rebuildIfNeeded();
 
     // Reload entity so that it has the new field.
     $reloaded_entity = $this->entityStorage->loadUnchanged($entity->id());
@@ -283,10 +310,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       // Set a default value on the fields.
       $entity->set('field_rest_test', ['value' => 'All the faith he had had had had no effect on the outcome of his life.']);
       $entity->set('field_jsonapi_test_entity_ref', ['user' => $account->id()]);
-      // @todo Do this unconditionally when JSON API requires Drupal 8.5 or newer.
-      if (floatval(\Drupal::VERSION) >= 8.5) {
-        $entity->set('field_rest_test_multivalue', [['value' => 'One'], ['value' => 'Two']]);
-      }
+      $entity->set('field_rest_test_multivalue', [['value' => 'One'], ['value' => 'Two']]);
       $entity->save();
     }
 
@@ -321,11 +345,14 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   The JSON API normalization for the given entity.
    */
   protected function normalize(EntityInterface $entity, Url $url) {
-    return $this->serializer->normalize(new JsonApiDocumentTopLevel($entity), 'api_json', [
+    $doc = new JsonApiDocumentTopLevel($entity, new NullEntityCollection(), [
+      'self' => [
+        'href' => $url->toString(TRUE)->getGeneratedUrl(),
+      ],
+    ]);
+    return $this->serializer->normalize($doc, 'api_json', [
       'resource_type' => $this->container->get('jsonapi.resource_type.repository')->getByTypeName(static::$resourceTypeName),
-      // Pass a Request object to the normalizer; this will be considered the
-      // "current request" for generating the "self" link.
-      'request' => Request::create($url->toString(TRUE)->getGeneratedUrl()),
+      'account' => $this->account,
     ])->rasterizeValue();
   }
 
@@ -410,7 +437,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Returns the expected cacheability for an unauthorized response.
+   *
+   * @return \Drupal\Core\Cache\CacheableMetadata
+   *   The expected cacheability.
    */
   protected function getExpectedUnauthorizedAccessCacheability() {
     return (new CacheableMetadata())
@@ -482,6 +512,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
   protected static function getExpectedCollectionCacheability(array $collection, array $sparse_fieldset = NULL, AccountInterface $account) {
     $cacheability = array_reduce($collection, function (CacheableMetadata $cacheability, EntityInterface $entity) use ($sparse_fieldset, $account) {
       $access_result = static::entityAccess($entity, 'view', $account);
+      if (!$access_result->isAllowed()) {
+        $access_result = static::entityAccess($entity, 'view label', $account)->addCacheableDependency($access_result);
+      }
       $cacheability->addCacheableDependency($access_result);
       if ($access_result->isAllowed()) {
         $cacheability->addCacheableDependency($entity);
@@ -628,7 +661,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   Defaults to FALSE.
    */
   protected function assertResourceResponse($expected_status_code, $expected_document, ResponseInterface $response, $expected_cache_tags = FALSE, $expected_cache_contexts = FALSE, $expected_page_cache_header_value = FALSE, $expected_dynamic_page_cache_header_value = FALSE) {
-    $this->assertSame($expected_status_code, $response->getStatusCode());
+    $this->assertSame($expected_status_code, $response->getStatusCode(), var_export(Json::decode((string) $response->getBody()), TRUE));
     if ($expected_status_code === 204) {
       // DELETE responses should not include a Content-Type header. But Apache
       // sets it to 'text/html' by default. We also cannot detect the presence
@@ -699,35 +732,14 @@ abstract class ResourceTestBase extends BrowserTestBase {
       static::sortResourceCollection($actual_document['included']);
     }
 
-    // @todo: remove in https://www.drupal.org/project/jsonapi/issues/2853066.
-    if (isset($actual_document['errors']) && isset($expected_document['errors'])) {
-      $actual_errors =& $actual_document['errors'];
-      static::sortErrors($actual_errors);
-      $expected_errors =& $expected_document['errors'];
-      static::sortErrors($expected_errors);
+    if (isset($actual_document['meta']['omitted']) && isset($expected_document['meta']['omitted'])) {
+      $actual_omitted =& $actual_document['meta']['omitted'];
+      $expected_omitted =& $expected_document['meta']['omitted'];
+      static::sortOmittedLinks($actual_omitted);
+      static::sortOmittedLinks($expected_omitted);
+      static::resetOmittedLinkKeys($actual_omitted);
+      static::resetOmittedLinkKeys($expected_omitted);
     }
-    if (isset($actual_document['meta']['errors']) && isset($expected_document['meta']['errors'])) {
-      $actual_errors =& $actual_document['meta']['errors'];
-      static::sortErrors($actual_errors);
-      $expected_errors =& $expected_document['meta']['errors'];
-      static::sortErrors($expected_errors);
-    }
-
-    // @todo remove this in https://www.drupal.org/project/jsonapi/issues/2943176
-    $strip_error_identifiers = function (&$document) {
-      if (isset($document['errors'])) {
-        foreach ($document['errors'] as &$error) {
-          unset($error['id']);
-        }
-      }
-      if (isset($document['meta']['errors'])) {
-        foreach ($document['meta']['errors'] as &$error) {
-          unset($error['id']);
-        }
-      }
-    };
-    $strip_error_identifiers($expected_document);
-    $strip_error_identifiers($actual_document);
 
     $expected_keys = array_keys($expected_document);
     $actual_keys = array_keys($actual_document);
@@ -751,6 +763,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   The expected response status.
    * @param string $expected_message
    *   The expected error message.
+   * @param \Drupal\Core\Url $via_link
+   *   The source URL for the errors of the response.
    * @param \Psr\Http\Message\ResponseInterface $response
    *   The error response to assert.
    * @param string|false $pointer
@@ -772,23 +786,25 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   FALSE if that header should be absent. Possible strings: 'MISS', 'HIT'.
    *   Defaults to FALSE.
    */
-  protected function assertResourceErrorResponse($expected_status_code, $expected_message, ResponseInterface $response, $pointer = FALSE, $expected_cache_tags = FALSE, $expected_cache_contexts = FALSE, $expected_page_cache_header_value = FALSE, $expected_dynamic_page_cache_header_value = FALSE) {
+  protected function assertResourceErrorResponse($expected_status_code, $expected_message, Url $via_link, ResponseInterface $response, $pointer = FALSE, $expected_cache_tags = FALSE, $expected_cache_contexts = FALSE, $expected_page_cache_header_value = FALSE, $expected_dynamic_page_cache_header_value = FALSE) {
     $expected_error = [];
     if (!empty(Response::$statusTexts[$expected_status_code])) {
       $expected_error['title'] = Response::$statusTexts[$expected_status_code];
     }
     $expected_error['status'] = $expected_status_code;
     $expected_error['detail'] = $expected_message;
-    if ($info_url = HttpExceptionNormalizer::getInfoUrl($expected_status_code)) {
-      $expected_error['links']['info'] = $info_url;
+    if ($via_link) {
+      $expected_error['links']['via']['href'] = $via_link->setAbsolute()->toString();
     }
-    // @todo Remove in https://www.drupal.org/project/jsonapi/issues/2934362.
-    $expected_error['code'] = 0;
+    if ($info_url = HttpExceptionNormalizer::getInfoUrl($expected_status_code)) {
+      $expected_error['links']['info']['href'] = $info_url;
+    }
     if ($pointer !== FALSE) {
       $expected_error['source']['pointer'] = $pointer;
     }
 
     $expected_document = [
+      'jsonapi' => static::$jsonApiMember,
       'errors' => [
         0 => $expected_error,
       ],
@@ -881,44 +897,71 @@ abstract class ResourceTestBase extends BrowserTestBase {
     //   error responses provide a good DX
     // - to eventually result in a well-formed request that succeeds.
     // @todo Remove line below in favor of commented line in https://www.drupal.org/project/jsonapi/issues/2878463.
-    $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), [static::$entityTypeId => $this->entity->uuid()]);
+    $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $this->entity->uuid()]);
     /* $url = $this->entity->toUrl('jsonapi'); */
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
     $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
 
-    // DX: 403 when unauthorized.
+    // DX: 403 when unauthorized, or 200 if the 'view label' operation is
+    // supported by the entity type.
     $response = $this->request('GET', $url, $request_options);
-    $expected_403_cacheability = $this->getExpectedUnauthorizedAccessCacheability();
-    $reason = $this->getExpectedUnauthorizedAccessMessage('GET');
-    // @todo Remove $expected + assertResourceResponse() in favor of the commented line below once https://www.drupal.org/project/jsonapi/issues/2943176 lands.
-    $expected_document = [
-      'errors' => [
-        [
-          'title' => 'Forbidden',
-          'status' => 403,
-          'detail' => "The current user is not allowed to GET the selected resource." . (strlen($reason) ? ' ' . $reason : ''),
-          'links' => [
-            'info' => HttpExceptionNormalizer::getInfoUrl(403),
-          ],
-          'code' => 0,
-          'id' => '/' . static::$resourceTypeName . '/' . $this->entity->uuid(),
-          'source' => [
-            'pointer' => '/data',
+    if (!static::$anonymousUsersCanViewLabels) {
+      $expected_403_cacheability = $this->getExpectedUnauthorizedAccessCacheability();
+      $reason = $this->getExpectedUnauthorizedAccessMessage('GET');
+      // @todo Remove $expected + assertResourceResponse() in favor of the commented line below once https://www.drupal.org/project/jsonapi/issues/2943176 lands.
+      $expected_document = [
+        'jsonapi' => static::$jsonApiMember,
+        'errors' => [
+          [
+            'title' => 'Forbidden',
+            'status' => 403,
+            'detail' => "The current user is not allowed to GET the selected resource." . (strlen($reason) ? ' ' . $reason : ''),
+            'links' => [
+              'info' => ['href' => HttpExceptionNormalizer::getInfoUrl(403)],
+              'via' => ['href' => $url->setAbsolute()->toString()],
+            ],
+            'source' => [
+              'pointer' => '/data',
+            ],
           ],
         ],
-      ],
-    ];
-    $this->assertResourceResponse(403, $expected_document, $response);
-    /* $this->assertResourceErrorResponse(403, "The current user is not allowed to GET the selected resource." . (strlen($reason) ? ' ' . $reason : ''), $response, '/data'); */
-    // @todo Uncomment in https://www.drupal.org/project/jsonapi/issues/2929428.
-    /* $this->assertResourceResponse(403, $expected_document, $response, $expected_403_cacheability->getCacheTags(), $expected_403_cacheability->getCacheContexts(), FALSE, 'MISS'); */
-    $this->assertArrayNotHasKey('Link', $response->getHeaders());
+      ];
+      $this->assertResourceResponse(403, $expected_document, $response, $expected_403_cacheability->getCacheTags(), $expected_403_cacheability->getCacheContexts(), FALSE, 'MISS');
+      $this->assertArrayNotHasKey('Link', $response->getHeaders());
+    }
+    else {
+      $expected_document = $this->getExpectedDocument();
+      $label_field_name = $this->entity->getEntityType()->hasKey('label') ? $this->entity->getEntityType()->getKey('label') : static::$labelFieldName;
+      $expected_document['data']['attributes'] = array_intersect_key($expected_document['data']['attributes'], [$label_field_name => TRUE]);
+      unset($expected_document['data']['relationships']);
+      $this->assertResourceResponse(200, $expected_document, $response, $this->getExpectedCacheTags(), $this->getExpectedCacheContexts(), FALSE, 'MISS');
+    }
 
     $this->setUpAuthorization('GET');
 
     // Set body despite that being nonsensical: should be ignored.
     $request_options[RequestOptions::BODY] = Json::encode($this->getExpectedDocument());
+
+    // 400 for GET request with reserved custom query parameter.
+    $url_reserved_custom_query_parameter = clone $url;
+    $url_reserved_custom_query_parameter = $url_reserved_custom_query_parameter->setOption('query', ['foo' => 'bar']);
+    $response = $this->request('GET', $url_reserved_custom_query_parameter, $request_options);
+    $expected_document = [
+      'jsonapi' => static::$jsonApiMember,
+      'errors' => [
+        [
+          'title' => 'Bad Request',
+          'status' => 400,
+          'detail' => "The following query parameters violate the JSON API spec: 'foo'.",
+          'links' => [
+            'info' => ['href' => 'http://jsonapi.org/format/#query-parameters'],
+            'via' => ['href' => $url_reserved_custom_query_parameter->toString()],
+          ],
+        ],
+      ],
+    ];
+    $this->assertResourceResponse(400, $expected_document, $response, ['4xx-response', 'http_response'], ['url.query_args'], FALSE, 'MISS');
 
     // 200 for well-formed HEAD request.
     $response = $this->request('HEAD', $url, $request_options);
@@ -998,43 +1041,6 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $head_headers = $header_cleaner($head_headers);
     $this->assertSame($get_headers, $head_headers);
 
-    // @todo Uncomment this in https://www.drupal.org/project/jsonapi/issues/2929932.
-    // @codingStandardsIgnoreStart
-    /*
-    // BC: serialization_update_8401().
-    // Only run this for fieldable entities. It doesn't make sense for config
-    // entities as config values always use the raw values (as per the config
-    // schema), returned directly from the ConfigEntityNormalizer, which
-    // doesn't deal with fields individually.
-    if ($this->entity instanceof FieldableEntityInterface) {
-      // Test the BC settings for timestamp values.
-      $this->config('serialization.settings')->set('bc_timestamp_normalizer_unix', TRUE)->save(TRUE);
-      // Rebuild the container so new config is reflected in the addition of the
-      // TimestampItemNormalizer.
-      $this->rebuildAll();
-
-      $response = $this->request('GET', $url, $request_options);
-      $this->assertResourceResponse(200, FALSE, $response, $this->getExpectedCacheTags(), $this->getExpectedCacheContexts(), static::$auth ? FALSE : 'MISS', 'MISS');
-
-      // This ensures the BC layer for bc_timestamp_normalizer_unix works as
-      // expected. This method should be using
-      // ::formatExpectedTimestampValue() to generate the timestamp value. This
-      // will take into account the above config setting.
-      $expected = $this->getExpectedNormalizedEntity();
-      // Config entities are not affected.
-      // @see \Drupal\serialization\Normalizer\ConfigEntityNormalizer::normalize()
-      static::recursiveKsort($expected);
-      $actual = Json::decode((string) $response->getBody());
-      static::recursiveKsort($actual);
-      $this->assertSame($expected, $actual);
-
-      // Reset the config value and rebuild.
-      $this->config('serialization.settings')->set('bc_timestamp_normalizer_unix', FALSE)->save(TRUE);
-      $this->rebuildAll();
-    }
-    */
-    // @codingStandardsIgnoreEnd
-
     // Feature: Sparse fieldsets.
     $this->doTestSparseFieldSets($url, $request_options);
     // Feature: Included.
@@ -1042,18 +1048,17 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
     // DX: 404 when GETting non-existing entity.
     $random_uuid = \Drupal::service('uuid')->generate();
-    $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), [static::$entityTypeId => $random_uuid]);
+    $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $random_uuid]);
     $response = $this->request('GET', $url, $request_options);
     $message_url = clone $url;
-    $path = str_replace($random_uuid, '{' . static::$entityTypeId . '}', $message_url->setAbsolute()->setOptions(['base_url' => '', 'query' => []])->toString());
-    $message = 'The "' . static::$entityTypeId . '" parameter was not converted for the path "' . $path . '" (route name: "jsonapi.' . static::$resourceTypeName . '.individual")';
-    $this->assertResourceErrorResponse(404, $message, $response);
+    $path = str_replace($random_uuid, '{entity}', $message_url->setAbsolute()->setOptions(['base_url' => '', 'query' => []])->toString());
+    $message = 'The "entity" parameter was not converted for the path "' . $path . '" (route name: "jsonapi.' . static::$resourceTypeName . '.individual")';
+    $this->assertResourceErrorResponse(404, $message, $url, $response, FALSE, ['4xx-response', 'http_response'], [''], FALSE, 'UNCACHEABLE');
 
-    // DX: when Accept request header is missing, still 404, but HTML response.
+    // DX: when Accept request header is missing, still 404, same response.
     unset($request_options[RequestOptions::HEADERS]['Accept']);
     $response = $this->request('GET', $url, $request_options);
-    $this->assertSame(404, $response->getStatusCode());
-    $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
+    $this->assertResourceErrorResponse(404, $message, $url, $response, FALSE, ['4xx-response', 'http_response'], [''], FALSE, 'UNCACHEABLE');
   }
 
   /**
@@ -1127,23 +1132,35 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $include = ['include' => implode(',', $relationship_field_names)];
     $filtered_collection_include_url = clone $collection_url;
     $filtered_collection_include_url->setOption('query', array_merge($entity_collection_filter, $include));
-    $expected_response = $this->getExpectedCollectionResponse($filtered_entity_collection, $filtered_collection_include_url->toString(), $request_options);
-    $related_responses = array_reduce($filtered_entity_collection, function ($related_responses, $entity) use ($relationship_field_names, $request_options) {
-      return array_merge($related_responses, array_values($this->getExpectedRelatedResponses($relationship_field_names, $request_options, $entity)));
-    }, []);
-    $expected_response = static::decorateExpectedResponseForIncludedFields($expected_response, $related_responses);
+    $expected_response = $this->getExpectedCollectionResponse($filtered_entity_collection, $filtered_collection_include_url->toString(), $request_options, $relationship_field_names);
     $expected_cacheability = $expected_response->getCacheableMetadata();
+    $expected_cacheability->setCacheTags(array_values(array_diff($expected_cacheability->getCacheTags(), ['4xx-response'])));
     $expected_document = $expected_response->getResponseData();
-    // @todo remove this loop in https://www.drupal.org/project/jsonapi/issues/2853066.
-    if (!empty($expected_document['meta']['errors'])) {
-      foreach ($expected_document['meta']['errors'] as $index => $error) {
-        $expected_document['meta']['errors'][$index]['source']['pointer'] = '/data';
-      }
-    }
     $response = $this->request('GET', $filtered_collection_include_url, $request_options);
     // MISS or UNCACHEABLE depends on the included data. It must not be HIT.
     $dynamic_cache = $expected_cacheability->getCacheMaxAge() === 0 ? 'UNCACHEABLE' : 'MISS';
     $this->assertResourceResponse(200, $expected_document, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), FALSE, $dynamic_cache);
+
+    // If the response should vary by a user's authorizations, grant permissions
+    // for the included resources and execute another request.
+    $permission_related_cache_contexts = [
+      'user',
+      'user.permissions',
+      'user.roles',
+    ];
+    if (!empty($relationship_field_names) && !empty(array_intersect($expected_cacheability->getCacheContexts(), $permission_related_cache_contexts))) {
+      $applicable_permissions = array_intersect_key(static::getIncludePermissions(), array_flip($relationship_field_names));
+      $flattened_permissions = array_unique(array_reduce($applicable_permissions, 'array_merge', []));
+      $this->grantPermissionsToTestedRole($flattened_permissions);
+      $expected_response = $this->getExpectedCollectionResponse($filtered_entity_collection, $filtered_collection_include_url->toString(), $request_options, $relationship_field_names);
+      $expected_cacheability = $expected_response->getCacheableMetadata();
+      $expected_document = $expected_response->getResponseData();
+      $response = $this->request('GET', $filtered_collection_include_url, $request_options);
+      $requires_include_only_permissions = !empty($flattened_permissions);
+      $cacheable = $expected_cacheability->getCacheMaxAge() !== 0;
+      $dynamic_cache = $cacheable ? $requires_include_only_permissions ? 'MISS' : 'HIT' : 'UNCACHEABLE';
+      $this->assertResourceResponse(200, $expected_document, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), FALSE, $dynamic_cache);
+    }
 
     // Sorted collection with includes.
     $sorted_entity_collection = $entity_collection;
@@ -1158,19 +1175,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
     }
     $sorted_collection_include_url = clone $collection_url;
     $sorted_collection_include_url->setOption('query', array_merge($include, ['sort' => "-{$id_key}"]));
-    $expected_response = $this->getExpectedCollectionResponse($sorted_entity_collection, $sorted_collection_include_url->toString(), $request_options);
-    $related_responses = array_reduce($sorted_entity_collection, function ($related_responses, $entity) use ($relationship_field_names, $request_options) {
-      return array_merge($related_responses, array_values($this->getExpectedRelatedResponses($relationship_field_names, $request_options, $entity)));
-    }, []);
-    $expected_response = static::decorateExpectedResponseForIncludedFields($expected_response, $related_responses);
+    $expected_response = $this->getExpectedCollectionResponse($sorted_entity_collection, $sorted_collection_include_url->toString(), $request_options, $relationship_field_names);
     $expected_cacheability = $expected_response->getCacheableMetadata();
+    $expected_cacheability->setCacheTags(array_values(array_diff($expected_cacheability->getCacheTags(), ['4xx-response'])));
     $expected_document = $expected_response->getResponseData();
-    // @todo remove this loop in https://www.drupal.org/project/jsonapi/issues/2853066.
-    if (!empty($expected_document['meta']['errors'])) {
-      foreach ($expected_document['meta']['errors'] as $index => $error) {
-        $expected_document['meta']['errors'][$index]['source']['pointer'] = '/data';
-      }
-    }
     $response = $this->request('GET', $sorted_collection_include_url, $request_options);
     // MISS or UNCACHEABLE depends on the included data. It must not be HIT.
     $dynamic_cache = $expected_cacheability->getCacheMaxAge() === 0 ? 'UNCACHEABLE' : 'MISS';
@@ -1186,13 +1194,16 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   The self link for the collection response document.
    * @param array $request_options
    *   Request options to apply.
+   * @param array|null $included_paths
+   *   (optional) Any include paths that should be appended to the expected
+   *   response.
    *
    * @return \Drupal\jsonapi\ResourceResponse
    *   A ResourceResponse for the expected entity collection.
    *
    * @see \GuzzleHttp\ClientInterface::request()
    */
-  protected function getExpectedCollectionResponse(array $collection, $self_link, array $request_options) {
+  protected function getExpectedCollectionResponse(array $collection, $self_link, array $request_options, array $included_paths = NULL) {
     $resource_identifiers = array_map([static::class, 'toResourceIdentifier'], $collection);
     $individual_responses = static::toResourceResponses($this->getResponses(static::getResourceLinks($resource_identifiers), $request_options));
     $merged_response = static::toCollectionResourceResponse($individual_responses, $self_link, TRUE);
@@ -1201,12 +1212,6 @@ abstract class ResourceTestBase extends BrowserTestBase {
     if (!isset($merged_document['data'])) {
       $merged_document['data'] = [];
     }
-    // @todo remove this loop in https://www.drupal.org/project/jsonapi/issues/2853066.
-    if (!empty($merged_document['meta']['errors'])) {
-      foreach ($merged_document['meta']['errors'] as $index => $error) {
-        $merged_document['meta']['errors'][$index]['source']['pointer'] = '/data';
-      }
-    }
 
     $cacheability = static::getExpectedCollectionCacheability($collection, NULL, $this->account);
     $cacheability->setCacheMaxAge($merged_response->getCacheableMetadata()->getCacheMaxAge());
@@ -1214,7 +1219,26 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $collection_response = ResourceResponse::create($merged_document);
     $collection_response->addCacheableDependency($cacheability);
 
-    return $collection_response;
+    if (is_null($included_paths)) {
+      return $collection_response;
+    }
+
+    $related_responses = array_reduce($collection, function ($related_responses, EntityInterface $entity) use ($included_paths, $request_options, $self_link) {
+      if (!$entity->access('view', $this->account) && !$entity->access('view label', $this->account)) {
+        return $related_responses;
+      }
+      $expected_related_responses = $this->getExpectedRelatedResponses($included_paths, $request_options, $entity);
+      if (empty($related_responses)) {
+        return $expected_related_responses;
+      }
+      foreach ($included_paths as $included_path) {
+        $both_responses = [$related_responses[$included_path], $expected_related_responses[$included_path]];
+        $related_responses[$included_path] = static::toCollectionResourceResponse($both_responses, $self_link, TRUE);
+      }
+      return $related_responses;
+    }, []);
+
+    return static::decorateExpectedResponseForIncludedFields($collection_response, $related_responses);
   }
 
   /**
@@ -1260,17 +1284,17 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->doTestRelationshipGet($request_options);
 
     // Test POST.
-    $this->doTestRelationshipPost($request_options);
+    $this->doTestRelationshipMutation($request_options);
     // Grant entity-level edit access.
     $this->setUpAuthorization('PATCH');
-    $this->doTestRelationshipPost($request_options);
+    $this->doTestRelationshipMutation($request_options);
     // Field edit access is still forbidden, grant it.
     $this->grantPermissionsToTestedRole([
       'field_jsonapi_test_entity_ref view access',
       'field_jsonapi_test_entity_ref edit access',
       'field_jsonapi_test_entity_ref update access',
     ]);
-    $this->doTestRelationshipPost($request_options);
+    $this->doTestRelationshipMutation($request_options);
   }
 
   /**
@@ -1294,12 +1318,12 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // Builds an array of expected responses, keyed by relationship field name.
     $expected_relationship_responses = $this->getExpectedRelatedResponses($relationship_field_names, $request_options);
     // Fetches actual responses as an array keyed by relationship field name.
-    $relationship_responses = $this->getRelatedResponses($relationship_field_names, $request_options);
+    $related_responses = $this->getRelatedResponses($relationship_field_names, $request_options);
     foreach ($relationship_field_names as $relationship_field_name) {
       /* @var \Drupal\jsonapi\ResourceResponse $expected_resource_response */
       $expected_resource_response = $expected_relationship_responses[$relationship_field_name];
       /* @var \Psr\Http\Message\ResponseInterface $actual_response */
-      $actual_response = $relationship_responses[$relationship_field_name];
+      $actual_response = $related_responses[$relationship_field_name];
       // @todo uncomment this assertion in https://www.drupal.org/project/jsonapi/issues/2929428
       // Dynamic Page Cache miss because cache should vary based on the
       // 'include' query param.
@@ -1343,11 +1367,17 @@ abstract class ResourceTestBase extends BrowserTestBase {
     foreach ($relationship_field_names as $relationship_field_name) {
       $expected_resource_response = $this->getExpectedGetRelationshipResponse($relationship_field_name);
       $expected_document = $expected_resource_response->getResponseData();
+      $expected_cacheability = $expected_resource_response->getCacheableMetadata();
       $actual_response = $related_responses[$relationship_field_name];
-      /* @var \Psr\Http\Message\ResponseInterface $actual_response */
-      $actual_document = Json::decode((string) $actual_response->getBody());
-      $this->assertSameDocument($expected_document, $actual_document);
-      $this->assertSame($expected_resource_response->getStatusCode(), $actual_response->getStatusCode());
+      $this->assertResourceResponse(
+        $expected_resource_response->getStatusCode(),
+        $expected_document,
+        $actual_response,
+        $expected_cacheability->getCacheTags(),
+        $expected_cacheability->getCacheContexts(),
+        FALSE,
+        $expected_resource_response->isSuccessful() ? 'MISS' : FALSE
+      );
     }
   }
 
@@ -1360,7 +1390,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @see \GuzzleHttp\ClientInterface::request()
    * @see ::testRelationships
    */
-  protected function doTestRelationshipPost(array $request_options) {
+  protected function doTestRelationshipMutation(array $request_options) {
     /* @var \Drupal\Core\Entity\FieldableEntityInterface $resource */
     $resource = $this->createAnotherEntity('dupe');
     $resource->set('field_jsonapi_test_entity_ref', NULL);
@@ -1376,18 +1406,25 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $relationship_field_name = 'field_jsonapi_test_entity_ref';
     /* @var \Drupal\Core\Access\AccessResultReasonInterface $update_access */
     $update_access = static::entityAccess($resource, 'update', $this->account)
-      ->andIf(static::entityFieldAccess($resource, $relationship_field_name, 'update', $this->account));
-    $url = Url::fromRoute(sprintf("jsonapi.{$resource_identifier['type']}.relationship"), [
-      'related' => $relationship_field_name,
-      $resource->getEntityTypeId() => $resource->uuid(),
+      ->andIf(static::entityFieldAccess($resource, $relationship_field_name, 'edit', $this->account));
+    $url = Url::fromRoute(sprintf("jsonapi.{$resource_identifier['type']}.{$relationship_field_name}.relationship.patch"), [
+      'entity' => $resource->uuid(),
     ]);
+
+    // Test POST: missing content-type.
+    $response = $this->request('POST', $url, $request_options);
+    $this->assertSame(415, $response->getStatusCode());
+
+    // Set the JSON API media type header for all subsequent requests.
+    $request_options[RequestOptions::HEADERS]['Content-Type'] = 'application/vnd.api+json';
+
     if ($update_access->isAllowed()) {
       // Test POST: empty body.
       $response = $this->request('POST', $url, $request_options);
-      $this->assertResourceErrorResponse(400, 'Empty request body.', $response);
+      $this->assertResourceErrorResponse(400, 'Empty request body.', $url, $response, FALSE);
       // Test PATCH: empty body.
       $response = $this->request('PATCH', $url, $request_options);
-      $this->assertResourceErrorResponse(400, 'Empty request body.', $response);
+      $this->assertResourceErrorResponse(400, 'Empty request body.', $url, $response, FALSE);
 
       // Test POST: empty data.
       $request_options[RequestOptions::BODY] = Json::encode(['data' => []]);
@@ -1401,20 +1438,20 @@ abstract class ResourceTestBase extends BrowserTestBase {
       // Test POST: data as resource identifier, not array of identifiers.
       $request_options[RequestOptions::BODY] = Json::encode(['data' => $target_identifier]);
       $response = $this->request('POST', $url, $request_options);
-      $this->assertResourceErrorResponse(400, 'Invalid body payload for the relationship.', $response);
+      $this->assertResourceErrorResponse(400, 'Invalid body payload for the relationship.', $url, $response, FALSE);
       // Test PATCH: data as resource identifier, not array of identifiers.
       $request_options[RequestOptions::BODY] = Json::encode(['data' => $target_identifier]);
       $response = $this->request('PATCH', $url, $request_options);
-      $this->assertResourceErrorResponse(400, 'Invalid body payload for the relationship.', $response);
+      $this->assertResourceErrorResponse(400, 'Invalid body payload for the relationship.', $url, $response, FALSE);
 
       // Test POST: missing the 'type' field.
       $request_options[RequestOptions::BODY] = Json::encode(['data' => array_intersect_key($target_identifier, ['id' => 'id'])]);
       $response = $this->request('POST', $url, $request_options);
-      $this->assertResourceErrorResponse(400, 'Invalid body payload for the relationship.', $response);
+      $this->assertResourceErrorResponse(400, 'Invalid body payload for the relationship.', $url, $response, FALSE);
       // Test PATCH: missing the 'type' field.
       $request_options[RequestOptions::BODY] = Json::encode(['data' => array_intersect_key($target_identifier, ['id' => 'id'])]);
       $response = $this->request('PATCH', $url, $request_options);
-      $this->assertResourceErrorResponse(400, 'Invalid body payload for the relationship.', $response);
+      $this->assertResourceErrorResponse(400, 'Invalid body payload for the relationship.', $url, $response, FALSE);
 
       // If the base resource type is the same as that of the target's (as it
       // will be for `user--user`), then the validity error will not be
@@ -1423,66 +1460,110 @@ abstract class ResourceTestBase extends BrowserTestBase {
         // Test POST: invalid target.
         $request_options[RequestOptions::BODY] = Json::encode(['data' => [$resource_identifier]]);
         $response = $this->request('POST', $url, $request_options);
-        $this->assertResourceErrorResponse(400, sprintf('The provided type (%s) does not mach the destination resource types (%s).', $resource_identifier['type'], $target_identifier['type']), $response);
+        $this->assertResourceErrorResponse(400, sprintf('The provided type (%s) does not mach the destination resource types (%s).', $resource_identifier['type'], $target_identifier['type']), $url, $response, FALSE);
         // Test PATCH: invalid target.
         $request_options[RequestOptions::BODY] = Json::encode(['data' => [$resource_identifier]]);
         $response = $this->request('POST', $url, $request_options);
-        $this->assertResourceErrorResponse(400, sprintf('The provided type (%s) does not mach the destination resource types (%s).', $resource_identifier['type'], $target_identifier['type']), $response);
+        $this->assertResourceErrorResponse(400, sprintf('The provided type (%s) does not mach the destination resource types (%s).', $resource_identifier['type'], $target_identifier['type']), $url, $response, FALSE);
       }
+
+      // Test POST: duplicate targets, no arity.
+      $request_options[RequestOptions::BODY] = Json::encode(['data' => [$target_identifier, $target_identifier]]);
+      $response = $this->request('POST', $url, $request_options);
+      $this->assertResourceErrorResponse(400, 'Duplicate relationships are not permitted. Use `meta.arity` to distinguish resource identifiers with matching `type` and `id` values.', $url, $response, FALSE);
+
+      // Test PATCH: duplicate targets, no arity.
+      $request_options[RequestOptions::BODY] = Json::encode(['data' => [$target_identifier, $target_identifier]]);
+      $response = $this->request('PATCH', $url, $request_options);
+      $this->assertResourceErrorResponse(400, 'Duplicate relationships are not permitted. Use `meta.arity` to distinguish resource identifiers with matching `type` and `id` values.', $url, $response, FALSE);
 
       // Test POST: success.
       $request_options[RequestOptions::BODY] = Json::encode(['data' => [$target_identifier]]);
       $response = $this->request('POST', $url, $request_options);
-      $resource->set($relationship_field_name, [$target_resource]);
       $this->assertResourceResponse(204, NULL, $response);
 
-      // @todo: Uncomment the following two assertions in https://www.drupal.org/project/jsonapi/issues/2977659.
       // Test POST: success, relationship already exists, no arity.
-      // @codingStandardsIgnoreStart
-      /*
       $response = $this->request('POST', $url, $request_options);
       $this->assertResourceResponse(204, NULL, $response);
-      */
-      // @codingStandardsIgnoreEnd
 
-      // Test PATCH: success, new value is the same as existing value.
-      $request_options[RequestOptions::BODY] = Json::encode(['data' => [$target_identifier]]);
-      $response = $this->request('PATCH', $url, $request_options);
-      $resource->set($relationship_field_name, [$target_resource]);
-      $this->assertResourceResponse(204, NULL, $response);
-
-      // Test POST: success, relationship already exists, with unique arity.
-      $request_options[RequestOptions::BODY] = Json::encode([
-        'data' => [
-          $target_identifier + ['meta' => ['arity' => 1]],
-        ],
-      ]);
+      // Test POST: success, relationship already exists, new arity.
+      $request_options[RequestOptions::BODY] = Json::encode(['data' => [$target_identifier + ['meta' => ['arity' => 1]]]]);
       $response = $this->request('POST', $url, $request_options);
       $resource->set($relationship_field_name, [$target_resource, $target_resource]);
       $expected_document = $this->getExpectedGetRelationshipDocument($relationship_field_name, $resource);
       $expected_document['data'][0] += ['meta' => ['arity' => 0]];
       $expected_document['data'][1] += ['meta' => ['arity' => 1]];
+      $this->assertResourceResponse(200, $expected_document, $response);
+
+      // Test PATCH: success, new value is the same as given value.
+      $request_options[RequestOptions::BODY] = Json::encode([
+        'data' => [
+          $target_identifier + ['meta' => ['arity' => 0]],
+          $target_identifier + ['meta' => ['arity' => 1]],
+        ],
+      ]);
+      $response = $this->request('PATCH', $url, $request_options);
+      $this->assertResourceResponse(204, NULL, $response);
+
+      // Test POST: success, relationship already exists, new arity.
+      $request_options[RequestOptions::BODY] = Json::encode([
+        'data' => [
+          $target_identifier + ['meta' => ['arity' => 2]],
+        ],
+      ]);
+      $response = $this->request('POST', $url, $request_options);
+      $resource->set($relationship_field_name, [
+        $target_resource,
+        $target_resource,
+        $target_resource,
+      ]);
+      $expected_document = $this->getExpectedGetRelationshipDocument($relationship_field_name, $resource);
+      $expected_document['data'][0] += ['meta' => ['arity' => 0]];
+      $expected_document['data'][1] += ['meta' => ['arity' => 1]];
+      $expected_document['data'][2] += ['meta' => ['arity' => 2]];
       // 200 with response body because the request did not include the
       // existing relationship resource identifier object.
       $this->assertResourceResponse(200, $expected_document, $response);
 
-      // @todo: Uncomment the following block in https://www.drupal.org/project/jsonapi/issues/2977659.
-      // @codingStandardsIgnoreStart
-      //// Test DELETE: two existing relationships, one removed.
-      //$request_options[RequestOptions::BODY] = Json::encode(['data' => [
-      //  $target_identifier + ['meta' => ['arity' => 0]],
-      //]]);
-      //$response = $this->request('DELETE', $url, $request_options);
-      //// @todo Remove 3 lines below in favor of commented line in https://www.drupal.org/project/jsonapi/issues/2977653.
-      //$resource->set($relationship_field_name, [$target_resource]);
-      //$expected_document = $this->getExpectedGetRelationshipDocument($relationship_field_name, $resource);
-      //$this->assertResourceResponse(201, $expected_document, $response);
-      //// $this->assertResourceResponse(204, NULL, $response);
-      //$resource->set($relationship_field_name, [$target_resource]);
-      //$expected_document = $this->getExpectedGetRelationshipDocument($relationship_field_name, $resource);
-      //$response = $this->request('GET', $url, $request_options);
-      //$this->assertSameDocument($expected_document, Json::decode((string) $response->getBody()));
-      // @codingStandardsIgnoreEnd
+      // Test POST: success.
+      $request_options[RequestOptions::BODY] = Json::encode([
+        'data' => [
+          $target_identifier + ['meta' => ['arity' => 0]],
+          $target_identifier + ['meta' => ['arity' => 1]],
+        ],
+      ]);
+      $response = $this->request('POST', $url, $request_options);
+      // 200 with response body because the request did not include the
+      // resource identifier with arity 2.
+      $this->assertResourceResponse(200, $expected_document, $response);
+
+      // Test PATCH: success.
+      $request_options[RequestOptions::BODY] = Json::encode([
+        'data' => [
+          $target_identifier + ['meta' => ['arity' => 0]],
+          $target_identifier + ['meta' => ['arity' => 1]],
+          $target_identifier + ['meta' => ['arity' => 2]],
+        ],
+      ]);
+      $response = $this->request('PATCH', $url, $request_options);
+      // 204 no content. PATCH data matches existing data.
+      $this->assertResourceResponse(204, NULL, $response);
+
+      // Test DELETE: three existing relationships, two removed.
+      $request_options[RequestOptions::BODY] = Json::encode([
+        'data' => [
+          $target_identifier + ['meta' => ['arity' => 0]],
+          $target_identifier + ['meta' => ['arity' => 2]],
+        ],
+      ]);
+      $response = $this->request('DELETE', $url, $request_options);
+      $this->assertResourceResponse(204, NULL, $response);
+      // Subsequent GET should return only one resource identifier, with no
+      // arity.
+      $resource->set($relationship_field_name, [$target_resource]);
+      $expected_document = $this->getExpectedGetRelationshipDocument($relationship_field_name, $resource);
+      $response = $this->request('GET', $url, $request_options);
+      $this->assertSameDocument($expected_document, Json::decode((string) $response->getBody()));
 
       // Test DELETE: one existing relationship, removed.
       $request_options[RequestOptions::BODY] = Json::encode(['data' => [$target_identifier]]);
@@ -1502,13 +1583,21 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertSameDocument($expected_document, Json::decode((string) $response->getBody()));
 
       // Test PATCH: success, new value is different than existing value.
-      $request_options[RequestOptions::BODY] = Json::encode(['data' => [$target_identifier, $target_identifier]]);
+      $request_options[RequestOptions::BODY] = Json::encode([
+        'data' => [
+          $target_identifier + ['meta' => ['arity' => 2]],
+          $target_identifier + ['meta' => ['arity' => 3]],
+        ],
+      ]);
       $response = $this->request('PATCH', $url, $request_options);
       $resource->set($relationship_field_name, [$target_resource, $target_resource]);
       $expected_document = $this->getExpectedGetRelationshipDocument($relationship_field_name, $resource);
       $expected_document['data'][0] += ['meta' => ['arity' => 0]];
       $expected_document['data'][1] += ['meta' => ['arity' => 1]];
-      $this->assertResourceResponse(204, NULL, $response);
+      // 200 with response body because arity values are computed; that means
+      // that the PATCH arity values 2 + 3 will become 0 + 1 if there are not
+      // already resource identifiers with those arity values.
+      $this->assertResourceResponse(200, $expected_document, $response);
 
       // Test DELETE: two existing relationships, both removed because no arity
       // was specified.
@@ -1524,13 +1613,13 @@ abstract class ResourceTestBase extends BrowserTestBase {
     else {
       $request_options[RequestOptions::BODY] = Json::encode(['data' => [$target_identifier]]);
       $response = $this->request('POST', $url, $request_options);
-      $message = 'The current user is not allowed to update this relationship.';
+      $message = 'The current user is not allowed to edit this relationship.';
       $message .= ($reason = $update_access->getReason()) ? ' ' . $reason : '';
-      $this->assertResourceErrorResponse(403, $message, $response, $relationship_field_name);
+      $this->assertResourceErrorResponse(403, $message, $url, $response, FALSE);
       $response = $this->request('PATCH', $url, $request_options);
-      $this->assertResourceErrorResponse(403, $message, $response, $relationship_field_name);
+      $this->assertResourceErrorResponse(403, $message, $url, $response, FALSE);
       $response = $this->request('DELETE', $url, $request_options);
-      $this->assertResourceErrorResponse(403, $message, $response, $relationship_field_name);
+      $this->assertResourceErrorResponse(403, $message, $url, $response, FALSE);
     }
 
     // Remove the test entities that were created.
@@ -1551,13 +1640,23 @@ abstract class ResourceTestBase extends BrowserTestBase {
    */
   protected function getExpectedGetRelationshipResponse($relationship_field_name, EntityInterface $entity = NULL) {
     $entity = $entity ?: $this->entity;
-    $access = static::entityFieldAccess($entity, $relationship_field_name, 'view', $this->account);
+    $access = static::entityFieldAccess($entity, $this->resourceType->getInternalName($relationship_field_name), 'view', $this->account);
     if (!$access->isAllowed()) {
-      return static::getAccessDeniedResponse($this->entity, $access, $relationship_field_name, 'The current user is not allowed to view this relationship.');
+      $via_link = Url::fromRoute(
+        sprintf('jsonapi.%s.%s.relationship.get', static::$resourceTypeName, $relationship_field_name),
+        ['entity' => $entity->uuid()]
+      );
+      return static::getAccessDeniedResponse($this->entity, $access, $via_link, $relationship_field_name, 'The current user is not allowed to view this relationship.', FALSE);
     }
     $expected_document = $this->getExpectedGetRelationshipDocument($relationship_field_name);
+    $expected_cacheability = (new CacheableMetadata())
+      ->addCacheTags($this->getExpectedCacheTags([]))
+      ->addCacheContexts(['url.site'])
+      ->addCacheableDependency($entity)
+      ->addCacheableDependency($access);
     $status_code = isset($expected_document['errors'][0]['status']) ? $expected_document['errors'][0]['status'] : 200;
     $resource_response = new ResourceResponse($expected_document, $status_code);
+    $resource_response->addCacheableDependency($expected_cacheability);
     return $resource_response;
   }
 
@@ -1582,17 +1681,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $data = $this->getExpectedGetRelationshipDocumentData($relationship_field_name, $entity);
     return [
       'data' => $data,
-      'jsonapi' => [
-        'meta' => [
-          'links' => [
-            'self' => 'http://jsonapi.org/format/1.0/',
-          ],
-        ],
-        'version' => '1.0',
-      ],
+      'jsonapi' => static::$jsonApiMember,
       'links' => [
-        'self' => $self_link,
-        'related' => $related_link,
+        'self' => ['href' => $self_link],
+        'related' => ['href' => $related_link],
       ],
     ];
   }
@@ -1610,8 +1702,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    */
   protected function getExpectedGetRelationshipDocumentData($relationship_field_name, EntityInterface $entity = NULL) {
     $entity = $entity ?: $this->entity;
+    $internal_field_name = $this->resourceType->getInternalName($relationship_field_name);
     /* @var \Drupal\Core\Field\FieldItemListInterface $field */
-    $field = $entity->{$relationship_field_name};
+    $field = $entity->{$internal_field_name};
     $is_multiple = $field->getFieldDefinition()->getFieldStorageDefinition()->getCardinality() !== 1;
     if ($field->isEmpty()) {
       return $is_multiple ? [] : NULL;
@@ -1655,29 +1748,18 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $base_resource_identifier = static::toResourceIdentifier($entity);
     $expected_related_responses = [];
     foreach ($relationship_field_names as $relationship_field_name) {
-      $access = static::entityFieldAccess($entity, $relationship_field_name, 'view', $this->account);
+      $internal_name = $this->resourceType->getInternalName($relationship_field_name);
+      $access = static::entityFieldAccess($entity, $internal_name, 'view', $this->account);
       if (!$access->isAllowed()) {
         $detail = 'The current user is not allowed to view this relationship.';
-        if ($access instanceof AccessResultReasonInterface && ($reason = $access->getReason())) {
-          $detail .= ' ' . $reason;
+        if (!$entity->access('view') && $entity->access('view label') && $access instanceof AccessResultReasonInterface && empty($access->getReason())) {
+          $access->setReason("The user only has authorization for the 'view label' operation.");
         }
-        $related_response = (new ResourceResponse([
-          'errors' => [
-            [
-              'status' => 403,
-              'title' => 'Forbidden',
-              'detail' => $detail,
-              'links' => [
-                'info' => HttpExceptionNormalizer::getInfoUrl(403),
-              ],
-              'code' => 0,
-              'id' => '/' . $base_resource_identifier['type'] . '/' . $base_resource_identifier['id'],
-              'source' => [
-                'pointer' => $relationship_field_name,
-              ],
-            ],
-          ],
-        ], 403))->addCacheableDependency($access);
+        $via_link = Url::fromRoute(
+          sprintf('jsonapi.%s.%s.related', $base_resource_identifier['type'], $relationship_field_name),
+          ['entity' => $base_resource_identifier['id']]
+        );
+        $related_response = static::getAccessDeniedResponse($entity, $access, $via_link, $relationship_field_name, $detail, FALSE);
       }
       else {
         $self_link = static::getRelatedLink($base_resource_identifier, $relationship_field_name);
@@ -1688,83 +1770,29 @@ abstract class ResourceTestBase extends BrowserTestBase {
         if (empty($relationship_document['data'])) {
           $related_response = isset($relationship_document['errors'])
             ? $relationship_response
-            : new ResourceResponse([
-              // Empty to-one relationships should be NULL and empty to-many
-              // relationships should be an empty array.
-              'data' => is_null($relationship_document['data']) ? NULL : [],
-              'jsonapi' => [
-                'meta' => [
-                  'links' => [
-                    'self' => 'http://jsonapi.org/format/1.0/',
-                  ],
-                ],
-                'version' => '1.0',
-              ],
-              'links' => ['self' => $self_link],
-            ]);
+            : static::getEmptyCollectionResponse(!is_null($relationship_document['data']), $self_link);
         }
         else {
           $is_to_one_relationship = static::isResourceIdentifier($relationship_document['data']);
           $resource_identifiers = $is_to_one_relationship
             ? [$relationship_document['data']]
             : $relationship_document['data'];
-          $individual_responses = static::toResourceResponses($this->getResponses(static::getResourceLinks($resource_identifiers), $request_options));
-          $related_response = static::toCollectionResourceResponse($individual_responses, $self_link, !$is_to_one_relationship);
+          // Remove any relationships to 'virtual' resources.
+          $resource_identifiers = array_filter($resource_identifiers, function ($resource_identifier) {
+            return $resource_identifier['id'] !== 'virtual';
+          });
+          if (!empty($resource_identifiers)) {
+            $individual_responses = static::toResourceResponses($this->getResponses(static::getResourceLinks($resource_identifiers), $request_options));
+            $related_response = static::toCollectionResourceResponse($individual_responses, $self_link, !$is_to_one_relationship);
+          }
+          else {
+            $related_response = static::getEmptyCollectionResponse(!$is_to_one_relationship, $self_link);
+          }
         }
       }
       $expected_related_responses[$relationship_field_name] = $related_response;
     }
     return $expected_related_responses ?: [];
-  }
-
-  /**
-   * Gets an expected ResourceResponse with includes for the given field set.
-   *
-   * @param string[] $include_paths
-   *   A list of include field paths for which to get an expected response.
-   * @param array $request_options
-   *   Request options to apply.
-   *
-   * @return \Drupal\jsonapi\ResourceResponse
-   *   The expected ResourceResponse.
-   *
-   * @see \GuzzleHttp\ClientInterface::request()
-   */
-  protected function getExpectedIncludeResponse(array $include_paths, array $request_options) {
-    $individual_response = $this->getExpectedGetIndividualResourceResponse();
-    $expected_document = $individual_response->getResponseData();
-    $self_link = Url::fromRoute(
-      sprintf('jsonapi.%s.individual', static::$resourceTypeName),
-      [static::$entityTypeId => $this->entity->uuid()],
-      ['query' => ['include' => implode(',', $include_paths)]]
-    )->setAbsolute()->toString();
-    $expected_document['links']['self'] = $self_link;
-    // If there can be no included data, just return the response with the
-    // updated 'self' link as is.
-    if (empty($include_paths)) {
-      return (new ResourceResponse($expected_document))
-        ->addCacheableDependency($individual_response->getCacheableMetadata());
-    }
-    $resource_data = $this->getExpectedIncludedResourceResponse($include_paths, $request_options);
-    $resource_document = $resource_data->getResponseData();
-    if (isset($resource_document['data'])) {
-      foreach ($resource_document['data'] as $related_resource) {
-        if (empty($expected_document['included']) || !static::collectionHasResourceIdentifier($related_resource, $expected_document['included'])) {
-          $expected_document['included'][] = $related_resource;
-        }
-      }
-    }
-    if (!empty($resource_document['meta']['errors'])) {
-      foreach ($resource_document['meta']['errors'] as $error) {
-        // @todo remove this when inaccessible relationships are able to raise errors in https://www.drupal.org/project/jsonapi/issues/2956084.
-        if (strpos($error['detail'], 'The current user is not allowed to view this relationship.') !== 0) {
-          $expected_document['meta']['errors'][] = $error;
-        }
-      }
-    }
-    return $expected_response = (new ResourceResponse($expected_document))
-      ->addCacheableDependency($individual_response->getCacheableMetadata())
-      ->addCacheableDependency($resource_data->getCacheableMetadata());
   }
 
   /**
@@ -1792,76 +1820,41 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // - to first test all mistakes a developer might make, and assert that the
     //   error responses provide a good DX
     // - to eventually result in a well-formed request that succeeds.
-    $url = Url::fromRoute(sprintf('jsonapi.%s.collection', static::$resourceTypeName));
+    $url = Url::fromRoute(sprintf('jsonapi.%s.collection.post', static::$resourceTypeName));
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
     $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
 
-    // @todo Uncomment in https://www.drupal.org/project/jsonapi/issues/2934149.
-    // @codingStandardsIgnoreStart
-    /*
-    // DX: 415 when no Content-Type request header. HTML response because
-    // missing ?_format query string.
-    $response = $this->request('POST', $url, $request_options);
-    $this->assertSame(415, $response->getStatusCode());
-    $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
-    $this->assertContains('A client error happened', (string) $response->getBody());
-
-    $url->setOption('query', ['_format' => 'api_json']);
-
     // DX: 415 when no Content-Type request header.
     $response = $this->request('POST', $url, $request_options);
-    $this->assertResourceErrorResponse(415, '…', 'No "Content-Type" request header specified', $response);
-*/
-    // @codingStandardsIgnoreEnd
+    $this->assertSame(415, $response->getStatusCode());
 
-    $request_options[RequestOptions::HEADERS]['Content-Type'] = '';
+    $request_options[RequestOptions::HEADERS]['Content-Type'] = 'application/vnd.api+json';
 
     // DX: 400 when no request body.
     $response = $this->request('POST', $url, $request_options);
-    $this->assertResourceErrorResponse(400, 'Empty request body.', $response);
+    $this->assertResourceErrorResponse(400, 'Empty request body.', $url, $response, FALSE);
 
     $request_options[RequestOptions::BODY] = $unparseable_request_body;
 
     // DX: 400 when unparseable request body.
     $response = $this->request('POST', $url, $request_options);
-    $this->assertResourceErrorResponse(400, 'Syntax error', $response);
+    $this->assertResourceErrorResponse(400, 'Syntax error', $url, $response, FALSE);
+
+    $request_options[RequestOptions::BODY] = $parseable_invalid_request_body_missing_type;
+
+    // DX: 400 when invalid JSON API request body.
+    $response = $this->request('POST', $url, $request_options);
+    $this->assertResourceErrorResponse(400, 'Resource object must include a "type".', $url, $response, FALSE);
 
     $request_options[RequestOptions::BODY] = $parseable_invalid_request_body;
 
     // DX: 403 when unauthorized.
     $response = $this->request('POST', $url, $request_options);
     $reason = $this->getExpectedUnauthorizedAccessMessage('POST');
-    // @todo Remove $expected + assertResourceResponse() in favor of the commented line below once https://www.drupal.org/project/jsonapi/issues/2943176 lands.
-    $expected_document = [
-      'errors' => [
-        [
-          'title' => 'Forbidden',
-          'status' => 403,
-          // @todo Why is the reason missing here?
-          'detail' => "The current user is not allowed to POST the selected resource." . (strlen($reason) ? ' ' . $reason : ''),
-          'links' => [
-            'info' => HttpExceptionNormalizer::getInfoUrl(403),
-          ],
-          'code' => 0,
-          'source' => [
-            'pointer' => '/data',
-          ],
-        ],
-      ],
-    ];
-    $this->assertResourceResponse(403, $expected_document, $response);
-    /* $this->assertResourceErrorResponse(403, "The current user is not allowed to POST the selected resource." . (strlen($reason) ? ' ' . $reason : ''), $response, '/data'); */
+    $this->assertResourceErrorResponse(403, (string) $reason, $url, $response);
 
     $this->setUpAuthorization('POST');
-
-    $request_options[RequestOptions::BODY] = $parseable_invalid_request_body_missing_type;
-
-    // DX: 400 when invalid JSON API request body.
-    $response = $this->request('POST', $url, $request_options);
-    $this->assertResourceErrorResponse(400, 'Resource object must include a "type".', $response);
-
-    $request_options[RequestOptions::BODY] = $parseable_invalid_request_body;
 
     // DX: 422 when invalid entity: multiple values sent for single-value field.
     $response = $this->request('POST', $url, $request_options);
@@ -1869,12 +1862,12 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $label_field_capitalized = $this->entity->getFieldDefinition($label_field)->getLabel();
     // @todo Remove $expected + assertResourceResponse() in favor of the commented line below once https://www.drupal.org/project/jsonapi/issues/2943176 lands.
     $expected_document = [
+      'jsonapi' => static::$jsonApiMember,
       'errors' => [
         [
           'title' => 'Unprocessable Entity',
           'status' => 422,
           'detail' => "$label_field: $label_field_capitalized: this field cannot hold more than 1 values.",
-          'code' => 0,
           'source' => [
             'pointer' => '/data/attributes/' . $label_field,
           ],
@@ -1893,15 +1886,16 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $response = $this->request('POST', $url, $request_options);
       // @todo Remove $expected + assertResourceResponse() in favor of the commented line below once https://www.drupal.org/project/jsonapi/issues/2943176 lands.
       $expected_document = [
+        'jsonapi' => static::$jsonApiMember,
         'errors' => [
           [
             'title' => 'Forbidden',
             'status' => 403,
             'detail' => "IDs should be properly generated and formatted UUIDs as described in RFC 4122.",
             'links' => [
-              'info' => HttpExceptionNormalizer::getInfoUrl(403),
+              'info' => ['href' => HttpExceptionNormalizer::getInfoUrl(403)],
+              'via' => ['href' => $url->setAbsolute()->toString()],
             ],
-            'code' => 0,
             'source' => [
               'pointer' => '/data/id',
             ],
@@ -1916,13 +1910,13 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
     // DX: 403 when entity contains field without 'edit' access.
     $response = $this->request('POST', $url, $request_options);
-    $this->assertResourceErrorResponse(403, "The current user is not allowed to POST the selected field (field_rest_test).", $response, '/data/attributes/field_rest_test');
+    $this->assertResourceErrorResponse(403, "The current user is not allowed to POST the selected field (field_rest_test).", $url, $response, '/data/attributes/field_rest_test');
 
     $request_options[RequestOptions::BODY] = $parseable_invalid_request_body_4;
 
     // DX: 422 when request document contains non-existent field.
     $response = $this->request('POST', $url, $request_options);
-    $this->assertResourceErrorResponse(422, sprintf("The attribute field_nonexistent does not exist on the %s resource type.", static::$resourceTypeName), $response);
+    $this->assertResourceErrorResponse(422, sprintf("The attribute field_nonexistent does not exist on the %s resource type.", static::$resourceTypeName), $url, $response, FALSE);
 
     $request_options[RequestOptions::BODY] = $parseable_valid_request_body;
 
@@ -1947,7 +1941,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     if (get_class($this->entityStorage) !== ContentEntityNullStorage::class) {
       $uuid = $this->entityStorage->load(static::$firstCreatedEntityId)->uuid();
       // @todo Remove line below in favor of commented line in https://www.drupal.org/project/jsonapi/issues/2878463.
-      $location = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), [static::$entityTypeId => $uuid])->setAbsolute(TRUE)->toString();
+      $location = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $uuid])->setAbsolute(TRUE)->toString();
       /* $location = $this->entityStorage->load(static::$firstCreatedEntityId)->toUrl('jsonapi')->setAbsolute(TRUE)->toString(); */
       $this->assertSame([$location], $response->getHeader('Location'));
 
@@ -1999,7 +1993,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     if ($this->entity->getEntityType()->getStorageClass() !== ContentEntityNullStorage::class && $this->entity->getEntityType()->hasKey('uuid')) {
       $uuid = $this->entityStorage->load(static::$secondCreatedEntityId)->uuid();
       // @todo Remove line below in favor of commented line in https://www.drupal.org/project/jsonapi/issues/2878463.
-      $location = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), [static::$entityTypeId => $uuid])->setAbsolute(TRUE)->toString();
+      $location = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $uuid])->setAbsolute(TRUE)->toString();
       /* $location = $this->entityStorage->load(static::$secondCreatedEntityId)->toUrl('jsonapi')->setAbsolute(TRUE)->toString(); */
       $this->assertSame([$location], $response->getHeader('Location'));
 
@@ -2010,7 +2004,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $request_options[RequestOptions::BODY] = Json::encode($doc);
 
       $response = $this->request('POST', $url, $request_options);
-      $this->assertResourceErrorResponse(409, 'Conflict: Entity already exists.', $response);
+      $this->assertResourceErrorResponse(409, 'Conflict: Entity already exists.', $url, $response, FALSE);
 
       // 201 when successfully creating an entity with a new UUID.
       $doc = $this->getModifiedEntityForPostTesting();
@@ -2055,6 +2049,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // API document that we send in a PATCH request, it is considered invalid.
     $parseable_invalid_request_body_3 = Json::encode(NestedArray::mergeDeep(['data' => ['attributes' => ['field_rest_test' => $this->entity->get('field_rest_test')->getValue()]]], $this->getPatchDocument()));
     $parseable_invalid_request_body_4 = Json::encode(NestedArray::mergeDeep(['data' => ['attributes' => ['field_nonexistent' => $this->randomString()]]], $this->getPatchDocument()));
+    // It is invalid to PATCH a relationship field under the attributes member.
+    if ($this->entity instanceof FieldableEntityInterface && $this->entity->hasField('field_jsonapi_test_entity_ref')) {
+      $parseable_invalid_request_body_5 = Json::encode(NestedArray::mergeDeep(['data' => ['attributes' => ['field_jsonapi_test_entity_ref' => ['target_id' => $this->randomString()]]]], $this->getPostDocument()));
+    }
 
     // The URL and Guzzle request options that will be used in this test. The
     // request options will be modified/expanded throughout this test:
@@ -2062,66 +2060,34 @@ abstract class ResourceTestBase extends BrowserTestBase {
     //   error responses provide a good DX
     // - to eventually result in a well-formed request that succeeds.
     // @todo Remove line below in favor of commented line in https://www.drupal.org/project/jsonapi/issues/2878463.
-    $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), [static::$entityTypeId => $this->entity->uuid()]);
+    $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $this->entity->uuid()]);
     /* $url = $this->entity->toUrl('jsonapi'); */
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
     $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
 
-    // @todo Uncomment in https://www.drupal.org/project/jsonapi/issues/2934149.
-    // @codingStandardsIgnoreStart
-    /*
     // DX: 415 when no Content-Type request header.
     $response = $this->request('PATCH', $url, $request_options);
-    $this->assertSame(415, $response->getStatusCode());
-    $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
-    $this->assertContains('A client error happened', (string) $response->getBody());
+    $this->assertsame(415, $response->getStatusCode());
 
-    $url->setOption('query', ['_format' => static::$format]);
-
-    // DX: 415 when no Content-Type request header.
-    $response = $this->request('PATCH', $url, $request_options);
-    $this->assertResourceErrorResponse(415, 'No "Content-Type" request header specified', $response);
-
-    $request_options[RequestOptions::HEADERS]['Content-Type'] = static::$mimeType;
-*/
-    // @codingStandardsIgnoreEnd
+    $request_options[RequestOptions::HEADERS]['Content-Type'] = 'application/vnd.api+json';
 
     // DX: 400 when no request body.
     $response = $this->request('PATCH', $url, $request_options);
-    $this->assertResourceErrorResponse(400, 'Empty request body.', $response);
+    $this->assertResourceErrorResponse(400, 'Empty request body.', $url, $response, FALSE);
 
     $request_options[RequestOptions::BODY] = $unparseable_request_body;
 
     // DX: 400 when unparseable request body.
     $response = $this->request('PATCH', $url, $request_options);
-    $this->assertResourceErrorResponse(400, 'Syntax error', $response);
+    $this->assertResourceErrorResponse(400, 'Syntax error', $url, $response, FALSE);
 
     $request_options[RequestOptions::BODY] = $parseable_invalid_request_body;
 
     // DX: 403 when unauthorized.
     $response = $this->request('PATCH', $url, $request_options);
     $reason = $this->getExpectedUnauthorizedAccessMessage('PATCH');
-    // @todo Remove $expected + assertResourceResponse() in favor of the commented line below once https://www.drupal.org/project/jsonapi/issues/2943176 lands.
-    $expected_document = [
-      'errors' => [
-        [
-          'title' => 'Forbidden',
-          'status' => 403,
-          'detail' => "The current user is not allowed to PATCH the selected resource." . (strlen($reason) ? ' ' . $reason : ''),
-          'links' => [
-            'info' => HttpExceptionNormalizer::getInfoUrl(403),
-          ],
-          'code' => 0,
-          'id' => '/' . static::$resourceTypeName . '/' . $this->entity->uuid(),
-          'source' => [
-            'pointer' => '/data',
-          ],
-        ],
-      ],
-    ];
-    $this->assertResourceResponse(403, $expected_document, $response);
-    /* $this->assertResourceErrorResponse(403, "The current user is not allowed to PATCH the selected resource." . (strlen($reason) ? ' ' . $reason : ''), $response, '/data'); */
+    $this->assertResourceErrorResponse(403, (string) $reason, $url, $response);
 
     $this->setUpAuthorization('PATCH');
 
@@ -2131,12 +2097,12 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $label_field_capitalized = $this->entity->getFieldDefinition($label_field)->getLabel();
     // @todo Remove $expected + assertResourceResponse() in favor of the commented line below once https://www.drupal.org/project/jsonapi/issues/2943176 lands.
     $expected_document = [
+      'jsonapi' => static::$jsonApiMember,
       'errors' => [
         [
           'title' => 'Unprocessable Entity',
           'status' => 422,
           'detail' => "$label_field: $label_field_capitalized: this field cannot hold more than 1 values.",
-          'code' => 0,
           'source' => [
             'pointer' => '/data/attributes/' . $label_field,
           ],
@@ -2152,16 +2118,16 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $response = $this->request('PATCH', $url, $request_options);
     // @todo Remove $expected + assertResourceResponse() in favor of the commented line below once https://www.drupal.org/project/jsonapi/issues/2943176 lands.
     $expected_document = [
+      'jsonapi' => static::$jsonApiMember,
       'errors' => [
         [
           'title' => 'Forbidden',
           'status' => 403,
           'detail' => "The current user is not allowed to PATCH the selected field (field_rest_test).",
           'links' => [
-            'info' => HttpExceptionNormalizer::getInfoUrl(403),
+            'info' => ['href' => HttpExceptionNormalizer::getInfoUrl(403)],
+            'via' => ['href' => $url->setAbsolute()->toString()],
           ],
-          'code' => 0,
-          'id' => '/' . static::$resourceTypeName . '/' . $this->entity->uuid(),
           'source' => [
             'pointer' => '/data/attributes/field_rest_test',
           ],
@@ -2177,16 +2143,16 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $id_field_name = $this->entity->getEntityType()->getKey('id');
     // @todo Remove $expected + assertResourceResponse() in favor of the commented line below once https://www.drupal.org/project/jsonapi/issues/2943176 lands.
     $expected_document = [
+      'jsonapi' => static::$jsonApiMember,
       'errors' => [
         [
           'title' => 'Forbidden',
           'status' => 403,
           'detail' => "The current user is not allowed to PATCH the selected field ($id_field_name). The entity ID cannot be changed.",
           'links' => [
-            'info' => HttpExceptionNormalizer::getInfoUrl(403),
+            'info' => ['href' => HttpExceptionNormalizer::getInfoUrl(403)],
+            'via' => ['href' => $url->setAbsolute()->toString()],
           ],
-          'code' => 0,
-          'id' => '/' . static::$resourceTypeName . '/' . $this->entity->uuid(),
           'source' => [
             'pointer' => '/data/attributes/' . $id_field_name,
           ],
@@ -2203,7 +2169,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       // DX: 400 when entity trying to update an entity's UUID field.
       $request_options[RequestOptions::BODY] = Json::encode($this->makeNormalizationInvalid($this->getPatchDocument(), 'uuid'));
       $response = $this->request('PATCH', $url, $request_options);
-      $this->assertResourceErrorResponse(400, sprintf("The selected entity (%s) does not match the ID in the payload (%s).", $this->entity->uuid(), $this->anotherEntity->uuid()), $response);
+      $this->assertResourceErrorResponse(400, sprintf("The selected entity (%s) does not match the ID in the payload (%s).", $this->entity->uuid(), $this->anotherEntity->uuid()), $url, $response, FALSE);
     }
 
     $request_options[RequestOptions::BODY] = $parseable_invalid_request_body_3;
@@ -2214,16 +2180,16 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $response = $this->request('PATCH', $url, $request_options);
     // @todo Remove $expected + assertResourceResponse() in favor of the commented line below once https://www.drupal.org/project/jsonapi/issues/2943176 lands.
     $expected_document = [
+      'jsonapi' => static::$jsonApiMember,
       'errors' => [
         [
           'title' => 'Forbidden',
           'status' => 403,
           'detail' => "The current user is not allowed to PATCH the selected field (field_rest_test).",
           'links' => [
-            'info' => HttpExceptionNormalizer::getInfoUrl(403),
+            'info' => ['href' => HttpExceptionNormalizer::getInfoUrl(403)],
+            'via' => ['href' => $url->setAbsolute()->toString()],
           ],
-          'code' => 0,
-          'id' => '/' . static::$resourceTypeName . '/' . $this->entity->uuid(),
           'source' => [
             'pointer' => '/data/attributes/field_rest_test',
           ],
@@ -2243,16 +2209,16 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $response = $this->request('PATCH', $url, $request_options);
       // @todo Remove $expected + assertResourceResponse() in favor of the commented line below once https://www.drupal.org/project/jsonapi/issues/2943176 lands.
       $expected_document = [
+        'jsonapi' => static::$jsonApiMember,
         'errors' => [
           [
             'title' => 'Forbidden',
             'status' => 403,
             'detail' => "The current user is not allowed to PATCH the selected field (" . $patch_protected_field_name . ")." . ($reason !== NULL ? ' ' . $reason : ''),
             'links' => [
-              'info' => HttpExceptionNormalizer::getInfoUrl(403),
+              'info' => ['href' => HttpExceptionNormalizer::getInfoUrl(403)],
+              'via' => ['href' => $url->setAbsolute()->toString()],
             ],
-            'code' => 0,
-            'id' => '/' . static::$resourceTypeName . '/' . $this->entity->uuid(),
             'source' => [
               'pointer' => '/data/attributes/' . $patch_protected_field_name,
             ],
@@ -2268,7 +2234,14 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
     // DX: 422 when request document contains non-existent field.
     $response = $this->request('PATCH', $url, $request_options);
-    $this->assertResourceErrorResponse(422, sprintf("The attribute field_nonexistent does not exist on the %s resource type.", static::$resourceTypeName), $response);
+    $this->assertResourceErrorResponse(422, sprintf("The attribute field_nonexistent does not exist on the %s resource type.", static::$resourceTypeName), $url, $response, FALSE);
+
+    // DX: 422 when updating a relationship field under attributes.
+    if (isset($parseable_invalid_request_body_5)) {
+      $request_options[RequestOptions::BODY] = $parseable_invalid_request_body_5;
+      $response = $this->request('PATCH', $url, $request_options);
+      $this->assertResourceErrorResponse(422, "The following relationship fields were provided as attributes: [ field_jsonapi_test_entity_ref ]", $url, $response, FALSE);
+    }
 
     // 200 for well-formed PATCH request that sends all fields (even including
     // read-only ones, but with unchanged values).
@@ -2278,17 +2251,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->assertResourceResponse(200, FALSE, $response);
 
     $request_options[RequestOptions::BODY] = $parseable_valid_request_body;
-
-    // @todo Uncomment when https://www.drupal.org/project/jsonapi/issues/2934149 lands.
-    // @codingStandardsIgnoreStart
-    /*
     $request_options[RequestOptions::HEADERS]['Content-Type'] = 'text/xml';
 
     // DX: 415 when request body in existing but not allowed format.
     $response = $this->request('PATCH', $url, $request_options);
-    $this->assertResourceErrorResponse(415, 'No route found that matches "Content-Type: text/xml"', $response);
-    */
-    // @codingStandardsIgnoreEnd
+    $this->assertSame(415, $response->getStatusCode());
 
     $request_options[RequestOptions::HEADERS]['Content-Type'] = 'application/vnd.api+json';
 
@@ -2302,13 +2269,23 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $updated_entity_document = $this->normalize($updated_entity, $url);
     $this->assertSame($updated_entity_document, Json::decode((string) $response->getBody()));
     // Assert that the entity was indeed created using the PATCHed values.
-    foreach ($this->getPatchDocument() as $field_name => $field_normalization) {
-      // Some top-level keys in the normalization may not be fields on the
-      // entity (for example '_links' and '_embedded' in the HAL normalization).
-      if ($updated_entity->hasField($field_name)) {
-        // Subset, not same, because we can e.g. send just the target_id for the
-        // bundle in a PATCH request; the response will include more properties.
-        $this->assertArraySubset($field_normalization, $updated_entity->get($field_name)->getValue(), TRUE);
+    foreach ($this->getPatchDocument()['data']['attributes'] as $field_name => $field_normalization) {
+      // If the value is an array of properties, only verify that the sent
+      // properties are present, the server could be computing additional
+      // properties.
+      if (is_array($field_normalization)) {
+        $this->assertArraySubset($field_normalization, $updated_entity_document['data']['attributes'][$field_name]);
+      }
+      else {
+        $this->assertSame($field_normalization, $updated_entity_document['data']['attributes'][$field_name]);
+      }
+    }
+    if (isset($this->getPatchDocument()['data']['relationships'])) {
+      foreach ($this->getPatchDocument()['data']['relationships'] as $field_name => $relationship_field_normalization) {
+        // POSTing relationships: 'data' is required, 'links' is optional.
+        static::recursiveKsort($relationship_field_normalization);
+        static::recursiveKsort($updated_entity_document['data']['relationships'][$field_name]);
+        $this->assertSame($relationship_field_normalization, array_diff_key($updated_entity_document['data']['relationships'][$field_name], ['links' => TRUE]));
       }
     }
 
@@ -2316,11 +2293,6 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // request. Test this using the configurable field that we added, but which
     // is not sent in the PATCH request.
     $this->assertSame('All the faith he had had had had no effect on the outcome of his life.', $updated_entity->get('field_rest_test')->value);
-
-    // @todo Remove this when JSON API requires Drupal 8.5 or newer.
-    if (floatval(\Drupal::VERSION) < 8.5) {
-      return;
-    }
 
     // Multi-value field: remove item 0. Then item 1 becomes item 0.
     $doc_multi_value_tests = $this->getPatchDocument();
@@ -2362,7 +2334,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     //   error responses provide a good DX
     // - to eventually result in a well-formed request that succeeds.
     // @todo Remove line below in favor of commented line in https://www.drupal.org/project/jsonapi/issues/2878463.
-    $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), [static::$entityTypeId => $this->entity->uuid()]);
+    $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $this->entity->uuid()]);
     /* $url = $this->entity->toUrl('jsonapi'); */
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
@@ -2371,26 +2343,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // DX: 403 when unauthorized.
     $response = $this->request('DELETE', $url, $request_options);
     $reason = $this->getExpectedUnauthorizedAccessMessage('DELETE');
-    // @todo Remove $expected + assertResourceResponse() in favor of the commented line below once https://www.drupal.org/project/jsonapi/issues/2943176 lands.
-    $expected_document = [
-      'errors' => [
-        [
-          'title' => 'Forbidden',
-          'status' => 403,
-          'detail' => "The current user is not allowed to DELETE the selected resource." . (strlen($reason) ? ' ' . $reason : ''),
-          'links' => [
-            'info' => HttpExceptionNormalizer::getInfoUrl(403),
-          ],
-          'code' => 0,
-          'id' => '/' . static::$resourceTypeName . '/' . $this->entity->uuid(),
-          'source' => [
-            'pointer' => '/data',
-          ],
-        ],
-      ],
-    ];
-    $this->assertResourceResponse(403, $expected_document, $response);
-    /* $this->assertResourceErrorResponse(403, "The current user is not allowed to DELETE the selected resource." . (strlen($reason) ? ' ' . $reason : ''), $response, '/data'); */
+    $this->assertResourceErrorResponse(403, (string) $reason, $url, $response, FALSE);
 
     $this->setUpAuthorization('DELETE');
 
@@ -2415,18 +2368,6 @@ abstract class ResourceTestBase extends BrowserTestBase {
         static::recursiveKsort($value);
       }
     }
-  }
-
-  /**
-   * Sorts an error array.
-   *
-   * @param array $errors
-   *   An array of JSON API error object to be sorted by ID.
-   */
-  protected static function sortErrors(array &$errors) {
-    usort($errors, function ($a, $b) {
-      return strcmp($a['id'], $b['id']);
-    });
   }
 
   /**
@@ -2550,9 +2491,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
         $owner = $this->entity->getOwner();
         $owner_resource = static::toResourceIdentifier($owner);
         foreach ($field_set as $field_name) {
-          $owner_resource['attributes'][$field_name] = $owner->get($field_name)[0]->get('value')->getCastedValue();
+          $owner_resource['attributes'][$field_name] = $this->serializer->normalize($owner->get($field_name)[0]->get('value'), 'api_json');
         }
-        $owner_resource['links']['self'] = static::getResourceLink($owner_resource);
+        $owner_resource['links']['self']['href'] = static::getResourceLink($owner_resource);
         $expected_document['included'] = [$owner_resource];
         $expected_cacheability->addCacheableDependency($owner);
         $expected_cacheability->addCacheableDependency(static::entityAccess($owner, 'view', $this->account));
@@ -2574,7 +2515,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       }
       $url->setOption('query', $query);
       // 'self' link should include the 'fields' query param.
-      $expected_document['links']['self'] = $url->setAbsolute()->toString();
+      $expected_document['links']['self']['href'] = $url->setAbsolute()->toString();
 
       $response = $this->request('GET', $url, $request_options);
       // Dynamic Page Cache miss because cache should vary based on the 'field'
@@ -2626,14 +2567,12 @@ abstract class ResourceTestBase extends BrowserTestBase {
     }
 
     foreach ($field_sets as $type => $included_paths) {
-      foreach (array_intersect_key(static::getIncludePermissions(), array_flip($included_paths)) as $permissions) {
-        $this->grantPermissionsToTestedRole($permissions);
-      }
-      $expected_response = $this->getExpectedIncludeResponse($included_paths, $request_options);
+      $this->grantIncludedPermissions($included_paths);
       $query = ['include' => implode(',', $included_paths)];
       $url->setOption('query', $query);
       $actual_response = $this->request('GET', $url, $request_options);
       $response_document = Json::decode((string) $actual_response->getBody());
+      $expected_response = $this->getExpectedIncludedResourceResponse($included_paths, $request_options);
       $expected_document = $expected_response->getResponseData();
       // @todo uncomment this assertion in https://www.drupal.org/project/jsonapi/issues/2929428
       // Dynamic Page Cache miss because cache should vary based on the
@@ -2675,18 +2614,16 @@ abstract class ResourceTestBase extends BrowserTestBase {
     foreach ($related_responses as $related_response) {
       $related_document = $related_response->getResponseData();
       $expected_cacheability->addCacheableDependency($related_response->getCacheableMetadata());
+      $expected_cacheability->setCacheTags(array_values(array_diff($expected_cacheability->getCacheTags(), ['4xx-response'])));
+      // If any of the related response documents had omitted items or errors,
+      // we should later expect the document to have omitted items as well.
       if (!empty($related_document['errors'])) {
-        // If any of the related response documents had top-level errors, we
-        // should later expect the document to have 'meta' errors too.
-        foreach ($related_document['errors'] as $error) {
-          // @todo remove this when inaccessible relationships are able to raise errors in https://www.drupal.org/project/jsonapi/issues/2956084.
-          if (strpos($error['detail'], 'The current user is not allowed to view this relationship.') !== 0) {
-            unset($error['source']['pointer']);
-            $expected_document['meta']['errors'][] = $error;
-          }
-        }
+        static::addOmittedObject($expected_document, static::errorsToOmittedObject($related_document['errors']));
       }
-      elseif (isset($related_document['data'])) {
+      if (!empty($related_document['meta']['omitted'])) {
+        static::addOmittedObject($expected_document, $related_document['meta']['omitted']);
+      }
+      if (isset($related_document['data'])) {
         $related_data = $related_document['data'];
         $related_resources = (static::isResourceIdentifier($related_data))
           ? [$related_data]
@@ -2703,6 +2640,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
   /**
    * Gets the expected individual ResourceResponse for GET.
+   *
+   * @return \Drupal\jsonapi\ResourceResponse
+   *   The expected individual ResourceResponse.
    */
   protected function getExpectedGetIndividualResourceResponse($status_code = 200) {
     $resource_response = new ResourceResponse($this->getExpectedDocument(), $status_code);
@@ -2734,7 +2674,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   }
 
   /**
-   * Gets a list of relationship field names for the resource type under test.
+   * Gets a list of public relationship names for the resource type under test.
    *
    * @param \Drupal\Core\Entity\EntityInterface|null $entity
    *   (optional) The entity for which to get relationship field names.
@@ -2751,7 +2691,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     return array_reduce($fields, function ($field_names, $field) {
       /* @var \Drupal\Core\Field\FieldItemListInterface $field */
       if (static::isReferenceFieldDefinition($field->getFieldDefinition())) {
-        $field_names[] = $field->getName();
+        $field_names[] = $this->resourceType->getPublicName($field->getName());
       }
       return $field_names;
     }, []);
@@ -2807,7 +2747,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   The AccessResult.
    */
   protected static function entityFieldAccess(EntityInterface $entity, $field_name, $operation, AccountInterface $account) {
-    $entity_access = static::entityAccess($entity, $operation, $account);
+    $entity_access = static::entityAccess($entity, $operation === 'edit' ? 'update' : 'view', $account);
     $field_access = $entity->{$field_name}->access($operation, $account, TRUE);
     return $entity_access->andIf($field_access);
   }
@@ -2825,12 +2765,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $get_nested_relationship_field_names = function (EntityInterface $entity, $depth, $path = "") use (&$get_nested_relationship_field_names) {
       $relationship_field_names = $this->getRelationshipFieldNames($entity);
       if ($depth > 0) {
-        // @todo remove the line below and uncomment the following line in https://www.drupal.org/project/jsonapi/issues/2946537
-        $paths = ($path) ? [$path] : [];
-        /* $paths = []; */
+        $paths = [];
         foreach ($relationship_field_names as $field_name) {
           $next = ($path) ? "$path.$field_name" : $field_name;
-          if ($target_entity = $entity->{$field_name}->entity) {
+          $internal_field_name = $this->resourceType->getInternalName($field_name);
+          if ($target_entity = $entity->{$internal_field_name}->entity) {
             $deep = $get_nested_relationship_field_names($target_entity, $depth - 1, $next);
             $paths = array_merge($paths, $deep);
           }
@@ -2863,6 +2802,20 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $main_property = $item_definition->getMainPropertyName();
     $property_definition = $item_definition->getPropertyDefinition($main_property);
     return $property_definition instanceof DataReferenceTargetDefinition;
+  }
+
+  /**
+   * Grants authorization to view includes.
+   *
+   * @param string[] $include_paths
+   *   An array of include paths for which to grant access.
+   */
+  protected function grantIncludedPermissions(array $include_paths = []) {
+    $applicable_permissions = array_intersect_key(static::getIncludePermissions(), array_flip($include_paths));
+    $flattened_permissions = array_unique(array_reduce($applicable_permissions, 'array_merge', []));
+    // Always grant access to 'view' the test entity reference field.
+    $flattened_permissions[] = 'field_jsonapi_test_entity_ref view access';
+    $this->grantPermissionsToTestedRole($flattened_permissions);
   }
 
 }

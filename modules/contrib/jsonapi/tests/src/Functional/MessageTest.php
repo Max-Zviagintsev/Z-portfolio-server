@@ -155,16 +155,16 @@ class MessageTest extends ResourceTestBase {
    */
   public function testRelationships() {
     // Contact Message entities are not stored, so they cannot be retrieved.
-    $this->setExpectedException(RouteNotFoundException::class, 'Route "jsonapi.contact_message--camelids.relationship" does not exist.');
+    $this->setExpectedException(RouteNotFoundException::class, 'Route "jsonapi.contact_message--camelids.relationship.get" does not exist.');
 
-    Url::fromRoute('jsonapi.contact_message--camelids.relationship')->toString(TRUE);
+    Url::fromRoute('jsonapi.contact_message--camelids.relationship.get')->toString(TRUE);
   }
 
   /**
    * {@inheritdoc}
    */
   public function testCollection() {
-    $collection_url = Url::fromRoute(sprintf('jsonapi.%s.collection', static::$resourceTypeName))->setAbsolute(TRUE);
+    $collection_url = Url::fromRoute('jsonapi.contact_message--camelids.collection.post')->setAbsolute(TRUE);
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
     $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
@@ -172,7 +172,8 @@ class MessageTest extends ResourceTestBase {
     // 405 because Message entities are not stored, so they cannot be retrieved,
     // yet the same URL can be used to POST them.
     $response = $this->request('GET', $collection_url, $request_options);
-    $this->assertResourceErrorResponse(405, 'No route found for "GET /jsonapi/contact_message/camelids": Method Not Allowed (Allow: POST)', $response);
+    $this->assertSame(405, $response->getStatusCode());
+    $this->assertSame(['POST'], $response->getHeader('Allow'));
   }
 
 }

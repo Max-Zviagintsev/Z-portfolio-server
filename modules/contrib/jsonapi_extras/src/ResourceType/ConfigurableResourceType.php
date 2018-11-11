@@ -3,15 +3,20 @@
 namespace Drupal\jsonapi_extras\ResourceType;
 
 use Drupal\Component\Plugin\Exception\PluginException;
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi_extras\Entity\JsonapiResourceConfig;
 use Drupal\jsonapi_extras\Plugin\ResourceFieldEnhancerManager;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
 
 /**
  * Defines a configurable resource type.
  */
 class ConfigurableResourceType extends ResourceType {
+
+  use DependencySerializationTrait;
 
   /**
    * The JsonapiResourceConfig entity.
@@ -35,7 +40,16 @@ class ConfigurableResourceType extends ResourceType {
   protected $configFactory;
 
   /**
+   * Cache instance to use for data caches.
+   *
+   * @var \Drupal\Core\Cache\CacheBackendInterface
+   */
+  protected $staticCache;
+
+  /**
    * {@inheritdoc}
+   *
+   * @todo Remove this when JSON API Extras drops support for JSON API 1.x.
    */
   public function getPublicName($field_name) {
     return $this->translateFieldName($field_name, 'fieldName', 'publicName');
@@ -43,6 +57,8 @@ class ConfigurableResourceType extends ResourceType {
 
   /**
    * {@inheritdoc}
+   *
+   * @todo Remove this when JSON API Extras drops support for JSON API 1.x.
    */
   public function getInternalName($field_name) {
     return $this->translateFieldName($field_name, 'publicName', 'fieldName');
@@ -66,14 +82,26 @@ class ConfigurableResourceType extends ResourceType {
    */
   public function setJsonapiResourceConfig(JsonapiResourceConfig $resource_config) {
     $this->jsonapiResourceConfig = $resource_config;
-    if ($name = $this->jsonapiResourceConfig->get('resourceType')) {
+    if ($name = $resource_config->get('resourceType')) {
       // Set the type name.
       $this->typeName = $name;
     }
   }
 
   /**
+   * Sets the internal cache storage service.
+   *
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   *   The cache back-end.
+   */
+  public function setStaticCache(CacheBackendInterface $cache_backend) {
+    $this->staticCache = $cache_backend;
+  }
+
+  /**
    * {@inheritdoc}
+   *
+   * @todo Remove this when JSON API Extras drops support for JSON API 1.x.
    */
   public function isFieldEnabled($field_name) {
     $resource_field = $this->getResourceFieldConfiguration($field_name);
@@ -109,6 +137,8 @@ class ConfigurableResourceType extends ResourceType {
   /**
    * Get the resource field configuration.
    *
+   * @todo https://www.drupal.org/node/3007820
+   *
    * @param string $field_name
    *   The internal field name.
    * @param string $from
@@ -118,16 +148,35 @@ class ConfigurableResourceType extends ResourceType {
    *   The resource field definition. NULL if none can be found.
    */
   public function getResourceFieldConfiguration($field_name, $from = 'fieldName') {
-    $resource_fields = $this->jsonapiResourceConfig->get('resourceFields');
+    $resource_config = $this->getJsonapiResourceConfig();
+    $config_id = $resource_config->id();
+    $cid = sprintf('jsonapi_extras::%s:%s:%s', $config_id, $field_name, $from);
+    $cache = $this->staticCache->get($cid);
+    if ($cache !== FALSE) {
+      return $cache->data ?: NULL;
+    }
+
+    $resource_fields = $resource_config->get('resourceFields');
     // Find the resource field in the config entity for the given field name.
     $found = array_filter($resource_fields, function ($resource_field) use ($field_name, $from) {
       return !empty($resource_field[$from]) &&
         $field_name == $resource_field[$from];
     });
-    if (empty($found)) {
-      return NULL;
-    }
-    return reset($found);
+    $result = empty($found) ? NULL : reset($found);
+    // Save the results into the cache.
+    $cache_tags = ['jsonapi_resource_types'];
+    $resource_tags = (new CacheableMetadata())
+      ->addCacheableDependency($resource_config)
+      ->addCacheableDependency($resource_config->getEntityType())
+      ->getCacheTags();
+    $cache_tags = array_merge($cache_tags, $resource_tags);
+    $this->staticCache->set(
+      $cid,
+      $result,
+      CacheBackendInterface::CACHE_PERMANENT,
+      $cache_tags
+    );
+    return $result;
   }
 
   /**
@@ -155,6 +204,8 @@ class ConfigurableResourceType extends ResourceType {
    *
    * @param bool $is_internal
    *   Indicates if the resource is not public.
+   *
+   * @todo Remove this when JSON API Extras drops support for JSON API 1.x.
    */
   public function setInternal($is_internal) {
     $this->internal = $is_internal;
@@ -211,6 +262,8 @@ class ConfigurableResourceType extends ResourceType {
    *
    * @return string
    *   The field name in the desired realm.
+   *
+   * @todo Remove this when JSON API Extras drops support for JSON API 1.x.
    */
   private function translateFieldName($field_name, $from, $to) {
     $resource_field = $this->getResourceFieldConfiguration($field_name, $from);

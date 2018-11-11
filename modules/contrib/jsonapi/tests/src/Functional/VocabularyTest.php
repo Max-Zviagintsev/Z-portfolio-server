@@ -63,23 +63,21 @@ class VocabularyTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => 'http://jsonapi.org/format/1.0/',
+            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
           ],
         ],
         'version' => '1.0',
       ],
       'links' => [
-        'self' => $self_url,
+        'self' => ['href' => $self_url],
       ],
       'data' => [
         'id' => $this->entity->uuid(),
         'type' => 'taxonomy_vocabulary--taxonomy_vocabulary',
         'links' => [
-          'self' => $self_url,
+          'self' => ['href' => $self_url],
         ],
         'attributes' => [
-          'uuid' => $this->entity->uuid(),
-          'vid' => 'llama',
           'langcode' => 'en',
           'status' => TRUE,
           'dependencies' => [],
@@ -87,6 +85,7 @@ class VocabularyTest extends ResourceTestBase {
           'description' => NULL,
           'hierarchy' => 0,
           'weight' => 0,
+          'drupal_internal__vid' => 'llama',
         ],
       ],
     ];
@@ -104,10 +103,6 @@ class VocabularyTest extends ResourceTestBase {
    */
   protected function getExpectedUnauthorizedAccessMessage($method) {
     if ($method === 'GET') {
-      // @todo Remove this when JSON API requires Drupal 8.5 or newer.
-      if (floatval(\Drupal::VERSION) < 8.5) {
-        return parent::getExpectedUnauthorizedAccessMessage($method);
-      }
       return "The following permissions are required: 'access taxonomy overview' OR 'administer taxonomy'.";
     }
     return parent::getExpectedUnauthorizedAccessMessage($method);

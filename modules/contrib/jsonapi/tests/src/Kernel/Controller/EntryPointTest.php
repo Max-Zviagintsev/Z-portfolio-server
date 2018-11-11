@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\jsonapi\Kernel\Controller;
 
-use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\jsonapi\Controller\EntryPoint;
 use Drupal\Tests\jsonapi\Kernel\JsonapiKernelTestBase;
 
@@ -33,18 +32,21 @@ class EntryPointTest extends JsonapiKernelTestBase {
     $controller = new EntryPoint(
       \Drupal::service('jsonapi.resource_type.repository'),
       \Drupal::service('renderer'),
-      new CacheableJsonResponse()
+      \Drupal::service('current_user')
     );
     $processed_response = $controller->index();
     $this->assertEquals(
-      ['url.site'],
+      [
+        'url.site',
+        'user.roles:authenticated',
+      ],
       $processed_response->getCacheableMetadata()->getCacheContexts()
     );
-    $data = json_decode($processed_response->getContent(), TRUE);
-    $links = $data['links'];
-    $this->assertRegExp('/.*\/jsonapi/', $links['self']);
-    $this->assertRegExp('/.*\/jsonapi\/user\/user/', $links['user--user']);
-    $this->assertRegExp('/.*\/jsonapi\/node_type\/node_type/', $links['node_type--node_type']);
+    $links = $processed_response->getResponseData()->getLinks();
+    $this->assertRegExp('/.*\/jsonapi/', $links['self']['href']);
+    $this->assertRegExp('/.*\/jsonapi\/user\/user/', $links['user--user']['href']);
+    $this->assertRegExp('/.*\/jsonapi\/node_type\/node_type/', $links['node_type--node_type']['href']);
+    $this->assertSame([], $processed_response->getResponseData()->getMeta());
   }
 
 }

@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\jsonapi\Kernel\Normalizer;
 
+use Drupal\jsonapi\Normalizer\SortNormalizer;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\jsonapi\Context\FieldResolver;
 use Drupal\jsonapi\Query\Sort;
@@ -38,8 +39,7 @@ class SortNormalizerTest extends KernelTestBase {
    */
   public function setUp() {
     parent::setUp();
-    $this->container->set('jsonapi.field_resolver', $this->getFieldResolver('foo', 'bar'));
-    $this->normalizer = $this->container->get('serializer.normalizer.sort.jsonapi');
+    $this->normalizer = new SortNormalizer($this->getFieldResolver('foo', 'bar'));
   }
 
   /**

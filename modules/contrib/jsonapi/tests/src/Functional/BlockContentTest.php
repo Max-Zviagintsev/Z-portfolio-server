@@ -6,7 +6,6 @@ use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Url;
-use Drupal\Tests\rest\Functional\BcTimestampNormalizerUnixTestTrait;
 
 /**
  * JSON API integration test for the "BlockContent" content entity type.
@@ -14,8 +13,6 @@ use Drupal\Tests\rest\Functional\BcTimestampNormalizerUnixTestTrait;
  * @group jsonapi
  */
 class BlockContentTest extends ResourceTestBase {
-
-  use BcTimestampNormalizerUnixTestTrait;
 
   /**
    * {@inheritdoc}
@@ -35,7 +32,7 @@ class BlockContentTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    *
-   * @var \Drupal\config_test\ConfigTestInterface
+   * @var \Drupal\block_content\BlockContentInterface
    */
   protected $entity;
 
@@ -49,11 +46,6 @@ class BlockContentTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $uniqueFieldNames = ['url'];
-
-  /**
-   * {@inheritdoc}
-   */
   protected function setUpAuthorization($method) {
     $this->grantPermissionsToTestedRole(['administer blocks']);
   }
@@ -62,12 +54,6 @@ class BlockContentTest extends ResourceTestBase {
    * {@inheritdoc}
    */
   public function createEntity() {
-    // @todo Remove when JSON API requires Drupal 8.5 or newer.
-    // @see https://www.drupal.org/project/drupal/issues/2835845#comment-12265016
-    if (floatval(\Drupal::VERSION) < 8.5) {
-      return;
-    }
-
     if (!BlockContentType::load('basic')) {
       $block_content_type = BlockContentType::create([
         'id' => 'basic',
@@ -87,7 +73,7 @@ class BlockContentTest extends ResourceTestBase {
         'format' => 'plain_text',
       ],
     ])
-      ->setPublished(FALSE);
+      ->setUnpublished();
     $block_content->save();
     return $block_content;
   }
@@ -97,69 +83,67 @@ class BlockContentTest extends ResourceTestBase {
    */
   protected function getExpectedDocument() {
     $self_url = Url::fromUri('base:/jsonapi/block_content/basic/' . $this->entity->uuid())->setAbsolute()->toString(TRUE)->getGeneratedUrl();
-    return [
+    $expected_document = [
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => 'http://jsonapi.org/format/1.0/',
+            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
           ],
         ],
         'version' => '1.0',
       ],
       'links' => [
-        'self' => $self_url,
+        'self' => ['href' => $self_url],
       ],
       'data' => [
         'id' => $this->entity->uuid(),
         'type' => 'block_content--basic',
         'links' => [
-          'self' => $self_url,
+          'self' => ['href' => $self_url],
         ],
         'attributes' => [
-          'id' => 1,
           'body' => [
             'value' => 'The name "llama" was adopted by European settlers from native Peruvians.',
             'format' => 'plain_text',
             'summary' => NULL,
             'processed' => "<p>The name &quot;llama&quot; was adopted by European settlers from native Peruvians.</p>\n",
           ],
-          'changed' => $this->entity->getChangedTime(),
-          // @todo uncomment this in https://www.drupal.org/project/jsonapi/issues/2929932
-          /* 'changed' => $this->formatExpectedTimestampItemValues($this->entity->getChangedTime()), */
+          'changed' => (new \DateTime())->setTimestamp($this->entity->getChangedTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
           'info' => 'Llama',
-          'revision_id' => 1,
           'revision_log' => NULL,
-          'revision_created' => (int) $this->entity->getRevisionCreationTime(),
-          // @todo uncomment this in https://www.drupal.org/project/jsonapi/issues/2929932
-          /* 'revision_created' => $this->formatExpectedTimestampItemValues($this->entity->getRevisionCreationTime()), */
-          // @todo Attempt to remove this in https://www.drupal.org/project/drupal/issues/2933518.
+          'revision_created' => (new \DateTime())->setTimestamp($this->entity->getRevisionCreationTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
           'revision_translation_affected' => TRUE,
           'status' => FALSE,
           'langcode' => 'en',
           'default_langcode' => TRUE,
-          'uuid' => $this->entity->uuid(),
+          'drupal_internal__id' => 1,
+          'drupal_internal__revision_id' => 1,
         ],
         'relationships' => [
-          'type' => [
+          'block_content_type' => [
             'data' => [
               'id' => BlockContentType::load('basic')->uuid(),
               'type' => 'block_content_type--block_content_type',
             ],
             'links' => [
-              'related' => $self_url . '/type',
-              'self' => $self_url . '/relationships/type',
+              'related' => ['href' => $self_url . '/block_content_type'],
+              'self' => ['href' => $self_url . '/relationships/block_content_type'],
             ],
           ],
           'revision_user' => [
             'data' => NULL,
             'links' => [
-              'related' => $self_url . '/revision_user',
-              'self' => $self_url . '/relationships/revision_user',
+              'related' => ['href' => $self_url . '/revision_user'],
+              'self' => ['href' => $self_url . '/relationships/revision_user'],
             ],
           ],
         ],
       ],
     ];
+    if (floatval(\Drupal::VERSION) >= 8.6) {
+      $expected_document['data']['attributes']['reusable'] = TRUE;
+    }
+    return $expected_document;
   }
 
   /**
@@ -205,54 +189,6 @@ class BlockContentTest extends ResourceTestBase {
       $contexts = Cache::mergeContexts($contexts, ['languages:language_interface', 'theme']);
     }
     return $contexts;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testGetIndividual() {
-    // @todo Remove when JSON API requires Drupal 8.5 or newer.
-    // @see https://www.drupal.org/project/drupal/issues/2835845#comment-12265016
-    if (floatval(\Drupal::VERSION) < 8.5) {
-      $this->markTestSkipped('BlockContent entities were made publishable in 8.5, this is necessary for this test coverage to work.');
-    }
-    return parent::testGetIndividual();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testPostIndividual() {
-    // @todo Remove when JSON API requires Drupal 8.5 or newer.
-    // @see https://www.drupal.org/project/drupal/issues/2835845#comment-12265016
-    if (floatval(\Drupal::VERSION) < 8.5) {
-      $this->markTestSkipped('BlockContent entities were made publishable in 8.5, this is necessary for this test coverage to work.');
-    }
-    return parent::testGetIndividual();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testPatchIndividual() {
-    // @todo Remove when JSON API requires Drupal 8.5 or newer.
-    // @see https://www.drupal.org/project/drupal/issues/2835845#comment-12265016
-    if (floatval(\Drupal::VERSION) < 8.5) {
-      $this->markTestSkipped('BlockContent entities were made publishable in 8.5, this is necessary for this test coverage to work.');
-    }
-    return parent::testPatchIndividual();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testDeleteIndividual() {
-    // @todo Remove when JSON API requires Drupal 8.5 or newer.
-    // @see https://www.drupal.org/project/drupal/issues/2835845#comment-12265016
-    if (floatval(\Drupal::VERSION) < 8.5) {
-      $this->markTestSkipped('BlockContent entities were made publishable in 8.5, this is necessary for this test coverage to work.');
-    }
-    return parent::testDeleteIndividual();
   }
 
   /**

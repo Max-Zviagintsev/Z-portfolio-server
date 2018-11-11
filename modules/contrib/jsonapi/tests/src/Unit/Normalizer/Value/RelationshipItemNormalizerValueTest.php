@@ -20,7 +20,7 @@ class RelationshipItemNormalizerValueTest extends UnitTestCase {
    * @dataProvider rasterizeValueProvider
    */
   public function testRasterizeValue($values, $entity_type_id, $bundle, $expected) {
-    $object = new RelationshipItemNormalizerValue($values, new CacheableMetadata(), new ResourceType($entity_type_id, $bundle, NULL), NULL);
+    $object = new RelationshipItemNormalizerValue($values, new CacheableMetadata(), new ResourceType($entity_type_id, $bundle, NULL));
     $this->assertEquals($expected, $object->rasterizeValue());
   }
 

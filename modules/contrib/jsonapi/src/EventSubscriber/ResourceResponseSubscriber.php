@@ -6,6 +6,7 @@ use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\jsonapi\Normalizer\Value\JsonApiDocumentTopLevelNormalizerValue;
 use Drupal\jsonapi\ResourceResponse;
+use Drupal\jsonapi\ResourceType\ResourceType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -109,11 +110,11 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
 
     // If there is data to send, serialize and set it as the response body.
     if ($data !== NULL) {
-      // First normalize the data.
-      $jsonapi_doc_object = $serializer->normalize($data, $format, [
-        'request' => $request,
-        'resource_type' => $request->get('resource_type'),
-      ]);
+      // First normalize the data. Note that error responses do not need a
+      // normalization context, since there are no entities to normalize.
+      // @see \Drupal\jsonapi\EventSubscriber\DefaultExceptionSubscriber::isJsonApiExceptionEvent()
+      $context = !$response->isSuccessful() ? [] : static::generateContext($request);
+      $jsonapi_doc_object = $serializer->normalize($data, $format, $context);
       // Having just normalized the data, we can associate its cacheability with
       // the response object.
       assert($jsonapi_doc_object instanceof JsonApiDocumentTopLevelNormalizerValue);
@@ -123,6 +124,33 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
       $response->setContent($serializer->encode($jsonapi_doc_object, $format));
       $response->headers->set('Content-Type', $request->getMimeType($format));
     }
+  }
+
+  /**
+   * Generates a top-level JSON API normalization context.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request from which the context can be derived.
+   *
+   * @return array
+   *   The generated context.
+   */
+  protected static function generateContext(Request $request) {
+    $resource_type = $request->get('resource_type');
+    assert($resource_type instanceof ResourceType || $resource_type === NULL);
+
+    // Build the expanded context.
+    $context = [
+      'account' => NULL,
+      'sparse_fieldset' => NULL,
+      'resource_type' => $resource_type,
+    ];
+    if ($request->query->get('fields')) {
+      $context['sparse_fieldset'] = array_map(function ($item) {
+        return explode(',', $item);
+      }, $request->query->get('fields'));
+    }
+    return $context;
   }
 
   /**

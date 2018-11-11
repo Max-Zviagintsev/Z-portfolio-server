@@ -4,16 +4,18 @@ namespace Drupal\jsonapi\Normalizer;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\Field\TypedData\FieldItemDataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataInternalPropertiesHelper;
 use Drupal\jsonapi\Normalizer\Value\FieldItemNormalizerValue;
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Drupal\serialization\Normalizer\CacheableNormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * Converts the Drupal field item object to a JSON API array structure.
  *
  * @internal
  */
-class FieldItemNormalizer extends NormalizerBase {
+class FieldItemNormalizer extends NormalizerBase implements DenormalizerInterface {
 
   /**
    * The interface or class that this Normalizer supports.
@@ -42,24 +44,21 @@ class FieldItemNormalizer extends NormalizerBase {
     $values = [];
     // We normalize each individual property, so each can do their own casting,
     // if needed.
-    // @todo Remove this when JSON API requires Drupal 8.5 or newer.
-    if (floatval(\Drupal::VERSION) >= 8.5) {
-      $field_item = TypedDataInternalPropertiesHelper::getNonInternalProperties($field_item);
-    }
+    $field_properties = !empty($field_item->getProperties(TRUE))
+      ? TypedDataInternalPropertiesHelper::getNonInternalProperties($field_item)
+      : $field_item->getValue();
 
-    // @todo Use the constant \Drupal\serialization\Normalizer\CacheableNormalizerInterface::SERIALIZATION_CONTEXT_CACHEABILITY instead of the 'cacheability' string when JSON API requires Drupal 8.5 or newer.
-    $context['cacheability'] = new CacheableMetadata();
+    $context[CacheableNormalizerInterface::SERIALIZATION_CONTEXT_CACHEABILITY] = new CacheableMetadata();
 
-    foreach ($field_item as $property_name => $property) {
+    foreach ($field_properties as $property_name => $property) {
       $values[$property_name] = $this->serializer->normalize($property, $format, $context);
     }
 
     if (isset($context['langcode'])) {
       $values['lang'] = $context['langcode'];
     }
-    // @todo Use the constant \Drupal\serialization\Normalizer\CacheableNormalizerInterface::SERIALIZATION_CONTEXT_CACHEABILITY instead of the 'cacheability' string when JSON API requires Drupal 8.5 or newer.
-    $value = new FieldItemNormalizerValue($values, $context['cacheability']);
-    unset($context['cacheability']);
+    $value = new FieldItemNormalizerValue($values, $context[CacheableNormalizerInterface::SERIALIZATION_CONTEXT_CACHEABILITY]);
+    unset($context[CacheableNormalizerInterface::SERIALIZATION_CONTEXT_CACHEABILITY]);
     return $value;
   }
 
@@ -67,7 +66,36 @@ class FieldItemNormalizer extends NormalizerBase {
    * {@inheritdoc}
    */
   public function denormalize($data, $class, $format = NULL, array $context = []) {
-    throw new UnexpectedValueException('Denormalization not implemented for JSON API');
+    $item_definition = $context['field_definition']->getItemDefinition();
+    assert($item_definition instanceof FieldItemDataDefinitionInterface);
+
+    $property_definitions = $item_definition->getPropertyDefinitions();
+
+    // Because e.g. the 'bundle' entity key field requires field values to not
+    // be expanded to an array of all properties, we special-case single-value
+    // properties.
+    if (!is_array($data)) {
+      $property_value = $data;
+      $property_value_class = $property_definitions[$item_definition->getMainPropertyName()]->getClass();
+      return $this->serializer->supportsDenormalization($property_value, $property_value_class, $format, $context)
+        ? $this->serializer->denormalize($property_value, $property_value_class, $format, $context)
+        : $property_value;
+    }
+
+    $data_internal = [];
+    if (!empty($property_definitions)) {
+      foreach ($data as $property_name => $property_value) {
+        $property_value_class = $property_definitions[$property_name]->getClass();
+        $data_internal[$property_name] = $this->serializer->supportsDenormalization($property_value, $property_value_class, $format, $context)
+          ? $this->serializer->denormalize($property_value, $property_value_class, $format, $context)
+          : $property_value;
+      }
+    }
+    else {
+      $data_internal = $data;
+    }
+
+    return $data_internal;
   }
 
 }

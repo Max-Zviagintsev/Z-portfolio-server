@@ -123,4 +123,31 @@ class JsonapiResourceConfig extends ConfigEntityBase {
     }
   }
 
+  /**
+   * Returns a field mapping as expected by JSON API 2.x' ResourceType class.
+   *
+   * @see \Drupal\jsonapi\ResourceType\ResourceType::__construct()
+   */
+  public function getFieldMapping() {
+    $resource_fields = $this->get('resourceFields') ?: [];
+
+    $mapping = [];
+    foreach ($resource_fields as $resource_field) {
+      $field_name = $resource_field['fieldName'];
+      if ($resource_field['disabled'] === TRUE) {
+        $mapping[$field_name] = FALSE;
+        continue;
+      }
+
+      if (($alias = $resource_field['publicName']) && $alias !== $field_name) {
+        $mapping[$field_name] = $alias;
+        continue;
+      }
+
+      $mapping[$field_name] = TRUE;
+    }
+
+    return $mapping;
+  }
+
 }

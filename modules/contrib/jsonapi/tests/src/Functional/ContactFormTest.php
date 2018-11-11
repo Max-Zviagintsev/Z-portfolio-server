@@ -69,23 +69,22 @@ class ContactFormTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => 'http://jsonapi.org/format/1.0/',
+            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
           ],
         ],
         'version' => '1.0',
       ],
       'links' => [
-        'self' => $self_url,
+        'self' => ['href' => $self_url],
       ],
       'data' => [
         'id' => $this->entity->uuid(),
         'type' => 'contact_form--contact_form',
         'links' => [
-          'self' => $self_url,
+          'self' => ['href' => $self_url],
         ],
         'attributes' => [
           'dependencies' => [],
-          'id' => 'llama',
           'label' => 'Llama',
           'langcode' => 'en',
           'message' => 'Let us know what you think about llamas',
@@ -96,8 +95,8 @@ class ContactFormTest extends ResourceTestBase {
           'redirect' => NULL,
           'reply' => 'Llamas are indeed awesome!',
           'status' => TRUE,
-          'uuid' => $this->entity->uuid(),
           'weight' => 0,
+          'drupal_internal__id' => 'llama',
         ],
       ],
     ];

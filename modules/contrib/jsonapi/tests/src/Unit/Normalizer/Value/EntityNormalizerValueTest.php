@@ -52,7 +52,6 @@ class EntityNormalizerValueTest extends UnitTestCase {
     \Drupal::setContainer($container);
 
     $field1 = $this->prophesize(FieldNormalizerValueInterface::class);
-    $field1->getIncludes()->willReturn([]);
     $field1->getPropertyType()->willReturn('attributes');
     $field1->rasterizeValue()->willReturn('dummy_title');
     $field1->getCacheContexts()->willReturn(['ccbar']);
@@ -65,7 +64,6 @@ class EntityNormalizerValueTest extends UnitTestCase {
     $field2->getCacheTags()->willReturn(['ctbaz']);
     $field2->getCacheMaxAge()->willReturn(25);
     $included[] = $this->prophesize(JsonApiDocumentTopLevelNormalizerValue::class);
-    $included[0]->getIncludes()->willReturn([]);
     $included[0]->rasterizeValue()->willReturn([
       'data' => [
         'type' => 'node',
@@ -76,7 +74,6 @@ class EntityNormalizerValueTest extends UnitTestCase {
     $included[0]->getCacheContexts()->willReturn(['lorem', 'ipsum']);
     // Type & id duplicated on purpose.
     $included[] = $this->prophesize(JsonApiDocumentTopLevelNormalizerValue::class);
-    $included[1]->getIncludes()->willReturn([]);
     $included[1]->rasterizeValue()->willReturn([
       'data' => [
         'type' => 'node',
@@ -85,7 +82,6 @@ class EntityNormalizerValueTest extends UnitTestCase {
       ],
     ]);
     $included[] = $this->prophesize(JsonApiDocumentTopLevelNormalizerValue::class);
-    $included[2]->getIncludes()->willReturn([]);
     $included[2]->rasterizeValue()->willReturn([
       'data' => [
         'type' => 'node',
@@ -93,9 +89,6 @@ class EntityNormalizerValueTest extends UnitTestCase {
         'attributes' => ['body' => 'dummy_body3'],
       ],
     ]);
-    $field2->getIncludes()->willReturn(array_map(function ($included_item) {
-      return $included_item->reveal();
-    }, $included));
     $context = [
       'resource_type' => new ResourceType('node', 'article',
         NodeInterface::class),
@@ -148,50 +141,9 @@ class EntityNormalizerValueTest extends UnitTestCase {
         'field_related' => ['data' => ['type' => 'node', 'id' => 2]],
       ],
       'links' => [
-        'self' => 'dummy_entity_link',
+        'self' => ['href' => 'dummy_entity_link'],
       ],
     ], $this->object->rasterizeValue());
-  }
-
-  /**
-   * @covers ::rasterizeIncludes
-   */
-  public function testRasterizeIncludes() {
-    $expected = [
-      [
-        'data' => [
-          'type' => 'node',
-          'id' => '199c681d-a9dc-4b6f-a4dc-e3811f24141b',
-          'attributes' => ['body' => 'dummy_body1'],
-        ],
-      ],
-      [
-        'data' => [
-          'type' => 'node',
-          'id' => '199c681d-a9dc-4b6f-a4dc-e3811f24141b',
-          'attributes' => ['body' => 'dummy_body2'],
-        ],
-      ],
-      [
-        'data' => [
-          'type' => 'node',
-          'id' => '83771375-a4ba-4d7d-a4d5-6153095bb5c5',
-          'attributes' => ['body' => 'dummy_body3'],
-        ],
-      ],
-    ];
-    $this->assertEquals($expected, $this->object->rasterizeIncludes());
-  }
-
-  /**
-   * @covers ::getIncludes
-   */
-  public function testGetIncludes() {
-    $includes = $this->object->getIncludes();
-    $includes = array_filter($includes, function ($included) {
-      return $included instanceof JsonApiDocumentTopLevelNormalizerValue;
-    });
-    $this->assertCount(3, $includes);
   }
 
 }

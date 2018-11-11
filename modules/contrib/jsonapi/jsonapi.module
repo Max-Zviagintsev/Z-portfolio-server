@@ -5,9 +5,10 @@
  * Module implementation file.
  */
 
-use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\jsonapi\Routing\Routes as JsonApiRoutes;
 
 /**
  * Implements hook_help().
@@ -31,35 +32,7 @@ function jsonapi_help($route_name, RouteMatchInterface $route_match) {
 }
 
 /**
- * Implements hook_entity_base_field_info().
- *
- * @todo This should probably live in core, but for now we will keep it as a
- * temporary solution. There are similar unresolved efforts already happening
- * there.
- *
- * @see https://www.drupal.org/node/2825487
- */
-function jsonapi_entity_base_field_info(EntityTypeInterface $entity_type) {
-  $fields = [];
-  if ($entity_type->id() == 'file') {
-    $fields['url'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Download URL'))
-      ->setDescription(t('The download URL of the file.'))
-      ->setComputed(TRUE)
-      ->setCustomStorage(TRUE)
-      ->setClass('\Drupal\jsonapi\Field\FileDownloadUrl')
-      ->setDisplayOptions('view', [
-        'label' => 'above',
-        'weight' => -5,
-        'region' => 'hidden',
-      ])
-      ->setDisplayConfigurable('view', TRUE);
-  }
-  return $fields;
-}
-
-/**
- * Implements hook_entity_base_field_info().
+ * Implements hook_entity_bundle_field_info().
  */
 function jsonapi_entity_bundle_field_info(EntityTypeInterface $entity_type, $bundle, array $base_field_definitions) {
   $fields = [];
@@ -72,4 +45,38 @@ function jsonapi_entity_bundle_field_info(EntityTypeInterface $entity_type, $bun
   }
 
   return $fields;
+}
+
+/**
+ * Implements hook_entity_bundle_create().
+ */
+function jsonapi_entity_bundle_create() {
+  JsonApiRoutes::rebuild();
+}
+
+/**
+ * Implements hook_entity_bundle_delete().
+ */
+function jsonapi_entity_bundle_delete() {
+  JsonApiRoutes::rebuild();
+}
+
+/**
+ * Implements hook_entity_create().
+ */
+function jsonapi_entity_create(EntityInterface $entity) {
+  if (in_array($entity->getEntityTypeId(), ['field_storage_config', 'field_config'])) {
+    // @todo: only do this when relationship fields are updated, not just any field.
+    JsonApiRoutes::rebuild();
+  }
+}
+
+/**
+ * Implements hook_entity_delete().
+ */
+function jsonapi_entity_delete(EntityInterface $entity) {
+  if (in_array($entity->getEntityTypeId(), ['field_storage_config', 'field_config'])) {
+    // @todo: only do this when relationship fields are updated, not just any field.
+    JsonApiRoutes::rebuild();
+  }
 }

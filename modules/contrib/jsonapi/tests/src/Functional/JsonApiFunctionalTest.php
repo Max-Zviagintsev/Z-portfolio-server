@@ -40,7 +40,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     ]));
     $this->assertSession()->statusCodeEquals(200);
     $this->assertEquals(OffsetPage::SIZE_MAX, count($collection_output['data']));
-    $this->assertContains('page%5Boffset%5D=53', $collection_output['links']['next']);
+    $this->assertContains('page%5Boffset%5D=53', $collection_output['links']['next']['href']);
     // 3. Load all articles (1st page, 2 items)
     $collection_output = Json::decode($this->drupalGet('/jsonapi/node/article', [
       'query' => ['page' => ['limit' => 2]],
@@ -58,7 +58,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     ]));
     $this->assertSession()->statusCodeEquals(200);
     $this->assertEquals(2, count($collection_output['data']));
-    $this->assertContains('page%5Boffset%5D=4', $collection_output['links']['next']);
+    $this->assertContains('page%5Boffset%5D=4', $collection_output['links']['next']['href']);
     // 5. Single article.
     $uuid = $this->nodes[0]->uuid();
     $single_output = Json::decode($this->drupalGet('/jsonapi/node/article/' . $uuid));
@@ -66,15 +66,19 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     $this->assertArrayHasKey('type', $single_output['data']);
     $this->assertEquals($this->nodes[0]->getTitle(), $single_output['data']['attributes']['title']);
 
-    // 5.1 Single article with access denied.
+    // 5.1 Single article with access denied because unauthenticated.
+    Json::decode($this->drupalGet('/jsonapi/node/article/' . $this->nodes[60]->uuid()));
+    $this->assertSession()->statusCodeEquals(401);
+
+    // 5.1 Single article with access denied while authenticated.
+    $this->drupalLogin($this->userCanViewProfiles);
     $single_output = Json::decode($this->drupalGet('/jsonapi/node/article/' . $this->nodes[60]->uuid()));
     $this->assertSession()->statusCodeEquals(403);
-
     $this->assertEquals('/data', $single_output['errors'][0]['source']['pointer']);
-    $this->assertEquals('/node--article/' . $this->nodes[60]->uuid(), $single_output['errors'][0]['id']);
+    $this->drupalLogout();
 
     // 6. Single relationship item.
-    $single_output = Json::decode($this->drupalGet('/jsonapi/node/article/' . $uuid . '/relationships/type'));
+    $single_output = Json::decode($this->drupalGet('/jsonapi/node/article/' . $uuid . '/relationships/node_type'));
     $this->assertSession()->statusCodeEquals(200);
     $this->assertArrayHasKey('type', $single_output['data']);
     $this->assertArrayNotHasKey('attributes', $single_output['data']);
@@ -94,17 +98,17 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     // 8b. Single related item, empty.
     $single_output = Json::decode($this->drupalGet('/jsonapi/node/article/' . $uuid . '/field_heroless'));
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSame([], $single_output['data']);
+    $this->assertSame(NULL, $single_output['data']);
     // 9. Related tags with includes.
     $single_output = Json::decode($this->drupalGet('/jsonapi/node/article/' . $uuid . '/field_tags', [
       'query' => ['include' => 'vid'],
     ]));
     $this->assertSession()->statusCodeEquals(200);
     $this->assertEquals('taxonomy_term--tags', $single_output['data'][0]['type']);
-    $this->assertArrayHasKey('tid', $single_output['data'][0]['attributes']);
+    $this->assertArrayNotHasKey('tid', $single_output['data'][0]['attributes']);
     $this->assertContains(
       '/taxonomy_term/tags/',
-      $single_output['data'][0]['links']['self']
+      $single_output['data'][0]['links']['self']['href']
     );
     $this->assertEquals(
       'taxonomy_vocabulary--taxonomy_vocabulary',
@@ -167,10 +171,12 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     ]));
     $this->assertSession()->statusCodeEquals(200);
     $this->assertEquals(1, count($single_output['data']));
-    $this->assertEquals(1, count($single_output['meta']['errors']));
-    $this->assertEquals(403, $single_output['meta']['errors'][0]['status']);
-    $this->assertEquals('/node--article/' . $this->nodes[1]->uuid(), $single_output['meta']['errors'][0]['id']);
-    $this->assertFalse(empty($single_output['meta']['errors'][0]['source']['pointer']));
+    $this->assertEquals(1, count(array_filter(array_keys($single_output['meta']['omitted']['links']), function ($key) {
+      return $key !== 'help';
+    })));
+    $link_keys = array_keys($single_output['meta']['omitted']['links']);
+    $this->assertSame('help', reset($link_keys));
+    $this->assertRegExp('/^item:[a-zA-Z0-9]{7}$/', next($link_keys));
     $this->nodes[1]->set('status', TRUE);
     $this->nodes[1]->save();
     // 13. Test filtering when using short syntax.
@@ -246,7 +252,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     $this->assertGreaterThanOrEqual(2, count($single_output['included']));
     // 17. Single user (check fields lacking 'view' access).
     $user_url = Url::fromRoute('jsonapi.user--user.individual', [
-      'user' => $this->user->uuid(),
+      'entity' => $this->user->uuid(),
     ]);
     $response = $this->request('GET', $user_url, [
       'auth' => [
@@ -278,9 +284,8 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     // 19. Test non-existing route without 'Accept' header.
     $this->drupalGet('/jsonapi/node/article/broccoli');
     $this->assertSession()->statusCodeEquals(404);
-    // Without the 'Accept' header we cannot know we want the 404 error
-    // formatted as JSON API.
-    $this->assertSession()->responseHeaderContains('Content-Type', 'text/html');
+    // Even without the 'Accept' header the 404 error is formatted as JSON API.
+    $this->assertSession()->responseHeaderEquals('Content-Type', 'application/vnd.api+json');
     // 20. Test non-existing route with 'Accept' header.
     $single_output = Json::decode($this->drupalGet('/jsonapi/node/article/broccoli', [], [
       'Accept' => 'application/vnd.api+json',
@@ -290,13 +295,6 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     // With the 'Accept' header we can know we want the 404 error formatted as
     // JSON API.
     $this->assertSession()->responseHeaderContains('Content-Type', 'application/vnd.api+json');
-    // 21. Test the value of the computed 'url' field.
-    $collection_output = Json::decode($this->drupalGet('/jsonapi/file/file'));
-    // @todo Remove this when JSON API requires Drupal 8.5 or newer.
-    $expected_url = (floatval(\Drupal::VERSION) < 8.5)
-      ? $collection_output['data'][0]['attributes']['uri']
-      : $collection_output['data'][0]['attributes']['uri']['value'];
-    $this->assertEquals($collection_output['data'][0]['attributes']['url'], $expected_url);
     // 22. Test sort criteria on multiple fields: both ASC.
     $output = Json::decode($this->drupalGet('/jsonapi/node/article', [
       'query' => [
@@ -304,11 +302,18 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
         'sort' => 'field_sort1,field_sort2',
       ],
     ]));
-    $output_nids = array_map(function ($result) {
-      return $result['attributes']['nid'];
+    $output_uuids = array_map(function ($result) {
+      return $result['id'];
     }, $output['data']);
-    $this->assertCount(6, $output_nids);
-    $this->assertEquals([5, 4, 3, 2, 1, 10], $output_nids);
+    $this->assertCount(6, $output_uuids);
+    $this->assertSame([
+      Node::load(5)->uuid(),
+      Node::load(4)->uuid(),
+      Node::load(3)->uuid(),
+      Node::load(2)->uuid(),
+      Node::load(1)->uuid(),
+      Node::load(10)->uuid(),
+    ], $output_uuids);
     // 23. Test sort criteria on multiple fields: first ASC, second DESC.
     $output = Json::decode($this->drupalGet('/jsonapi/node/article', [
       'query' => [
@@ -316,11 +321,18 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
         'sort' => 'field_sort1,-field_sort2',
       ],
     ]));
-    $output_nids = array_map(function ($result) {
-      return $result['attributes']['nid'];
+    $output_uuids = array_map(function ($result) {
+      return $result['id'];
     }, $output['data']);
-    $this->assertCount(6, $output_nids);
-    $this->assertEquals([1, 2, 3, 4, 5, 6], $output_nids);
+    $this->assertCount(6, $output_uuids);
+    $this->assertSame([
+      Node::load(1)->uuid(),
+      Node::load(2)->uuid(),
+      Node::load(3)->uuid(),
+      Node::load(4)->uuid(),
+      Node::load(5)->uuid(),
+      Node::load(6)->uuid(),
+    ], $output_uuids);
     // 24. Test sort criteria on multiple fields: first DESC, second ASC.
     $output = Json::decode($this->drupalGet('/jsonapi/node/article', [
       'query' => [
@@ -328,12 +340,18 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
         'sort' => '-field_sort1,field_sort2',
       ],
     ]));
-    $output_nids = array_map(function ($result) {
-      return $result['attributes']['nid'];
+    $output_uuids = array_map(function ($result) {
+      return $result['id'];
     }, $output['data']);
-    $this->assertCount(5, $output_nids);
-    $this->assertCount(1, $output['meta']['errors']);
-    $this->assertEquals([60, 59, 58, 57, 56], $output_nids);
+    $this->assertCount(5, $output_uuids);
+    $this->assertCount(2, $output['meta']['omitted']['links']);
+    $this->assertSame([
+      Node::load(60)->uuid(),
+      Node::load(59)->uuid(),
+      Node::load(58)->uuid(),
+      Node::load(57)->uuid(),
+      Node::load(56)->uuid(),
+    ], $output_uuids);
     // 25. Test sort criteria on multiple fields: both DESC.
     $output = Json::decode($this->drupalGet('/jsonapi/node/article', [
       'query' => [
@@ -341,12 +359,18 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
         'sort' => '-field_sort1,-field_sort2',
       ],
     ]));
-    $output_nids = array_map(function ($result) {
-      return $result['attributes']['nid'];
+    $output_uuids = array_map(function ($result) {
+      return $result['id'];
     }, $output['data']);
-    $this->assertCount(5, $output_nids);
-    $this->assertCount(1, $output['meta']['errors']);
-    $this->assertEquals([56, 57, 58, 59, 60], $output_nids);
+    $this->assertCount(5, $output_uuids);
+    $this->assertCount(2, $output['meta']['omitted']['links']);
+    $this->assertSame([
+      Node::load(56)->uuid(),
+      Node::load(57)->uuid(),
+      Node::load(58)->uuid(),
+      Node::load(59)->uuid(),
+      Node::load(60)->uuid(),
+    ], $output_uuids);
     // 25. Test collection count.
     $this->container->get('module_installer')->install(['jsonapi_test_collection_count']);
     $collection_output = Json::decode($this->drupalGet('/jsonapi/node/article'));
@@ -491,7 +515,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
   public function testWrite() {
     $this->createDefaultContent(0, 3, FALSE, FALSE, static::IS_NOT_MULTILINGUAL, FALSE);
     // 1. Successful post.
-    $collection_url = Url::fromRoute('jsonapi.node--article.collection');
+    $collection_url = Url::fromRoute('jsonapi.node--article.collection.post');
     $body = [
       'data' => [
         'type' => 'node--article',
@@ -534,10 +558,10 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     ]);
     $created_response = Json::decode($response->getBody()->__toString());
     $this->assertEquals(201, $response->getStatusCode());
-    $this->assertArrayHasKey('uuid', $created_response['data']['attributes']);
-    $uuid = $created_response['data']['attributes']['uuid'];
+    $this->assertArrayNotHasKey('uuid', $created_response['data']['attributes']);
+    $uuid = $created_response['data']['id'];
     $this->assertEquals(2, count($created_response['data']['relationships']['field_tags']['data']));
-    $this->assertEquals($created_response['data']['links']['self'], $response->getHeader('Location')[0]);
+    $this->assertEquals($created_response['data']['links']['self']['href'], $response->getHeader('Location')[0]);
 
     // 2. Authorization error.
     $response = $this->request('POST', $collection_url, [
@@ -545,9 +569,9 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
       'headers' => ['Content-Type' => 'application/vnd.api+json'],
     ]);
     $created_response = Json::decode($response->getBody()->__toString());
-    $this->assertEquals(403, $response->getStatusCode());
+    $this->assertEquals(401, $response->getStatusCode());
     $this->assertNotEmpty($created_response['errors']);
-    $this->assertEquals('Forbidden', $created_response['errors'][0]['title']);
+    $this->assertEquals('Unauthorized', $created_response['errors'][0]['title']);
 
     // 2.1 Authorization error with a user without create permissions.
     $response = $this->request('POST', $collection_url, [
@@ -560,23 +584,14 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     $this->assertNotEmpty($created_response['errors']);
     $this->assertEquals('Forbidden', $created_response['errors'][0]['title']);
 
-    // @todo Uncomment when https://www.drupal.org/project/jsonapi/issues/2934149 lands, and make more strict.
-    /*
-     * // 3. Missing Content-Type error.
-     *
-     * $response = $this->request('POST', $collection_url, [
-     *   'body' => Json::encode($body),
-     *   'auth' => [$this->user->getUsername(), $this->user->pass_raw],
-     *   'headers' => ['Accept' => 'application/vnd.api+json'],
-     * ]);
-     * $created_response = Json::decode($response->getBody()->__toString());
-     * $this->assertEquals(422, $response->getStatusCode());
-     * $this->assertNotEmpty($created_response['errors']);
-     * $this->assertEquals(
-     *   'Unprocessable Entity',
-     *   $created_response['errors'][0]['title']
-     * );
-     */
+    // 3. Missing Content-Type error.
+    $response = $this->request('POST', $collection_url, [
+      'body' => Json::encode($body),
+      'auth' => [$this->user->getUsername(), $this->user->pass_raw],
+      'headers' => ['Accept' => 'application/vnd.api+json'],
+    ]);
+    $created_response = Json::decode($response->getBody()->__toString());
+    $this->assertEquals(415, $response->getStatusCode());
 
     // 4. Article with a duplicate ID.
     $invalid_body = $body;
@@ -673,7 +688,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
       ],
     ];
     $individual_url = Url::fromRoute('jsonapi.node--article.individual', [
-      'node' => $uuid,
+      'entity' => $uuid,
     ]);
     $response = $this->request('PATCH', $individual_url, [
       'body' => Json::encode($body),
@@ -693,7 +708,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
       ],
     ];
     $individual_url = Url::fromRoute('jsonapi.node--article.individual', [
-      'node' => $uuid,
+      'entity' => $uuid,
     ]);
     $response = $this->request('PATCH', $individual_url, [
       'body' => Json::encode($body),
@@ -734,9 +749,8 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
         ],
       ],
     ];
-    $relationship_url = Url::fromRoute('jsonapi.node--article.relationship', [
-      'node' => $uuid,
-      'related' => 'field_tags',
+    $relationship_url = Url::fromRoute('jsonapi.node--article.field_tags.relationship.post', [
+      'entity' => $uuid,
     ]);
     $response = $this->request('POST', $relationship_url, [
       'body' => Json::encode($body),
@@ -784,7 +798,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
       'body' => Json::encode($body),
       'headers' => ['Content-Type' => 'application/vnd.api+json'],
     ]);
-    $this->assertEquals(403, $response->getStatusCode());
+    $this->assertEquals(401, $response->getStatusCode());
     $response = $this->request('DELETE', $relationship_url, [
       // Remove the existing relationship item.
       'body' => Json::encode($body),

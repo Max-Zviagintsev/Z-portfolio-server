@@ -6,7 +6,6 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\jsonapi\Normalizer\Value\FieldItemNormalizerValue;
 use Drupal\jsonapi\Normalizer\Value\FieldNormalizerValue;
-use Drupal\jsonapi\Normalizer\Value\RelationshipItemNormalizerValue;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -74,21 +73,6 @@ class FieldNormalizerValueTest extends UnitTestCase {
         [$uuid_raw, $uuid_raw],
       ],
     ];
-  }
-
-  /**
-   * @covers ::rasterizeIncludes
-   */
-  public function testRasterizeIncludes() {
-    $value = $this->prophesize(RelationshipItemNormalizerValue::class);
-    $include = $this->prophesize('\Drupal\jsonapi\Normalizer\Value\EntityNormalizerValue');
-    $include->rasterizeValue()->willReturn('Lorem');
-    $value->getCacheContexts()->willReturn(['ccfoo']);
-    $value->getCacheTags()->willReturn(['ctfoo']);
-    $value->getCacheMaxAge()->willReturn(15);
-    $value->getInclude()->willReturn($include->reveal());
-    $object = new FieldNormalizerValue(AccessResult::allowed(), [$value->reveal()], 1, 'attributes');
-    $this->assertEquals(['Lorem'], $object->rasterizeIncludes());
   }
 
 }

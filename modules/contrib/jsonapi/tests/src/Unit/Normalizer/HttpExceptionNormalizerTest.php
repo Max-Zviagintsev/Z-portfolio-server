@@ -5,6 +5,9 @@ namespace Drupal\Tests\jsonapi\Unit\Normalizer;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\jsonapi\Normalizer\HttpExceptionNormalizer;
 use Drupal\Tests\UnitTestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
@@ -19,6 +22,11 @@ class HttpExceptionNormalizerTest extends UnitTestCase {
    * @covers ::normalize
    */
   public function testNormalize() {
+    $request_stack = $this->prophesize(RequestStack::class);
+    $request_stack->getCurrentRequest()->willReturn(Request::create('http://localhost/'));
+    $container = $this->prophesize(ContainerInterface::class);
+    $container->get('request_stack')->willReturn($request_stack->reveal());
+    \Drupal::setContainer($container->reveal());
     $exception = new AccessDeniedHttpException('lorem', NULL, 13);
     $current_user = $this->prophesize(AccountInterface::class);
     $current_user->hasPermission('access site reports')->willReturn(TRUE);

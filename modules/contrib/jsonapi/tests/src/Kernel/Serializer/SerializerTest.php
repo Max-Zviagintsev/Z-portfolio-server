@@ -79,7 +79,8 @@ class SerializerTest extends JsonapiKernelTestBase {
       'uid' => $this->user->id(),
     ]);
     $this->node->save();
-    $this->sut = $this->container->get('jsonapi.serializer_do_not_use_removal_imminent');
+    $this->container->setAlias('sut', 'jsonapi.serializer_do_not_use_removal_imminent');
+    $this->sut = $this->container->get('sut');
   }
 
   /**

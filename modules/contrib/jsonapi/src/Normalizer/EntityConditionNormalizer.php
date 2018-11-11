@@ -2,9 +2,10 @@
 
 namespace Drupal\jsonapi\Normalizer;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\jsonapi\Query\EntityCondition;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
 
 /**
  * The normalizer used for entity conditions.
@@ -81,32 +82,33 @@ class EntityConditionNormalizer implements DenormalizerInterface {
     $has_path_key = isset($data[static::PATH_KEY]);
     $has_value_key = isset($data[static::VALUE_KEY]);
 
+    $cacheability = (new CacheableMetadata())->addCacheContexts(['url.query_args:filter']);
     if (!$valid_key_set) {
       // Try to provide a more specific exception is a key is missing.
       if (!$has_operator_key) {
         if (!$has_path_key) {
-          throw new BadRequestHttpException("Filter parameter is missing a '" . static::PATH_KEY . "' key.");
+          throw new CacheableBadRequestHttpException($cacheability, "Filter parameter is missing a '" . static::PATH_KEY . "' key.");
         }
         if (!$has_value_key) {
-          throw new BadRequestHttpException("Filter parameter is missing a '" . static::VALUE_KEY . "' key.");
+          throw new CacheableBadRequestHttpException($cacheability, "Filter parameter is missing a '" . static::VALUE_KEY . "' key.");
         }
       }
 
       // Catchall exception.
       $reason = "You must provide a valid filter condition. Check that you have set the required keys for your filter.";
-      throw new BadRequestHttpException($reason);
+      throw new CacheableBadRequestHttpException($cacheability, $reason);
     }
 
     if ($has_operator_key) {
       $operator = $data[static::OPERATOR_KEY];
       if (!in_array($operator, EntityCondition::$allowedOperators)) {
         $reason = "The '" . $operator . "' operator is not allowed in a filter parameter.";
-        throw new BadRequestHttpException($reason);
+        throw new CacheableBadRequestHttpException($cacheability, $reason);
       }
 
       if (in_array($operator, ['IS NULL', 'IS NOT NULL']) && $has_value_key) {
         $reason = "Filters using the '" . $operator . "' operator should not provide a value.";
-        throw new BadRequestHttpException($reason);
+        throw new CacheableBadRequestHttpException($cacheability, $reason);
       }
     }
   }

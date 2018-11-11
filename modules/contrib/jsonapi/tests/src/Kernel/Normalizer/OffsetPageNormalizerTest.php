@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\jsonapi\Kernel\Normalizer;
 
+use Drupal\jsonapi\Normalizer\OffsetPageNormalizer;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\jsonapi\Query\OffsetPage;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -37,7 +38,7 @@ class OffsetPageNormalizerTest extends KernelTestBase {
    */
   public function setUp() {
     parent::setUp();
-    $this->normalizer = $this->container->get('serializer.normalizer.offset_page.jsonapi');
+    $this->normalizer = new OffsetPageNormalizer();
   }
 
   /**

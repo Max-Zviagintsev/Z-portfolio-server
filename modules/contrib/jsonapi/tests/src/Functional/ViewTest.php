@@ -62,19 +62,19 @@ class ViewTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => 'http://jsonapi.org/format/1.0/',
+            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
           ],
         ],
         'version' => '1.0',
       ],
       'links' => [
-        'self' => $self_url,
+        'self' => ['href' => $self_url],
       ],
       'data' => [
         'id' => $this->entity->uuid(),
         'type' => 'view--view',
         'links' => [
-          'self' => $self_url,
+          'self' => ['href' => $self_url],
         ],
         'attributes' => [
           'base_field' => 'nid',
@@ -101,13 +101,12 @@ class ViewTest extends ResourceTestBase {
               ],
             ],
           ],
-          'id' => 'test_rest',
           'label' => 'Test REST',
           'langcode' => 'en',
           'module' => 'views',
           'status' => TRUE,
           'tag' => '',
-          'uuid' => $this->entity->uuid(),
+          'drupal_internal__id' => 'test_rest',
         ],
       ],
     ];

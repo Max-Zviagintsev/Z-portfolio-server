@@ -3,6 +3,7 @@
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Access\AccessResultReasonInterface;
 use Drupal\Core\Cache\Cache;
@@ -27,7 +28,7 @@ trait ResourceResponseTestTrait {
    * objects. Not necessarily to a response to a collection route. In both
    * cases, the document should indistinguishable.
    *
-   * @param array $responses
+   * @param \Drupal\jsonapi\ResourceResponse[] $responses
    *   An array or ResourceResponses to be merged.
    * @param string|null $self_link
    *   The self link for the merged document if one should be set.
@@ -45,24 +46,14 @@ trait ResourceResponseTestTrait {
     $merged_cacheability = new CacheableMetadata();
     foreach ($responses as $response) {
       $response_document = $response->getResponseData();
-      $merge_errors = function ($errors) use (&$merged_document, $is_multiple) {
-        foreach ($errors as $error) {
-          if ($is_multiple) {
-            $merged_document['meta']['errors'][] = $error;
-          }
-          else {
-            $merged_document['errors'][] = $error;
-          }
-        }
-      };
-      // If any of the response documents had top-level or meta errors, we
-      // should later expect the merged document to have all these errors
-      // under the 'meta' member.
+      // If any of the response documents had top-level errors, we should later
+      // expect the merged document to have all errors as omitted links under
+      // the 'meta.omitted' member.
       if (!empty($response_document['errors'])) {
-        $merge_errors($response_document['errors']);
+        static::addOmittedObject($merged_document, static::errorsToOmittedObject($response_document['errors']));
       }
-      if (!empty($response_document['meta']['errors'])) {
-        $merge_errors($response_document['meta']['errors']);
+      if (!empty($response_document['meta']['omitted'])) {
+        static::addOmittedObject($merged_document, $response_document['meta']['omitted']);
       }
       elseif (isset($response_document['data'])) {
         $response_data = $response_document['data'];
@@ -82,6 +73,14 @@ trait ResourceResponseTestTrait {
       }
       $merged_cacheability->addCacheableDependency($response->getCacheableMetadata());
     }
+    $merged_document['jsonapi'] = [
+      'meta' => [
+        'links' => [
+          'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
+        ],
+      ],
+      'version' => '1.0',
+    ];
     // Until we can reasonably know what caused an error, we shouldn't include
     // 'self' links in error documents. For example, a 404 shouldn't have a
     // 'self' link because HATEOAS links shouldn't point to resources which do
@@ -90,43 +89,18 @@ trait ResourceResponseTestTrait {
       unset($merged_document['links']);
     }
     else {
-      $merged_document['links'] = ['self' => $self_link];
-      // @todo Assign this to every document, even with errors in https://www.drupal.org/project/jsonapi/issues/2949807
-      $merged_document['jsonapi'] = [
-        'meta' => [
-          'links' => [
-            'self' => 'http://jsonapi.org/format/1.0/',
-          ],
+      if (!isset($merged_document['data'])) {
+        $merged_document['data'] = $is_multiple ? [] : NULL;
+      }
+      $merged_document['links'] = [
+        'self' => [
+          'href' => $self_link,
         ],
-        'version' => '1.0',
       ];
     }
-    // If any successful code exists, use that one. Partial success isn't
-    // defined by HTTP semantics. When different response codes exist, fall
-    // back to a more general code. Any one success will make the merged request
-    // a success.
-    $merged_response_code = array_reduce($responses, function ($merged_response_code, $response) {
-      $response_code = $response->getStatusCode();
-      assert($response_code >= 200 && $response_code < 500, 'Responses must be valid and complete to be merged.');
-      assert(!($response_code >= 300 && $response_code < 400), 'Redirect responses cannot be merged.');
-      // In the initial case, use the first response code.
-      if (is_null($merged_response_code)) {
-        return $response_code;
-      }
-      // If the codes match, keep them.
-      elseif ($merged_response_code === $response_code) {
-        return $merged_response_code;
-      }
-      // If the current code or the prior code is successful, use a general 200.
-      elseif (($response_code >= 200 && $response_code < 300) || ($merged_response_code >= 200 && $merged_response_code < 300)) {
-        return 200;
-      }
-      // There are different client errors, return a general 400.
-      else {
-        return 400;
-      }
-    }, NULL);
-    return (new ResourceResponse($merged_document, $merged_response_code))->addCacheableDependency($merged_cacheability);
+    // All collections should be 200, without regard for the status of the
+    // individual resources in those collections.
+    return (new ResourceResponse($merged_document, 200))->addCacheableDependency($merged_cacheability);
   }
 
   /**
@@ -143,30 +117,46 @@ trait ResourceResponseTestTrait {
    * @see \GuzzleHttp\ClientInterface::request()
    */
   protected function getExpectedIncludedResourceResponse(array $include_paths, array $request_options) {
-    $resource_data = array_reduce($include_paths, function ($data, $path) use ($request_options) {
+    $resource_type = $this->resourceType;
+    $resource_data = array_reduce($include_paths, function ($data, $path) use ($request_options, $resource_type) {
       $field_names = explode('.', $path);
+      /* @var \Drupal\Core\Entity\EntityInterface $entity */
       $entity = $this->entity;
-      foreach ($field_names as $field_name) {
-        $collected_responses = [];
+      $collected_responses = [];
+      foreach ($field_names as $public_field_name) {
+        $resource_type = $this->container->get('jsonapi.resource_type.repository')->get($entity->getEntityTypeId(), $entity->bundle());
+        $field_name = $resource_type->getInternalName($public_field_name);
         $field_access = static::entityFieldAccess($entity, $field_name, 'view', $this->account);
         if (!$field_access->isAllowed()) {
-          $collected_responses[] = static::getAccessDeniedResponse($entity, $field_access, $field_name, 'The current user is not allowed to view this relationship.');
+          if (!$entity->access('view') && $entity->access('view label') && $field_access instanceof AccessResultReasonInterface && empty($field_access->getReason())) {
+            $field_access->setReason("The user only has authorization for the 'view label' operation.");
+          }
+          $via_link = Url::fromRoute(
+            sprintf('jsonapi.%s.%s.related', $entity->getEntityTypeId() . '--' . $entity->bundle(), $public_field_name),
+            ['entity' => $entity->uuid()]
+          );
+          $collected_responses[] = static::getAccessDeniedResponse($entity, $field_access, $via_link, $field_name, 'The current user is not allowed to view this relationship.', $field_name);
           break;
         }
         if ($target_entity = $entity->{$field_name}->entity) {
           $target_access = static::entityAccess($target_entity, 'view', $this->account);
           if (!$target_access->isAllowed()) {
+            $target_access = static::entityAccess($target_entity, 'view label', $this->account)->addCacheableDependency($target_access);
+          }
+          if (!$target_access->isAllowed()) {
             $resource_identifier = static::toResourceIdentifier($target_entity);
             if (!static::collectionHasResourceIdentifier($resource_identifier, $data['already_checked'])) {
               $data['already_checked'][] = $resource_identifier;
-              // @todo remove this in https://www.drupal.org/project/jsonapi/issues/2943176
-              $error_id = '/' . $resource_identifier['type'] . '/' . $resource_identifier['id'];
-              $collected_responses[] = static::getAccessDeniedResponse($entity, $target_access, NULL, NULL, '/data', $error_id);
+              $via_link = Url::fromRoute(
+                sprintf('jsonapi.%s.individual', $resource_identifier['type']),
+                ['entity' => $resource_identifier['id']]
+              );
+              $collected_responses[] = static::getAccessDeniedResponse($entity, $target_access, $via_link, NULL, NULL, '/data');
             }
             break;
           }
         }
-        $psr_responses = $this->getResponses([static::getRelatedLink(static::toResourceIdentifier($entity), $field_name)], $request_options);
+        $psr_responses = $this->getResponses([static::getRelatedLink(static::toResourceIdentifier($entity), $public_field_name)], $request_options);
         $collected_responses[] = static::toCollectionResourceResponse(static::toResourceResponses($psr_responses), NULL, TRUE);
         $entity = $entity->{$field_name}->entity;
       }
@@ -175,7 +165,31 @@ trait ResourceResponseTestTrait {
       }
       return $data;
     }, ['responses' => [], 'already_checked' => []]);
-    return static::toCollectionResourceResponse($resource_data['responses'], NULL, TRUE);
+
+    $individual_document = $this->getExpectedDocument();
+
+    $expected_base_url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $this->entity->uuid()])->setAbsolute();
+    $include_url = clone $expected_base_url;
+    $query = ['include' => implode(',', $include_paths)];
+    $include_url->setOption('query', $query);
+    $individual_document['links']['self']['href'] = $include_url->toString();
+
+    // The test entity reference field should always be present.
+    if (!isset($individual_document['data']['relationships']['field_jsonapi_test_entity_ref'])) {
+      $individual_document['data']['relationships']['field_jsonapi_test_entity_ref'] = [
+        'data' => [],
+        'links' => [
+          'related' => [
+            'href' => $expected_base_url->toString() . '/field_jsonapi_test_entity_ref',
+          ],
+          'self' => [
+            'href' => $expected_base_url->toString() . '/relationships/field_jsonapi_test_entity_ref',
+          ],
+        ],
+      ];
+    }
+
+    return static::decorateExpectedResponseForIncludedFields(ResourceResponse::create($individual_document), $resource_data['responses']);
   }
 
   /**
@@ -209,11 +223,11 @@ trait ResourceResponseTestTrait {
     if ($cache_tags = $response->getHeader('X-Drupal-Cache-Tags')) {
       $cacheability->addCacheTags(explode(' ', $cache_tags[0]));
     }
-    if ($cache_contexts = $response->getHeader('X-Drupal-Cache-Contexts')) {
-      $cacheability->addCacheContexts(explode(' ', $cache_contexts[0]));
+    if (!empty($response->getHeaderLine('X-Drupal-Cache-Contexts'))) {
+      $cacheability->addCacheContexts(explode(' ', $response->getHeader('X-Drupal-Cache-Contexts')[0]));
     }
     if ($dynamic_cache = $response->getHeader('X-Drupal-Dynamic-Cache')) {
-      $cacheability->setCacheMaxAge(($dynamic_cache[0] === 'UNCACHEABLE') ? 0 : Cache::PERMANENT);
+      $cacheability->setCacheMaxAge(($dynamic_cache[0] === 'UNCACHEABLE' && $response->getStatusCode() < 400) ? 0 : Cache::PERMANENT);
     }
     $related_document = Json::decode($response->getBody());
     $resource_response = new ResourceResponse($related_document, $response->getStatusCode());
@@ -299,7 +313,7 @@ trait ResourceResponseTestTrait {
     assert($type === 'relationship' || $type === 'related');
     return array_reduce($relationship_field_names, function ($link_paths, $relationship_field_name) use ($type) {
       $tail = $type === 'relationship' ? 'self' : $type;
-      $link_paths[$relationship_field_name] = "data.relationships.$relationship_field_name.links.$tail";
+      $link_paths[$relationship_field_name] = "data.relationships.$relationship_field_name.links.$tail.href";
       return $link_paths;
     }, []);
   }
@@ -352,8 +366,7 @@ trait ResourceResponseTestTrait {
     assert(static::isResourceIdentifier($resource_identifier));
     $resource_type = $resource_identifier['type'];
     $resource_id = $resource_identifier['id'];
-    $entity_type_id = explode('--', $resource_type)[0];
-    $url = Url::fromRoute(sprintf('jsonapi.%s.individual', $resource_type), [$entity_type_id => $resource_id]);
+    $url = Url::fromRoute(sprintf('jsonapi.%s.individual', $resource_type), ['entity' => $resource_id]);
     return $url->setAbsolute()->toString();
   }
 
@@ -457,43 +470,173 @@ trait ResourceResponseTestTrait {
    *   The entity for which to generate the forbidden response.
    * @param \Drupal\Core\Access\AccessResultInterface $access
    *   The denied AccessResult. This can carry a reason and cacheability data.
+   * @param \Drupal\Core\Url $via_link
+   *   The source URL for the errors of the response.
    * @param string|null $relationship_field_name
    *   (optional) The field name to which the forbidden result applies. Useful
    *   for testing related/relationship routes and includes.
    * @param string|null $detail
    *   (optional) Details for the JSON API error object.
-   * @param string|null $pointer
-   *   (optional) Document pointer for the JSON API error object.
-   * @param string|null $id
-   *   (optional) ID for the JSON API error object.
+   * @param string|bool|null $pointer
+   *   (optional) Document pointer for the JSON API error object. FALSE to omit
+   *   the pointer.
    *
    * @return \Drupal\jsonapi\ResourceResponse
    *   The forbidden ResourceResponse.
    */
-  protected static function getAccessDeniedResponse(EntityInterface $entity, AccessResultInterface $access, $relationship_field_name = NULL, $detail = NULL, $pointer = NULL, $id = NULL) {
+  protected static function getAccessDeniedResponse(EntityInterface $entity, AccessResultInterface $access, Url $via_link, $relationship_field_name = NULL, $detail = NULL, $pointer = NULL) {
     $detail = ($detail) ? $detail : 'The current user is not allowed to GET the selected resource.';
     if ($access instanceof AccessResultReasonInterface && ($reason = $access->getReason())) {
       $detail .= ' ' . $reason;
     }
-    $resource_identifier = static::toResourceIdentifier($entity);
     $error = [
       'status' => 403,
       'title' => 'Forbidden',
       'detail' => $detail,
       'links' => [
-        'info' => HttpExceptionNormalizer::getInfoUrl(403),
+        'info' => ['href' => HttpExceptionNormalizer::getInfoUrl(403)],
       ],
-      'code' => 0,
-      // @todo uncomment in https://www.drupal.org/project/jsonapi/issues/2943176
-      /* 'id' => '/' . $resource_identifier['type'] . '/' . $resource_identifier['id'], */
     ];
-    if (!is_null($id)) {
-      $error['id'] = $id;
-    }
-    if ($relationship_field_name || $pointer) {
+    if ($pointer || $pointer !== FALSE && $relationship_field_name) {
       $error['source']['pointer'] = ($pointer) ? $pointer : $relationship_field_name;
     }
-    return (new ResourceResponse(['errors' => [$error]], 403))->addCacheableDependency($access);
+    if ($via_link) {
+      $error['links']['via']['href'] = $via_link->setAbsolute()->toString();
+    }
+
+    return (new ResourceResponse([
+      'jsonapi' => static::$jsonApiMember,
+      'errors' => [$error],
+    ], 403))
+      ->addCacheableDependency((new CacheableMetadata())->addCacheTags(['4xx-response', 'http_response']))
+      ->addCacheableDependency($access);
+  }
+
+  /**
+   * Gets a generic empty collection response.
+   *
+   * @param int $cardinality
+   *   The cardinality of the resource collection. 1 for a to-one related
+   *   resource collection; -1 for an unlimited cardinality.
+   * @param string $self_link
+   *   The self link for collection ResourceResponse.
+   *
+   * @return \Drupal\jsonapi\ResourceResponse
+   *   The empty collection ResourceResponse.
+   */
+  protected static function getEmptyCollectionResponse($cardinality, $self_link) {
+    return new ResourceResponse([
+      // Empty to-one relationships should be NULL and empty to-many
+      // relationships should be an empty array.
+      'data' => $cardinality === 1 ? NULL : [],
+      'jsonapi' => static::$jsonApiMember,
+      'links' => ['self' => ['href' => $self_link]],
+    ]);
+  }
+
+  /**
+   * Add the omitted object to the document or merges it if one already exists.
+   *
+   * @param array $document
+   *   The JSON API response document.
+   * @param array $omitted
+   *   The omitted object.
+   */
+  protected static function addOmittedObject(array &$document, array $omitted) {
+    if (isset($document['meta']['omitted'])) {
+      $document['meta']['omitted'] = static::mergeOmittedObjects($document['meta']['omitted'], $omitted);
+    }
+    else {
+      $document['meta']['omitted'] = $omitted;
+    }
+  }
+
+  /**
+   * Maps error objects into an omitted object.
+   *
+   * @param array $errors
+   *   An array of error objects.
+   *
+   * @return array
+   *   A new omitted object.
+   */
+  protected static function errorsToOmittedObject(array $errors) {
+    $omitted = [
+      'detail' => 'Some resources have been omitted because of insufficient authorization.',
+      'links' => [
+        'help' => [
+          'href' => 'https://www.drupal.org/docs/8/modules/json-api/filtering#filters-access-control',
+        ],
+      ],
+    ];
+    foreach ($errors as $error) {
+      $omitted['links']['item:' . substr(Crypt::hashBase64($error['links']['via']['href']), 0, 7)] = [
+        'href' => $error['links']['via']['href'],
+        'meta' => [
+          'detail' => $error['detail'],
+          'rel' => 'item',
+        ],
+      ];
+    }
+    return $omitted;
+  }
+
+  /**
+   * Merges the links of two omitted objects and returns a new omitted object.
+   *
+   * @param array $a
+   *   The first omitted object.
+   * @param array $b
+   *   The second omitted object.
+   *
+   * @return mixed
+   *   A new, merged omitted object.
+   */
+  protected static function mergeOmittedObjects(array $a, array $b) {
+    $merged['detail'] = 'Some resources have been omitted because of insufficient authorization.';
+    $merged['links']['help']['href'] = 'https://www.drupal.org/docs/8/modules/json-api/filtering#filters-access-control';
+    $a_links = array_diff_key($a['links'], array_flip(['help']));
+    $b_links = array_diff_key($b['links'], array_flip(['help']));
+    foreach (array_merge(array_values($a_links), array_values($b_links)) as $link) {
+      $merged['links'][$link['href'] . $link['meta']['detail']] = $link;
+    }
+    static::resetOmittedLinkKeys($merged);
+    return $merged;
+  }
+
+  /**
+   * Sorts an omitted link object array by href.
+   *
+   * @param array $omitted
+   *   An array of JSON API omitted link objects.
+   */
+  protected static function sortOmittedLinks(array &$omitted) {
+    $help = $omitted['links']['help'];
+    $links = array_diff_key($omitted['links'], array_flip(['help']));
+    uasort($links, function ($a, $b) {
+      return strcmp($a['href'], $b['href']);
+    });
+    $omitted['links'] = ['help' => $help] + $links;
+  }
+
+  /**
+   * Resets omitted link keys.
+   *
+   * Omitted link keys are a link relation type + a random string. This string
+   * is meaningless and only serves to differentiate link objects. Given that
+   * these are random, we can't assert their value.
+   *
+   * @param array $omitted
+   *   An array of JSON API omitted link objects.
+   */
+  protected static function resetOmittedLinkKeys(array &$omitted) {
+    $help = $omitted['links']['help'];
+    $reindexed = [];
+    $links = array_diff_key($omitted['links'], array_flip(['help']));
+    foreach (array_values($links) as $index => $link) {
+      $reindexed['item:' . $index] = $link;
+    }
+    $omitted['links'] = ['help' => $help] + $reindexed;
   }
 
 }

@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\jsonapi\Unit\EventSubscriber;
 
+use Drupal\jsonapi\Encoder\JsonEncoder;
 use Drupal\jsonapi\EventSubscriber\ResourceResponseValidator;
 use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi\Routing\Routes;
@@ -48,8 +49,12 @@ class ResourceResponseValidatorTest extends UnitTestCase {
     $module_path = dirname(dirname(dirname(dirname(__DIR__))));
     $module->getPath()->willReturn($module_path);
     $module_handler->getModule('jsonapi')->willReturn($module->reveal());
+    $encoders = [new JsonEncoder()];
+    if (class_exists(JsonSchemaEncoder::class)) {
+      $encoders[] = new JsonSchemaEncoder();
+    }
     $subscriber = new ResourceResponseValidator(
-      new Serializer([], [new JsonSchemaEncoder()]),
+      new Serializer([], $encoders),
       $this->prophesize(LoggerInterface::class)->reveal(),
       $module_handler->reveal(),
       ''
@@ -101,6 +106,7 @@ class ResourceResponseValidatorTest extends UnitTestCase {
 
   /**
    * @covers ::onResponse
+   * @requires function Drupal\schemata\SchemaFactory::__construct
    */
   public function testValidateResponseSchemata() {
     $request = $this->createRequest(

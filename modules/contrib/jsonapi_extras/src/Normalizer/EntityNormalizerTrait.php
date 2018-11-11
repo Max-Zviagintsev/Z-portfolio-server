@@ -16,11 +16,19 @@ trait EntityNormalizerTrait {
    *   The input data to modify.
    * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
    *   Contains the info about the resource type.
+   * @param string $format
+   *   (optional) Format from which the given data was extracted. Only required
+   *   for JSON API 2.x.
+   * @param array $context
+   *   (optional) Options available to the denormalizer. Only required for JSON
+   *   API 2.x.
    *
    * @return array
    *   The modified input data.
+   *
+   * @todo Make the last 2 args non-optional when JSON API 2.x is required.
    */
-  protected function prepareInput(array $data, ResourceType $resource_type) {
+  protected function prepareInput(array $data, ResourceType $resource_type, $format = NULL, array $context = []) {
     /** @var \Drupal\Core\Field\FieldStorageDefinitionInterface[] $field_storage_definitions */
     $field_storage_definitions = \Drupal::service('entity_field.manager')
       ->getFieldStorageDefinitions(

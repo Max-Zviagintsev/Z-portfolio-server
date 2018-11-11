@@ -4,7 +4,6 @@ namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\aggregator\Entity\Feed;
 use Drupal\Core\Url;
-use Drupal\Tests\rest\Functional\BcTimestampNormalizerUnixTestTrait;
 
 /**
  * JSON API integration test for the "Feed" content entity type.
@@ -12,8 +11,6 @@ use Drupal\Tests\rest\Functional\BcTimestampNormalizerUnixTestTrait;
  * @group jsonapi
  */
 class FeedTest extends ResourceTestBase {
-
-  use BcTimestampNormalizerUnixTestTrait;
 
   /**
    * {@inheritdoc}
@@ -107,41 +104,34 @@ class FeedTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => 'http://jsonapi.org/format/1.0/',
+            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
           ],
         ],
         'version' => '1.0',
       ],
       'links' => [
-        'self' => $self_url,
+        'self' => ['href' => $self_url],
       ],
       'data' => [
         'id' => $this->entity->uuid(),
         'type' => 'aggregator_feed--aggregator_feed',
         'links' => [
-          'self' => $self_url,
+          'self' => ['href' => $self_url],
         ],
         'attributes' => [
-          'uuid' => $this->entity->uuid(),
-          'fid' => 1,
           'url' => 'http://example.com/rss.xml',
           'title' => 'Feed',
           'refresh' => 900,
-          'checked' => 123456789,
-          // @todo uncomment this in https://www.drupal.org/project/jsonapi/issues/2929932
-          /* 'checked' => $this->formatExpectedTimestampItemValues(123456789), */
-          'queued' => 123456789,
-          // @todo uncomment this in https://www.drupal.org/project/jsonapi/issues/2929932
-          /* 'queued' => $this->formatExpectedTimestampItemValues(123456789), */
+          'checked' => '1973-11-29T21:33:09+00:00',
+          'queued' => '1973-11-29T21:33:09+00:00',
           'link' => 'http://example.com',
           'description' => 'Feed Resource Test 1',
           'image' => 'http://example.com/feed_logo',
           'hash' => 'abcdefg',
           'etag' => 'hijklmn',
-          'modified' => 123456789,
-          // @todo uncomment this in https://www.drupal.org/project/jsonapi/issues/2929932
-          /* 'modified' => $this->formatExpectedTimestampItemValues(123456789), */
+          'modified' => '1973-11-29T21:33:09+00:00',
           'langcode' => 'en',
+          'drupal_internal__fid' => 1,
         ],
       ],
     ];

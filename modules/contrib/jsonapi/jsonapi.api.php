@@ -87,13 +87,6 @@
  *   types).
  * - All available authentication mechanisms are allowed.
  *
- * The JSON API module does provide a PHP API to generate a JSON API
- * representation of entities:
- *
- * @code
- * \Drupal::service('jsonapi.entity.to_jsonapi')->serialize($entity)
- * @endcode
- *
  *
  * @section tests Test Coverage
  * The JSON API module comes with extensive unit and kernel tests. But most

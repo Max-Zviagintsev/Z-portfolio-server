@@ -92,9 +92,9 @@ class JsonApiDocumentTopLevelNormalizerTest extends UnitTestCase {
    * @dataProvider denormalizeProvider
    */
   public function testDenormalize($input, $expected) {
-    $context = [
-      'resource_type' => new ResourceType($this->randomMachineName(), $this->randomMachineName(), FieldableEntityInterface::class),
-    ];
+    $resource_type = new ResourceType('node', 'article', FieldableEntityInterface::class);
+    $resource_type->setRelatableResourceTypes([]);
+    $context = ['resource_type' => $resource_type];
     $denormalized = $this->normalizer->denormalize($input, NULL, 'api_json', $context);
     $this->assertSame($expected, $denormalized);
   }
@@ -227,8 +227,8 @@ class JsonApiDocumentTopLevelNormalizerTest extends UnitTestCase {
 
     $denormalized = $this->normalizer->denormalize($data, NULL, 'api_json', [
       'resource_type' => new ResourceType(
-        $this->randomMachineName(),
-        $this->randomMachineName(),
+        'node',
+        'article',
         FieldableEntityInterface::class
       ),
     ]);

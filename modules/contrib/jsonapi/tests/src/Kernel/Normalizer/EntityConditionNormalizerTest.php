@@ -31,7 +31,7 @@ class EntityConditionNormalizerTest extends KernelTestBase {
    */
   public function setUp() {
     parent::setUp();
-    $this->normalizer = $this->container->get('serializer.normalizer.entity_condition.jsonapi');
+    $this->normalizer = new EntityConditionNormalizer();
   }
 
   /**

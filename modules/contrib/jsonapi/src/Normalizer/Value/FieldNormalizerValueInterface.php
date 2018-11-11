@@ -12,27 +12,11 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 interface FieldNormalizerValueInterface extends ValueExtractorInterface, CacheableDependencyInterface {
 
   /**
-   * Gets the includes.
-   *
-   * @return mixed
-   *   The includes.
-   */
-  public function getIncludes();
-
-  /**
    * Gets the propertyType.
    *
    * @return mixed
    *   The propertyType.
    */
   public function getPropertyType();
-
-  /**
-   * Computes all the nested includes recursively.
-   *
-   * @return array
-   *   The includes and the nested includes.
-   */
-  public function getAllIncludes();
 
 }

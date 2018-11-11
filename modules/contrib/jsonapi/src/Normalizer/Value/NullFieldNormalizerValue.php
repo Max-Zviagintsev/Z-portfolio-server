@@ -3,7 +3,7 @@
 namespace Drupal\jsonapi\Normalizer\Value;
 
 use Drupal\Core\Access\AccessResultInterface;
-use Drupal\jsonapi\Normalizer\CacheableDependencyTrait;
+use Drupal\Core\Cache\CacheableDependencyTrait;
 
 /**
  * Normalizes null fields in accordance with the JSON API specification.
@@ -39,13 +39,6 @@ class NullFieldNormalizerValue implements FieldNormalizerValueInterface {
   /**
    * {@inheritdoc}
    */
-  public function getIncludes() {
-    return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getPropertyType() {
     return $this->propertyType;
   }
@@ -54,20 +47,6 @@ class NullFieldNormalizerValue implements FieldNormalizerValueInterface {
    * {@inheritdoc}
    */
   public function rasterizeValue() {
-    return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function rasterizeIncludes() {
-    return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getAllIncludes() {
     return NULL;
   }
 

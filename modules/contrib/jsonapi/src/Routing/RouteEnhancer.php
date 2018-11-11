@@ -2,29 +2,25 @@
 
 namespace Drupal\jsonapi\Routing;
 
-use Drupal\Core\Routing\Enhancer\RouteEnhancerInterface;
+use Drupal\Core\Routing\EnhancerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Route;
 
 /**
  * Ensures the loaded entity matches the requested resource type.
  *
  * @internal
  */
-class RouteEnhancer implements RouteEnhancerInterface {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function applies(Route $route) {
-    return (bool) Routes::getResourceTypeNameFromParameters($route->getDefaults());
-  }
+class RouteEnhancer implements EnhancerInterface {
 
   /**
    * {@inheritdoc}
    */
   public function enhance(array $defaults, Request $request) {
+    if (!Routes::isJsonApiRequest($defaults)) {
+      return $defaults;
+    }
+
     $resource_type = Routes::getResourceTypeNameFromParameters($defaults);
     $entity_type_id = $resource_type->getEntityTypeId();
     if (!isset($defaults[$entity_type_id]) || !($entity = $defaults[$entity_type_id])) {

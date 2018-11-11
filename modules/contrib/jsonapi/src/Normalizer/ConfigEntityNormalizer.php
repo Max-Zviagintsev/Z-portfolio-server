@@ -27,7 +27,7 @@ class ConfigEntityNormalizer extends EntityNormalizer {
    */
   protected function getFields($entity, $bundle, ResourceType $resource_type) {
     $enabled_public_fields = [];
-    $fields = static::getDataWithoutInternals($entity->toArray());
+    $fields = $entity->toArray();
     // Filter the array based on the field names.
     $enabled_field_names = array_filter(
       array_keys($fields),
@@ -60,23 +60,14 @@ class ConfigEntityNormalizer extends EntityNormalizer {
   }
 
   /**
-   * Gets the given data without the internal implementation details.
-   *
-   * @param array $data
-   *   The data that is either currently or about to be stored in configuration.
-   *
-   * @return array
-   *   The same data, but without internals. Currently, that is only the '_core'
-   *   key, which is reserved by Drupal core to handle complex edge cases
-   *   correctly. Data in the '_core' key is irrelevant to clients reading
-   *   configuration, and is not allowed to be set by clients writing
-   *   configuration: it is for Drupal core only, and managed by Drupal core.
-   *
-   * @see https://www.drupal.org/node/2653358
-   * @see \Drupal\serialization\Normalizer\ConfigEntityNormalizer::getDataWithoutInternals
+   * {@inheritdoc}
    */
-  protected static function getDataWithoutInternals(array $data) {
-    return array_diff_key($data, ['_core' => TRUE]);
+  protected function prepareInput(array $data, ResourceType $resource_type, $format, array $context) {
+    $prepared = [];
+    foreach ($data as $key => $value) {
+      $prepared[$resource_type->getInternalName($key)] = $value;
+    }
+    return $prepared;
   }
 
 }

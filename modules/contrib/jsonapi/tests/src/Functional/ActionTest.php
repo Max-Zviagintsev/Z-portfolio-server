@@ -69,19 +69,19 @@ class ActionTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => 'http://jsonapi.org/format/1.0/',
+            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
           ],
         ],
         'version' => '1.0',
       ],
       'links' => [
-        'self' => $self_url,
+        'self' => ['href' => $self_url],
       ],
       'data' => [
         'id' => $this->entity->uuid(),
         'type' => 'action--action',
         'links' => [
-          'self' => $self_url,
+          'self' => ['href' => $self_url],
         ],
         'attributes' => [
           'configuration' => [
@@ -91,13 +91,12 @@ class ActionTest extends ResourceTestBase {
             'config' => ['user.role.anonymous'],
             'module' => ['user'],
           ],
-          'id' => 'user_add_role_action.anonymous',
           'label' => 'Add the anonymous role to the selected users',
           'langcode' => 'en',
           'plugin' => 'user_add_role_action',
           'status' => TRUE,
-          'type' => 'user',
-          'uuid' => $this->entity->uuid(),
+          'action_type' => 'user',
+          'drupal_internal__id' => 'user_add_role_action.anonymous',
         ],
       ],
     ];

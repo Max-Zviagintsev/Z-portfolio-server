@@ -3,7 +3,7 @@
 namespace Drupal\jsonapi\Normalizer\Value;
 
 use Drupal\Core\Access\AccessResultInterface;
-use Drupal\jsonapi\Normalizer\CacheableDependencyTrait;
+use Drupal\Core\Cache\CacheableDependencyTrait;
 
 /**
  * Helps normalize fields in compliance with the JSON API spec.
@@ -21,13 +21,6 @@ class FieldNormalizerValue implements FieldNormalizerValueInterface {
    * @var array
    */
   protected $values;
-
-  /**
-   * The includes.
-   *
-   * @var array
-   */
-  protected $includes;
 
   /**
    * The field cardinality.
@@ -60,13 +53,6 @@ class FieldNormalizerValue implements FieldNormalizerValueInterface {
     $this->setCacheability(static::mergeCacheableDependencies(array_merge([$field_access_result], $values)));
 
     $this->values = $values;
-    $this->includes = array_map(function ($value) {
-      if (!$value instanceof RelationshipItemNormalizerValue) {
-        return NULL;
-      }
-      return $value->getInclude();
-    }, $values);
-    $this->includes = array_filter($this->includes);
     $this->cardinality = $cardinality;
     $this->propertyType = $property_type;
   }
@@ -93,42 +79,8 @@ class FieldNormalizerValue implements FieldNormalizerValueInterface {
   /**
    * {@inheritdoc}
    */
-  public function rasterizeIncludes() {
-    return array_map(function ($include) {
-      return $include->rasterizeValue();
-    }, $this->includes);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getIncludes() {
-    return $this->includes;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getPropertyType() {
     return $this->propertyType;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getAllIncludes() {
-    $nested_includes = array_map(function ($include) {
-      return $include->getIncludes();
-    }, $this->getIncludes());
-    $includes = array_reduce(array_filter($nested_includes), function ($carry, $item) {
-      return array_merge($carry, $item);
-    }, $this->getIncludes());
-    // Make sure we don't output duplicate includes.
-    return array_values(array_reduce($includes, function ($unique_includes, $include) {
-      $rasterized_include = $include->rasterizeValue();
-      $unique_includes[$rasterized_include['data']['type'] . ':' . $rasterized_include['data']['id']] = $include;
-      return $unique_includes;
-    }, []));
   }
 
 }

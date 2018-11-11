@@ -7,7 +7,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\entity_test\Entity\EntityTestNoLabel;
 use Drupal\entity_test\Entity\EntityTestWithBundle;
-use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
+use Drupal\jsonapi\BackwardCompatibility\tests\Traits\EntityReferenceTestTrait;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -57,7 +57,6 @@ class InternalEntitiesTest extends BrowserTestBase {
   public function setUp() {
     parent::setUp();
     $this->testUser = $this->drupalCreateUser([
-      'access jsonapi resource list',
       'view test entity',
       'administer entity_test_with_bundle content',
     ], $this->randomString(), TRUE);
@@ -86,7 +85,6 @@ class InternalEntitiesTest extends BrowserTestBase {
    * Ensures that internal resources types aren't present in the entry point.
    */
   public function testEntryPoint() {
-    $this->skipIfIsInternalIsNotSupported();
     $document = $this->jsonapiGet('/jsonapi');
     $this->assertArrayNotHasKey(
       "{$this->internalEntity->getEntityTypeId()}--{$this->internalEntity->bundle()}",
@@ -99,20 +97,17 @@ class InternalEntitiesTest extends BrowserTestBase {
    * Ensures that internal resources types aren't present in the routes.
    */
   public function testRoutes() {
-    $this->skipIfIsInternalIsNotSupported();
     // This cannot be in a data provider because it needs values created by the
     // setUp method.
     $paths = [
-      'individual' => $this->getIndividual($this->internalEntity),
-      'collection' => $this->jsonapiGet("/jsonapi/{$this->internalEntity->getEntityTypeId()}/{$this->internalEntity->bundle()}"),
-      'related' => $this->getRelated($this->referencingEntity, 'field_internal'),
+      'individual' => "/jsonapi/entity_test_no_label/entity_test_no_label/{$this->internalEntity->uuid()}",
+      'collection' => "/jsonapi/entity_test_no_label/entity_test_no_label",
+      'related' => "/jsonapi/entity_test_no_label/entity_test_no_label/{$this->internalEntity->uuid()}/field_internal",
     ];
-    foreach ($paths as $type => $document) {
-      $this->assertSame(
-        404,
-        $document['errors'][0]['status'],
-        "The '{$type}' route should not be available for internal resource types.'"
-      );
+    $this->drupalLogin($this->testUser);
+    foreach ($paths as $type => $path) {
+      $this->drupalGet($path, ['Accept' => 'application/vnd.api+json']);
+      $this->assertSame(404, $this->getSession()->getStatusCode());
     }
   }
 
@@ -120,7 +115,6 @@ class InternalEntitiesTest extends BrowserTestBase {
    * Asserts that internal entities are not included in compound documents.
    */
   public function testIncludes() {
-    $this->skipIfIsInternalIsNotSupported();
     $document = $this->getIndividual($this->referencingEntity, [
       'query' => ['include' => 'field_internal'],
     ]);
@@ -135,7 +129,6 @@ class InternalEntitiesTest extends BrowserTestBase {
    * Asserts that links to internal relationships aren't generated.
    */
   public function testLinks() {
-    $this->skipIfIsInternalIsNotSupported();
     $document = $this->getIndividual($this->referencingEntity);
     $this->assertArrayNotHasKey(
       'related',
@@ -189,15 +182,6 @@ class InternalEntitiesTest extends BrowserTestBase {
     $this->drupalLogin($this->testUser);
     $response = $this->drupalGet($path, $options, ['Accept' => 'application/vnd.api+json']);
     return Json::decode($response);
-  }
-
-  /**
-   * Only run tests when Drupal version is >= 8.5.
-   */
-  protected function skipIfIsInternalIsNotSupported() {
-    if (floatval(\Drupal::VERSION) < 8.5) {
-      $this->markTestSkipped('The Drupal Core version must be >= 8.5');
-    }
   }
 
 }

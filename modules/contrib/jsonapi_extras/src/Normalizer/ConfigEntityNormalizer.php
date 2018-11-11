@@ -32,7 +32,7 @@ class ConfigEntityNormalizer extends JsonapiConfigEntityNormalizer {
   /**
    * {@inheritdoc}
    */
-  protected function prepareInput(array $data, ResourceType $resource_type) {
+  protected function prepareInput(array $data, ResourceType $resource_type, $format = NULL, array $context = []) {
     foreach ($data as $public_field_name => &$field_value) {
       /** @var \Drupal\jsonapi_extras\Plugin\ResourceFieldEnhancerInterface $enhancer */
       $enhancer = $resource_type->getFieldEnhancer($public_field_name);
@@ -42,7 +42,7 @@ class ConfigEntityNormalizer extends JsonapiConfigEntityNormalizer {
       $field_value = $enhancer->transform($field_value);
     }
 
-    return parent::prepareInput($data, $resource_type);
+    return parent::prepareInput($data, $resource_type, $format, $context);
   }
 
 }

@@ -21,12 +21,37 @@ class JsonapiExtrasServiceProvider extends ServiceProviderBase {
       // Override the class used for the configurable service.
       $definition = $container->getDefinition('jsonapi.resource_type.repository');
       $definition->setClass(ConfigurableResourceTypeRepository::class);
+      // We can't use ConfigurableResourceTypeRepository::isJsonApi2x() here.
+      // 'jsonapi.entity.to_jsonapi' service was removed in 2.x see
+      // https://www.drupal.org/node/2983182.
+      // @todo Remove this when JSON API Extras drops support for JSON API 1.x.
+      if ($container->has('jsonapi.entity.to_jsonapi')) {
+        $definition->addMethodCall('setStaticCache', [new Reference('cache.static')]);
+      }
       // The configurable service expects the entity repository and the enhancer
       // plugin manager.
-      $definition->addArgument(new Reference('entity.repository'));
-      $definition->addArgument(new Reference('plugin.manager.resource_field_enhancer'));
-      $definition->addArgument(new Reference('config.factory'));
+      $definition->addMethodCall('setEntityRepository', [new Reference('entity.repository')]);
+      $definition->addMethodCall('setEnhancerManager', [new Reference('plugin.manager.resource_field_enhancer')]);
+      $definition->addMethodCall('setConfigFactory', [new Reference('config.factory')]);
     }
+
+    // Make all three of the normalizers that JSON API Extras overrides private
+    // untagged services, to ensure that JSON API Extras' overrides continue to
+    // work in JSON API 2.x, using core's @serializer service.
+    if ($container->has('serializer.normalizer.field_item.jsonapi')) {
+      $container->getDefinition('serializer.normalizer.field_item.jsonapi')->setPrivate(TRUE)->clearTags();
+    }
+    if ($container->has('serializer.normalizer.entity.jsonapi')) {
+      $container->getDefinition('serializer.normalizer.entity.jsonapi')->setPrivate(TRUE)->clearTags();
+    }
+    if ($container->has('serializer.normalizer.config_entity.jsonapi')) {
+      $container->getDefinition('serializer.normalizer.config_entity.jsonapi')->setPrivate(TRUE)->clearTags();
+    }
+
+    // Break a circular dependency.
+    // @see \Drupal\jsonapi_extras\SerializerDecorator::lazilyInitialize()
+    $definition = $container->getDefinition('jsonapi.serializer_do_not_use_removal_imminent');
+    $definition->removeMethodCall('setFallbackNormalizer');
 
     $settings = BootstrapConfigStorageFactory::get()
       ->read('jsonapi_extras.settings');

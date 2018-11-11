@@ -42,11 +42,6 @@ class TestCoverageTest extends BrowserTestBase {
 
     $this->definitions = $this->container->get('entity_type.manager')->getDefinitions();
 
-    // @todo Remove this when JSON API requires Drupal 8.5 or newer.
-    if (floatval(\Drupal::VERSION) < 8.5) {
-      return;
-    }
-
     // Entity types marked as "internal" are not exposed by JSON API and hence
     // also don't need test coverage.
     $this->definitions = array_filter($this->definitions, function (EntityTypeInterface $entity_type) {

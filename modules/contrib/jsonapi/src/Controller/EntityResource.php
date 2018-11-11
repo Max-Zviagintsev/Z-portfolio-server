@@ -3,51 +3,47 @@
 namespace Drupal\jsonapi\Controller;
 
 use Drupal\Component\Serialization\Json;
-use Drupal\Core\Access\AccessibleInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
+use Drupal\Core\Entity\Query\QueryInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Core\Field\FieldTypePluginManagerInterface;
+use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\jsonapi\Exception\EntityAccessDeniedHttpException;
 use Drupal\jsonapi\Exception\UnprocessableHttpEntityException;
+use Drupal\jsonapi\IncludeResolver;
+use Drupal\jsonapi\JsonApiResource\NullEntityCollection;
+use Drupal\jsonapi\JsonApiResource\ResourceIdentifier;
+use Drupal\jsonapi\LabelOnlyEntity;
 use Drupal\jsonapi\Query\Filter;
 use Drupal\jsonapi\Query\Sort;
 use Drupal\jsonapi\Query\OffsetPage;
 use Drupal\jsonapi\LinkManager\LinkManager;
-use Drupal\jsonapi\Resource\EntityCollection;
-use Drupal\jsonapi\Resource\JsonApiDocumentTopLevel;
+use Drupal\jsonapi\JsonApiResource\EntityCollection;
+use Drupal\jsonapi\JsonApiResource\JsonApiDocumentTopLevel;
 use Drupal\jsonapi\ResourceResponse;
 use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface;
+use Drupal\jsonapi\Routing\Routes;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 /**
  * Process all entity requests.
  *
- * @see \Drupal\jsonapi\Controller\RequestHandler
  * @internal
  */
 class EntityResource {
-
-  /**
-   * The JSON API resource type.
-   *
-   * @var \Drupal\jsonapi\ResourceType\ResourceType
-   */
-  protected $resourceType;
 
   /**
    * The entity type manager.
@@ -64,13 +60,6 @@ class EntityResource {
   protected $fieldManager;
 
   /**
-   * The current context service.
-   *
-   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface
-   */
-  protected $pluginManager;
-
-  /**
    * The link manager service.
    *
    * @var \Drupal\jsonapi\LinkManager\LinkManager
@@ -85,28 +74,52 @@ class EntityResource {
   protected $resourceTypeRepository;
 
   /**
+   * The renderer.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  /**
+   * The entity repository.
+   *
+   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   */
+  protected $entityRepository;
+
+  /**
+   * The include resolver.
+   *
+   * @var \Drupal\jsonapi\IncludeResolver
+   */
+  protected $includeResolver;
+
+  /**
    * Instantiates a EntityResource object.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
-   *   The JSON API resource type.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager
    *   The entity type field manager.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $plugin_manager
-   *   The plugin manager for fields.
    * @param \Drupal\jsonapi\LinkManager\LinkManager $link_manager
    *   The link manager service.
    * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
    *   The link manager service.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   *   The entity repository.
+   * @param \Drupal\jsonapi\IncludeResolver $include_resolver
+   *   The include resolver.
    */
-  public function __construct(ResourceType $resource_type, EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $field_manager, FieldTypePluginManagerInterface $plugin_manager, LinkManager $link_manager, ResourceTypeRepositoryInterface $resource_type_repository) {
-    $this->resourceType = $resource_type;
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $field_manager, LinkManager $link_manager, ResourceTypeRepositoryInterface $resource_type_repository, RendererInterface $renderer, EntityRepositoryInterface $entity_repository, IncludeResolver $include_resolver) {
     $this->entityTypeManager = $entity_type_manager;
     $this->fieldManager = $field_manager;
-    $this->pluginManager = $plugin_manager;
     $this->linkManager = $link_manager;
     $this->resourceTypeRepository = $resource_type_repository;
+    $this->renderer = $renderer;
+    $this->entityRepository = $entity_repository;
+    $this->includeResolver = $include_resolver;
   }
 
   /**
@@ -116,19 +129,19 @@ class EntityResource {
    *   The loaded entity.
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
-   * @param int $response_code
-   *   The response code. Defaults to 200.
    *
    * @return \Drupal\jsonapi\ResourceResponse
    *   The response.
+   *
+   * @throws \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException
+   *   Thrown when access to the entity is not allowed.
    */
-  public function getIndividual(EntityInterface $entity, Request $request, $response_code = 200) {
-    $entity_access = $entity->access('view', NULL, TRUE);
-    if (!$entity_access->isAllowed()) {
-      throw new EntityAccessDeniedHttpException($entity, $entity_access, '/data', 'The current user is not allowed to GET the selected resource.');
+  public function getIndividual(EntityInterface $entity, Request $request) {
+    $entity = static::getAccessCheckedEntity($entity);
+    if ($entity instanceof EntityAccessDeniedHttpException) {
+      throw $entity;
     }
-    $response = $this->buildWrappedResponse($entity, $response_code);
-    $response->addCacheableDependency($entity_access);
+    $response = $this->buildWrappedResponse($entity, $request, $this->getIncludes($request, $entity));
     return $response;
   }
 
@@ -142,8 +155,8 @@ class EntityResource {
    *   list to include only this set of fields. Defaults to NULL,
    *   which means that all violations will be reported.
    *
-   * @throws \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException
-   *   If validation errors are found.
+   * @throws \Drupal\jsonapi\Exception\UnprocessableHttpEntityException
+   *   Thrown when violations remain after filtering.
    *
    * @see \Drupal\rest\Plugin\rest\resource\EntityResourceValidationTrait::validate()
    */
@@ -180,7 +193,9 @@ class EntityResource {
   /**
    * Creates an individual entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   *   The JSON API resource type for the request to be served.
+   * @param \Drupal\Core\Entity\EntityInterface $parsed_entity
    *   The loaded entity.
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
@@ -188,69 +203,56 @@ class EntityResource {
    * @return \Drupal\jsonapi\ResourceResponse
    *   The response.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
-   * @throws \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Symfony\Component\HttpKernel\Exception\ConflictHttpException
+   *   Thrown when the entity already exists.
    */
-  public function createIndividual(EntityInterface $entity, Request $request) {
-    $entity_access = $entity->access('create', NULL, TRUE);
-
-    if (!$entity_access->isAllowed()) {
-      throw new EntityAccessDeniedHttpException(NULL, $entity_access, '/data', 'The current user is not allowed to POST the selected resource.');
-    }
-
-    // Only check 'edit' permissions for fields that were actually submitted by
-    // the user. Field access makes no difference between 'create' and 'update',
-    // so the 'edit' operation is used here.
-    $document = Json::decode($request->getContent());
-    if (isset($document['data']['attributes'])) {
-      $received_attributes = array_keys($document['data']['attributes']);
-      foreach ($received_attributes as $field_name) {
-        $internal_field_name = $this->resourceType->getInternalName($field_name);
-        try {
-          $field_access = $entity->get($internal_field_name)->access('edit', NULL, TRUE);
+  public function createIndividual(ResourceType $resource_type, EntityInterface $parsed_entity, Request $request) {
+    if ($parsed_entity instanceof FieldableEntityInterface) {
+      // Only check 'edit' permissions for fields that were actually submitted
+      // by the user. Field access makes no distinction between 'create' and
+      // 'update', so the 'edit' operation is used here.
+      $document = Json::decode($request->getContent());
+      if (isset($document['data']['attributes'])) {
+        $received_attributes = array_keys($document['data']['attributes']);
+        foreach ($received_attributes as $field_name) {
+          $internal_field_name = $resource_type->getInternalName($field_name);
+          $field_access = $parsed_entity->get($internal_field_name)
+            ->access('edit', NULL, TRUE);
           if (!$field_access->isAllowed()) {
             throw new EntityAccessDeniedHttpException(NULL, $field_access, '/data/attributes/' . $field_name, sprintf('The current user is not allowed to POST the selected field (%s).', $field_name));
           }
         }
-        catch (\InvalidArgumentException $e) {
-          throw new UnprocessableEntityHttpException(sprintf(
-            'The attribute %s does not exist on the %s resource type.',
-            $internal_field_name,
-            $this->resourceType->getTypeName()
-          ));
-        }
       }
-    }
-    if (isset($document['data']['relationships'])) {
-      $received_relationships = array_keys($document['data']['relationships']);
-      foreach ($received_relationships as $field_name) {
-        $internal_field_name = $this->resourceType->getInternalName($field_name);
-        $field_access = $entity->get($internal_field_name)->access('edit', NULL, TRUE);
-        if (!$field_access->isAllowed()) {
-          throw new EntityAccessDeniedHttpException(NULL, $field_access, '/data/relationships/' . $field_name, sprintf('The current user is not allowed to POST the selected field (%s).', $field_name));
+      if (isset($document['data']['relationships'])) {
+        $received_relationships = array_keys($document['data']['relationships']);
+        foreach ($received_relationships as $field_name) {
+          $internal_field_name = $resource_type->getInternalName($field_name);
+          $field_access = $parsed_entity->get($internal_field_name)->access('edit', NULL, TRUE);
+          if (!$field_access->isAllowed()) {
+            throw new EntityAccessDeniedHttpException(NULL, $field_access, '/data/relationships/' . $field_name, sprintf('The current user is not allowed to POST the selected field (%s).', $field_name));
+          }
         }
       }
     }
 
-    $this->validate($entity);
+    $this->validate($parsed_entity);
 
     // Return a 409 Conflict response in accordance with the JSON API spec. See
     // http://jsonapi.org/format/#crud-creating-responses-409.
-    if ($this->entityExists($entity)) {
+    if ($this->entityExists($parsed_entity)) {
       throw new ConflictHttpException('Conflict: Entity already exists.');
     }
 
-    $entity->save();
+    $parsed_entity->save();
 
     // Build response object.
-    $response = $this->buildWrappedResponse($entity, 201);
+    $response = $this->buildWrappedResponse($parsed_entity, $request, new NullEntityCollection(), 201);
 
     // According to JSON API specification, when a new entity was created
     // we should send "Location" header to the frontend.
     $entity_url = $this->linkManager->getEntityLink(
-      $entity->uuid(),
-      $this->resourceType,
+      $parsed_entity->uuid(),
+      $resource_type,
       [],
       'individual'
     );
@@ -265,6 +267,8 @@ class EntityResource {
   /**
    * Patches an individual entity.
    *
+   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   *   The JSON API resource type for the request to be served.
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The loaded entity.
    * @param \Drupal\Core\Entity\EntityInterface $parsed_entity
@@ -275,14 +279,10 @@ class EntityResource {
    * @return \Drupal\jsonapi\ResourceResponse
    *   The response.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
-   * @throws \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException
+   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   *   Thrown when the selected entity does not match the id in th payload.
    */
-  public function patchIndividual(EntityInterface $entity, EntityInterface $parsed_entity, Request $request) {
-    $entity_access = $entity->access('update', NULL, TRUE);
-    if (!$entity_access->isAllowed()) {
-      throw new EntityAccessDeniedHttpException($entity, $entity_access, '/data', 'The current user is not allowed to PATCH the selected resource.');
-    }
+  public function patchIndividual(ResourceType $resource_type, EntityInterface $entity, EntityInterface $parsed_entity, Request $request) {
     $body = Json::decode($request->getContent());
     $data = $body['data'];
     if ($data['id'] != $entity->uuid()) {
@@ -295,14 +295,14 @@ class EntityResource {
     $data += ['attributes' => [], 'relationships' => []];
     $field_names = array_merge(array_keys($data['attributes']), array_keys($data['relationships']));
 
-    array_reduce($field_names, function (EntityInterface $destination, $field_name) use ($parsed_entity) {
-      $this->updateEntityField($parsed_entity, $destination, $field_name);
+    array_reduce($field_names, function (EntityInterface $destination, $field_name) use ($resource_type, $parsed_entity) {
+      $this->updateEntityField($resource_type, $parsed_entity, $destination, $field_name);
       return $destination;
     }, $entity);
 
     $this->validate($entity, $field_names);
     $entity->save();
-    return $this->buildWrappedResponse($entity);
+    return $this->buildWrappedResponse($entity, $request, new NullEntityCollection());
   }
 
   /**
@@ -310,20 +310,11 @@ class EntityResource {
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The loaded entity.
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The request object.
    *
    * @return \Drupal\jsonapi\ResourceResponse
    *   The response.
-   *
-   * @throws \Drupal\Core\Entity\EntityStorageException
-   * @throws \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException
    */
-  public function deleteIndividual(EntityInterface $entity, Request $request) {
-    $entity_access = $entity->access('delete', NULL, TRUE);
-    if (!$entity_access->isAllowed()) {
-      throw new EntityAccessDeniedHttpException($entity, $entity_access, '/data', 'The current user is not allowed to DELETE the selected resource.');
-    }
+  public function deleteIndividual(EntityInterface $entity) {
     $entity->delete();
     return new ResourceResponse(NULL, 204);
   }
@@ -331,24 +322,31 @@ class EntityResource {
   /**
    * Gets the collection of entities.
    *
+   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   *   The JSON API resource type for the request to be served.
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
    *
    * @return \Drupal\jsonapi\ResourceResponse
    *   The response.
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Core\Http\Exception\CacheableBadRequestHttpException
+   *   Thrown when filtering on a config entity which does not support it.
    */
-  public function getCollection(Request $request) {
+  public function getCollection(ResourceType $resource_type, Request $request) {
     // Instantiate the query for the filtering.
-    $entity_type_id = $this->resourceType->getEntityTypeId();
+    $entity_type_id = $resource_type->getEntityTypeId();
 
     $route_params = $request->attributes->get('_route_params');
     $params = isset($route_params['_json_api_params']) ? $route_params['_json_api_params'] : [];
-    $query = $this->getCollectionQuery($entity_type_id, $params);
+    $query = $this->getCollectionQuery($resource_type, $params);
+    $query_cacheability = new CacheableMetadata();
 
     try {
-      $results = $query->execute();
+      $results = $this->executeQueryInRenderContext(
+        $query,
+        $query_cacheability
+      );
     }
     catch (\LogicException $e) {
       // Ensure good DX when an entity query involves a config entity type.
@@ -356,7 +354,8 @@ class EntityResource {
       if (strpos($e->getMessage(), 'Getting the base fields is not supported for entity type') === 0) {
         preg_match('/entity type (.*)\./', $e->getMessage(), $matches);
         $config_entity_type_id = $matches[1];
-        throw new BadRequestHttpException(sprintf("Filtering on config entities is not supported by Drupal's entity API. You tried to filter on a %s config entity.", $config_entity_type_id));
+        $cacheability = (new CacheableMetadata())->addCacheContexts(['url.path', 'url.query_args:filter']);
+        throw new CacheableBadRequestHttpException($cacheability, sprintf("Filtering on config entities is not supported by Drupal's entity API. You tried to filter on a %s config entity.", $config_entity_type_id));
       }
       else {
         throw $e;
@@ -374,63 +373,78 @@ class EntityResource {
     // Each item of the collection data contains an array with 'entity' and
     // 'access' elements.
     $collection_data = $this->loadEntitiesWithAccess($storage, $results);
-    $entity_collection = new EntityCollection(array_column($collection_data, 'entity'));
+    $entity_collection = new EntityCollection($collection_data);
     $entity_collection->setHasNextPage($has_next_page);
 
     // Calculate all the results and pass them to the EntityCollectionInterface.
-    if ($this->resourceType->includeCount()) {
-      $total_results = $this
-        ->getCollectionCountQuery($entity_type_id, $params)
-        ->execute();
+    $count_query_cacheability = new CacheableMetadata();
+    if ($resource_type->includeCount()) {
+      $count_query = $this->getCollectionCountQuery($resource_type, $params);
+      $total_results = $this->executeQueryInRenderContext(
+        $count_query,
+        $count_query_cacheability
+      );
 
       $entity_collection->setTotalCount($total_results);
     }
 
-    $response = $this->respondWithCollection($entity_collection, $entity_type_id);
+    $response = $this->respondWithCollection($entity_collection, $this->getIncludes($request, $entity_collection), $request, $resource_type);
 
-    // Add cacheable metadata for the access result.
-    $access_info = array_column($collection_data, 'access');
-    array_walk($access_info, function ($access) use ($response) {
-      $response->addCacheableDependency($access);
-    });
+    $response->addCacheableDependency($query_cacheability);
+    $response->addCacheableDependency($count_query_cacheability);
 
     return $response;
   }
 
   /**
+   * Executes the query in a render context, to catch bubbled cacheability.
+   *
+   * @param \Drupal\Core\Entity\Query\QueryInterface $query
+   *   The query to execute to get the return results.
+   * @param \Drupal\Core\Cache\CacheableMetadata $query_cacheability
+   *   The value object to carry the query cacheability.
+   *
+   * @return int|array
+   *   Returns an integer for count queries or an array of IDs. The values of
+   *   the array are always entity IDs. The keys will be revision IDs if the
+   *   entity supports revision and entity IDs if not.
+   *
+   * @see node_query_node_access_alter()
+   * @see https://www.drupal.org/project/drupal/issues/2557815
+   * @see https://www.drupal.org/project/drupal/issues/2794385
+   * @todo Remove this when the query sytems's return value is able to carry
+   * cacheability.
+   */
+  protected function executeQueryInRenderContext(QueryInterface $query, CacheableMetadata $query_cacheability) {
+    $context = new RenderContext();
+    $results = $this->renderer->executeInRenderContext($context, function () use ($query) {
+      return $query->execute();
+    });
+    if (!$context->isEmpty()) {
+      $query_cacheability->addCacheableDependency($context->pop());
+    }
+    return $results;
+  }
+
+  /**
    * Gets the related resource.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   *   The JSON API resource type for the request to be served.
+   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
    *   The requested entity.
-   * @param string $related_field
+   * @param string $related
    *   The related field name.
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
    *
    * @return \Drupal\jsonapi\ResourceResponse
    *   The response.
-   *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
    */
-  public function getRelated(EntityInterface $entity, $related_field, Request $request) {
-    $related_field = $this->resourceType->getInternalName($related_field);
-    $this->relationshipAccess($entity, 'view', $related_field);
+  public function getRelated(ResourceType $resource_type, FieldableEntityInterface $entity, $related, Request $request) {
     /* @var \Drupal\Core\Field\EntityReferenceFieldItemListInterface $field_list */
-    $field_list = $entity->get($related_field);
-    $this->validateReferencedResource($field_list, $related_field);
-    // Add the cacheable metadata from the host entity.
-    $cacheable_metadata = CacheableMetadata::createFromObject($entity);
-    $is_multiple = $field_list
-      ->getDataDefinition()
-      ->getFieldStorageDefinition()
-      ->isMultiple();
-    if (!$is_multiple && $field_list->entity) {
-      $response = $this->getIndividual($field_list->entity, $request);
-      // Add cacheable metadata for host entity to individual response.
-      $response->addCacheableDependency($cacheable_metadata);
-      return $response;
-    }
-    $collection_data = [];
+    $field_list = $entity->get($resource_type->getInternalName($related));
+
     // Remove the entities pointing to a resource that may be disabled. Even
     // though the normalizer skips disabled references, we can avoid unnecessary
     // work by checking here too.
@@ -444,20 +458,16 @@ class EntityResource {
         );
       }
     );
+    $collection_data = [];
     foreach ($referenced_entities as $referenced_entity) {
-      $collection_data[$referenced_entity->id()] = static::getEntityAndAccess($referenced_entity);
-      $cacheable_metadata->addCacheableDependency($referenced_entity);
+      $collection_data[] = static::getAccessCheckedEntity($referenced_entity);
     }
-    $entity_collection = new EntityCollection(array_column($collection_data, 'entity'));
-    $response = $this->buildWrappedResponse($entity_collection);
+    $entity_collection = new EntityCollection($collection_data, $field_list->getFieldDefinition()->getFieldStorageDefinition()->getCardinality());
+    $response = $this->buildWrappedResponse($entity_collection, $request, $this->getIncludes($request, $entity_collection, $related));
 
-    $access_info = array_column($collection_data, 'access');
-    array_walk($access_info, function ($access) use ($response) {
-      $response->addCacheableDependency($access);
-    });
     // $response does not contain the entity list cache tag. We add the
     // cacheable metadata for the finite list of entities in the relationship.
-    $response->addCacheableDependency($cacheable_metadata);
+    $response->addCacheableDependency($entity);
 
     return $response;
   }
@@ -465,9 +475,11 @@ class EntityResource {
   /**
    * Gets the relationship of an entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   *   The base JSON API resource type for the request to be served.
+   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
    *   The requested entity.
-   * @param string $related_field
+   * @param string $related
    *   The related field name.
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
@@ -477,51 +489,95 @@ class EntityResource {
    * @return \Drupal\jsonapi\ResourceResponse
    *   The response.
    */
-  public function getRelationship(EntityInterface $entity, $related_field, Request $request, $response_code = 200) {
-    $related_field = $this->resourceType->getInternalName($related_field);
-    $this->relationshipAccess($entity, 'view', $related_field);
-    /* @var \Drupal\Core\Field\FieldItemListInterface $field_list */
-    $field_list = $entity->get($related_field);
-    $this->validateReferencedResource($field_list, $related_field);
-    $response = $this->buildWrappedResponse($field_list, $response_code);
+  public function getRelationship(ResourceType $resource_type, FieldableEntityInterface $entity, $related, Request $request, $response_code = 200) {
+    /* @var \Drupal\Core\Field\EntityReferenceFieldItemListInterface $field_list */
+    $field_list = $entity->get($resource_type->getInternalName($related));
+    $response = $this->buildWrappedResponse($field_list, $request, $this->getIncludes($request, $entity), $response_code);
+    // Add the host entity as a cacheable dependency.
+    $response->addCacheableDependency($entity);
     return $response;
-  }
-
-  /**
-   * Validates that the referenced field points to an enabled resource.
-   *
-   * @param \Drupal\Core\Field\EntityReferenceFieldItemListInterface|null $field_list
-   *   The field list with the reference.
-   * @param string $related_field
-   *   The internal name of the related field.
-   *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-   *   If the field is not a reference or the target resource is disabled.
-   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-   *   If the $field_list is of the incorrect type.
-   */
-  protected function validateReferencedResource($field_list, $related_field) {
-    if (
-      !is_null($field_list) &&
-      !$field_list instanceof EntityReferenceFieldItemListInterface
-    ) {
-      throw new HttpException(500, 'Invalid internal structure for relationship field list.');
-    }
-    if (!$field_list || !$this->isRelationshipField($field_list)) {
-      throw new NotFoundHttpException(sprintf('The relationship %s is not present in this resource.', $related_field));
-    }
   }
 
   /**
    * Adds a relationship to a to-many relationship.
    *
+   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   *   The base JSON API resource type for the request to be served.
+   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   *   The requested entity.
+   * @param string $related
+   *   The related field name.
+   * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifier[] $resource_identifiers
+   *   The received resource identifiers.
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request object.
+   *
+   * @return \Drupal\jsonapi\ResourceResponse
+   *   The response.
+   *
+   * @throws \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException
+   *   Thrown when the current user is not allowed to PATCH the selected
+   *   field(s).
+   * @throws \Symfony\Component\HttpKernel\Exception\ConflictHttpException
+   *   Thrown when POSTing to a "to-one" relationship.
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   *   Thrown when the underlying entity cannot be saved.
+   */
+  public function addToRelationshipData(ResourceType $resource_type, FieldableEntityInterface $entity, $related, array $resource_identifiers, Request $request) {
+    $related = $resource_type->getInternalName($related);
+    // According to the specification, you are only allowed to POST to a
+    // relationship if it is a to-many relationship.
+    /* @var \Drupal\Core\Field\EntityReferenceFieldItemListInterface $field_list */
+    $field_list = $entity->{$related};
+    /* @var \Drupal\field\Entity\FieldConfig $field_definition */
+    $field_definition = $field_list->getFieldDefinition();
+    $is_multiple = $field_definition->getFieldStorageDefinition()->isMultiple();
+    if (!$is_multiple) {
+      throw new ConflictHttpException(sprintf('You can only POST to to-many relationships. %s is a to-one relationship.', $related));
+    }
+
+    $original_resource_identifiers = ResourceIdentifier::toResourceIdentifiers($field_list);
+    $new_resource_identifiers = array_udiff(
+      ResourceIdentifier::deduplicate(array_merge($original_resource_identifiers, $resource_identifiers)),
+      $original_resource_identifiers,
+      [ResourceIdentifier::class, 'compare']
+    );
+
+    // There are no relationships that need to be added so we can exit early.
+    if (empty($new_resource_identifiers)) {
+      $status = static::relationshipResponseRequiresBody($resource_identifiers, $original_resource_identifiers) ? 200 : 204;
+      return $this->getRelationship($resource_type, $entity, $related, $request, $status);
+    }
+
+    $main_property_name = $field_definition->getItemDefinition()->getMainPropertyName();
+    foreach ($new_resource_identifiers as $new_resource_identifier) {
+      $new_field_value = [$main_property_name => $this->getEntityFromResourceIdentifier($new_resource_identifier)->id()];
+      // Remove `arity` from the received extra properties, otherwise this
+      // will fail field validation.
+      $new_field_value += array_diff_key($new_resource_identifier->getMeta(), array_flip([ResourceIdentifier::ARITY_KEY]));
+      $field_list->appendItem($new_field_value);
+    }
+
+    $this->validate($entity);
+    $entity->save();
+
+    $final_resource_identifiers = ResourceIdentifier::toResourceIdentifiers($field_list);
+    $status = static::relationshipResponseRequiresBody($resource_identifiers, $final_resource_identifiers) ? 200 : 204;
+    return $this->getRelationship($resource_type, $entity, $related, $request, $status);
+  }
+
+  /**
+   * Updates the relationship of an entity.
+   *
+   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   *   The base JSON API resource type for the request to be served.
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The requested entity.
-   * @param string $related_field
+   * @param string $related
    *   The related field name.
-   * @param mixed $parsed_field_list
-   *   The entity reference field list of items to add, or a response object in
-   *   case of error.
+   * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifier[] $resource_identifiers
+   *   The client-sent resource identifiers which should be set on the given
+   *   entity.
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
    *
@@ -529,124 +585,23 @@ class EntityResource {
    *   The response.
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
+   *   Thrown when the underlying entity cannot be saved.
    */
-  public function createRelationship(EntityInterface $entity, $related_field, $parsed_field_list, Request $request) {
-    $related_field = $this->resourceType->getInternalName($related_field);
-    /* @var \Drupal\Core\Field\EntityReferenceFieldItemListInterface $parsed_field_list */
-    $this->relationshipAccess($entity, 'update', $related_field);
-    if ($parsed_field_list instanceof Response) {
-      // This usually means that there was an error, so there is no point on
-      // processing further.
-      return $parsed_field_list;
-    }
-    // According to the specification, you are only allowed to POST to a
-    // relationship if it is a to-many relationship.
-    /* @var \Drupal\Core\Field\EntityReferenceFieldItemListInterface $field_list */
-    $field_list = $entity->{$related_field};
-    $is_multiple = $field_list->getFieldDefinition()
-      ->getFieldStorageDefinition()
-      ->isMultiple();
-    if (!$is_multiple) {
-      throw new ConflictHttpException(sprintf('You can only POST to to-many relationships. %s is a to-one relationship.', $related_field));
-    }
-
-    $field_access = $field_list->access('edit', NULL, TRUE);
-    if (!$field_access->isAllowed()) {
-      $field_name = $field_list->getName();
-      throw new EntityAccessDeniedHttpException($entity, $field_access, '/data/relationships/' . $field_name, sprintf('The current user is not allowed to PATCH the selected field (%s).', $field_name));
-    }
-    $original_field_list = clone $field_list;
-    // Time to save the relationship.
-    foreach ($parsed_field_list as $field_item) {
-      $field_list->appendItem($field_item->getValue());
-    }
-    $this->validate($entity);
-    $entity->save();
-    $status = static::relationshipArityIsAffected($original_field_list, $field_list)
-      ? 200
-      : 204;
-    return $this->getRelationship($entity, $related_field, $request, $status);
-  }
-
-  /**
-   * Checks whether relationship arity is affected.
-   *
-   * @param \Drupal\Core\Field\EntityReferenceFieldItemListInterface $old
-   *   The old (stored) entity references.
-   * @param \Drupal\Core\Field\EntityReferenceFieldItemListInterface $new
-   *   The new (updated) entity references.
-   *
-   * @return bool
-   *   Whether entities already being referenced now have additional references.
-   *
-   * @see \Drupal\jsonapi\Normalizer\Value\RelationshipNormalizerValue::ensureUniqueResourceIdentifierObjects()
-   */
-  protected static function relationshipArityIsAffected(EntityReferenceFieldItemListInterface $old, EntityReferenceFieldItemListInterface $new) {
-    $old_targets = static::toTargets($old);
-    $new_targets = static::toTargets($new);
-    $relationship_count_changed = count($old_targets) !== count($new_targets);
-    $existing_relationships_updated = !empty(array_unique(array_intersect($old_targets, $new_targets)));
-    return $relationship_count_changed && $existing_relationships_updated;
-  }
-
-  /**
-   * Maps a list of entity reference field objects to a list of targets.
-   *
-   * @param \Drupal\Core\Field\EntityReferenceFieldItemListInterface $relationship_list
-   *   A list of entity reference field objects.
-   *
-   * @return string[]|int[]
-   *   A list of targets.
-   */
-  protected static function toTargets(EntityReferenceFieldItemListInterface $relationship_list) {
-    $main_property_name = $relationship_list->getFieldDefinition()
-      ->getFieldStorageDefinition()
-      ->getMainPropertyName();
-
-    $values = [];
-    foreach ($relationship_list->getIterator() as $relationship) {
-      $values[] = $relationship->getValue()[$main_property_name];
-    }
-    return $values;
-  }
-
-  /**
-   * Updates the relationship of an entity.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The requested entity.
-   * @param string $related_field
-   *   The related field name.
-   * @param mixed $parsed_field_list
-   *   The entity reference field list of items to add, or a response object in
-   *   case of error.
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The request object.
-   *
-   * @return \Drupal\jsonapi\ResourceResponse
-   *   The response.
-   */
-  public function patchRelationship(EntityInterface $entity, $related_field, $parsed_field_list, Request $request) {
-    $related_field = $this->resourceType->getInternalName($related_field);
-    if ($parsed_field_list instanceof Response) {
-      // This usually means that there was an error, so there is no point on
-      // processing further.
-      return $parsed_field_list;
-    }
-    /* @var \Drupal\Core\Field\EntityReferenceFieldItemListInterface $parsed_field_list */
-    $this->relationshipAccess($entity, 'update', $related_field);
+  public function replaceRelationshipData(ResourceType $resource_type, EntityInterface $entity, $related, array $resource_identifiers, Request $request) {
+    $related = $resource_type->getInternalName($related);
+    /* @var \Drupal\Core\Field\EntityReferenceFieldItemListInterface $resource_identifiers */
     // According to the specification, PATCH works a little bit different if the
     // relationship is to-one or to-many.
     /* @var \Drupal\Core\Field\EntityReferenceFieldItemListInterface $field_list */
-    $field_list = $entity->{$related_field};
-    $is_multiple = $field_list->getFieldDefinition()
-      ->getFieldStorageDefinition()
-      ->isMultiple();
+    $field_list = $entity->{$related};
+    $field_definition = $field_list->getFieldDefinition();
+    $is_multiple = $field_definition->getFieldStorageDefinition()->isMultiple();
     $method = $is_multiple ? 'doPatchMultipleRelationship' : 'doPatchIndividualRelationship';
-    $this->{$method}($entity, $parsed_field_list);
+    $this->{$method}($entity, $resource_identifiers, $field_definition);
     $this->validate($entity);
     $entity->save();
-    return $this->getRelationship($entity, $related_field, $request, 204);
+    $requires_response = static::relationshipResponseRequiresBody($resource_identifiers, ResourceIdentifier::toResourceIdentifiers($field_list));
+    return $this->getRelationship($resource_type, $entity, $related, $request, $requires_response ? 200 : 204);
   }
 
   /**
@@ -654,15 +609,20 @@ class EntityResource {
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The requested entity.
-   * @param \Drupal\Core\Field\EntityReferenceFieldItemListInterface $parsed_field_list
-   *   The entity reference field list of items to add, or a response object in
-   *   case of error.
+   * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifier[] $resource_identifiers
+   *   The client-sent resource identifiers which should be set on the given
+   *   entity. Should be an empty array or an array with a single value.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   The field definition of the entity field to be updated.
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   *   Thrown when a "to-one" relationship is not provided.
    */
-  protected function doPatchIndividualRelationship(EntityInterface $entity, EntityReferenceFieldItemListInterface $parsed_field_list) {
-    if ($parsed_field_list->count() > 1) {
-      throw new BadRequestHttpException(sprintf('Provide a single relationship so to-one relationship fields (%s).', $parsed_field_list->getName()));
+  protected function doPatchIndividualRelationship(EntityInterface $entity, array $resource_identifiers, FieldDefinitionInterface $field_definition) {
+    if (count($resource_identifiers) > 1) {
+      throw new BadRequestHttpException(sprintf('Provide a single relationship so to-one relationship fields (%s).', $field_definition->getName()));
     }
-    $this->doPatchMultipleRelationship($entity, $parsed_field_list);
+    $this->doPatchMultipleRelationship($entity, $resource_identifiers, $field_definition);
   }
 
   /**
@@ -670,94 +630,102 @@ class EntityResource {
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The requested entity.
-   * @param \Drupal\Core\Field\EntityReferenceFieldItemListInterface $parsed_field_list
-   *   The entity reference field list of items to add, or a response object in
-   *   case of error.
+   * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifier[] $resource_identifiers
+   *   The client-sent resource identifiers which should be set on the given
+   *   entity.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   The field definition of the entity field to be updated.
    */
-  protected function doPatchMultipleRelationship(EntityInterface $entity, EntityReferenceFieldItemListInterface $parsed_field_list) {
-    $field_name = $parsed_field_list->getName();
-    $field_access = $parsed_field_list->access('edit', NULL, TRUE);
-    if (!$field_access->isAllowed()) {
-      throw new EntityAccessDeniedHttpException($entity, $field_access, '/data/relationships/' . $field_name, sprintf('The current user is not allowed to PATCH the selected field (%s).', $field_name));
-    }
-    $entity->{$field_name} = $parsed_field_list;
+  protected function doPatchMultipleRelationship(EntityInterface $entity, array $resource_identifiers, FieldDefinitionInterface $field_definition) {
+    $main_property_name = $field_definition->getItemDefinition()->getMainPropertyName();
+    $entity->{$field_definition->getName()} = array_map(function (ResourceIdentifier $resource_identifier) use ($main_property_name) {
+      $field_properties = [$main_property_name => $this->getEntityFromResourceIdentifier($resource_identifier)->id()];
+      // Remove `arity` from the received extra properties, otherwise this
+      // will fail field validation.
+      $field_properties += array_diff_key($resource_identifier->getMeta(), array_flip([ResourceIdentifier::ARITY_KEY]));
+      return $field_properties;
+    }, $resource_identifiers);
   }
 
   /**
    * Deletes the relationship of an entity.
    *
+   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   *   The base JSON API resource type for the request to be served.
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The requested entity.
-   * @param string $related_field
+   * @param string $related
    *   The related field name.
-   * @param mixed $parsed_field_list
-   *   The entity reference field list of items to add, or a response object in
-   *   case of error.
+   * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifier[]|\Symfony\Component\HttpFoundation\Request $resource_identifiers
+   *   The client-sent resource identifiers which should be removed from the
+   *   relationship, if they exist.
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
    *
    * @return \Drupal\jsonapi\ResourceResponse
    *   The response.
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   *   Thrown when not body was provided for the DELETE operation.
+   * @throws \Symfony\Component\HttpKernel\Exception\ConflictHttpException
+   *   Thrown when deleting a "to-one" relationship.
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   *   Thrown when the underlying entity cannot be saved.
    */
-  public function deleteRelationship(EntityInterface $entity, $related_field, $parsed_field_list, Request $request = NULL) {
-    if ($parsed_field_list instanceof Response) {
-      // This usually means that there was an error, so there is no point on
-      // processing further.
-      return $parsed_field_list;
-    }
-    if ($parsed_field_list instanceof Request) {
+  public function removeFromRelationshipData(ResourceType $resource_type, EntityInterface $entity, $related, array $resource_identifiers, Request $request) {
+    if ($resource_identifiers instanceof Request) {
       // This usually means that there was not body provided.
-      throw new BadRequestHttpException(sprintf('You need to provide a body for DELETE operations on a relationship (%s).', $related_field));
-    }
-    /* @var \Drupal\Core\Field\EntityReferenceFieldItemListInterface $parsed_field_list */
-    $this->relationshipAccess($entity, 'update', $related_field);
-
-    $field_name = $parsed_field_list->getName();
-    $field_access = $parsed_field_list->access('edit', NULL, TRUE);
-    if (!$field_access->isAllowed()) {
-      throw new EntityAccessDeniedHttpException($entity, $field_access, '/data/relationships/' . $field_name, sprintf('The current user is not allowed to PATCH the selected field (%s).', $field_name));
+      throw new BadRequestHttpException(sprintf('You need to provide a body for DELETE operations on a relationship (%s).', $related));
     }
     /* @var \Drupal\Core\Field\EntityReferenceFieldItemListInterface $field_list */
-    $field_list = $entity->{$related_field};
+    $field_list = $entity->{$related};
     $is_multiple = $field_list->getFieldDefinition()
       ->getFieldStorageDefinition()
       ->isMultiple();
     if (!$is_multiple) {
-      throw new ConflictHttpException(sprintf('You can only DELETE from to-many relationships. %s is a to-one relationship.', $related_field));
+      throw new ConflictHttpException(sprintf('You can only DELETE from to-many relationships. %s is a to-one relationship.', $related));
     }
 
     // Compute the list of current values and remove the ones in the payload.
-    $current_values = $field_list->getValue();
-    $deleted_values = $parsed_field_list->getValue();
-    $keep_values = array_udiff($current_values, $deleted_values, function ($first, $second) {
-      return reset($first) - reset($second);
-    });
-    // Replace the existing field with one containing the relationships to keep.
-    $entity->{$related_field} = $this->pluginManager
-      ->createFieldItemList($entity, $related_field, $keep_values);
+    $original_resource_identifiers = ResourceIdentifier::toResourceIdentifiers($field_list);
+    $removed_resource_identifiers = array_uintersect($resource_identifiers, $original_resource_identifiers, [ResourceIdentifier::class, 'compare']);
+    $deltas_to_be_removed = [];
+    foreach ($removed_resource_identifiers as $removed_resource_identifier) {
+      foreach ($original_resource_identifiers as $delta => $existing_resource_identifier) {
+        // Identify the field item deltas which should be removed.
+        if (ResourceIdentifier::isDuplicate($removed_resource_identifier, $existing_resource_identifier)) {
+          $deltas_to_be_removed[] = $delta;
+        }
+      }
+    }
+    // Field item deltas are reset when an item is removed. This removes
+    // items in descending order so that the deltas yet to be removed will
+    // continue to exist.
+    rsort($deltas_to_be_removed);
+    foreach ($deltas_to_be_removed as $delta) {
+      $field_list->removeItem($delta);
+    }
 
     // Save the entity and return the response object.
     $this->validate($entity);
     $entity->save();
-    return $this->getRelationship($entity, $related_field, $request, 204);
+    return $this->getRelationship($resource_type, $entity, $related, $request, 204);
   }
 
   /**
    * Gets a basic query for a collection.
    *
-   * @param string $entity_type_id
-   *   The entity type for the entity query.
+   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   *   The base JSON API resource type for the query.
    * @param array $params
    *   The parameters for the query.
    *
    * @return \Drupal\Core\Entity\Query\QueryInterface
    *   A new query.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  protected function getCollectionQuery($entity_type_id, array $params) {
-    $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
-    $entity_storage = $this->entityTypeManager->getStorage($entity_type_id);
+  protected function getCollectionQuery(ResourceType $resource_type, array $params) {
+    $entity_type = $this->entityTypeManager->getDefinition($resource_type->getEntityTypeId());
+    $entity_storage = $this->entityTypeManager->getStorage($resource_type->getEntityTypeId());
 
     $query = $entity_storage->getQuery();
 
@@ -791,7 +759,7 @@ class EntityResource {
     $query->addMetaData('pager_size', (int) $pagination->getSize());
 
     // Limit this query to the bundle type for this resource.
-    $bundle = $this->resourceType->getBundle();
+    $bundle = $resource_type->getBundle();
     if ($bundle && ($bundle_key = $entity_type->getKey('bundle'))) {
       $query->condition(
         $bundle_key, $bundle
@@ -804,19 +772,59 @@ class EntityResource {
   /**
    * Gets a basic query for a collection count.
    *
-   * @param string $entity_type_id
-   *   The entity type for the entity query.
+   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   *   The base JSON API resource type for the query.
    * @param array $params
    *   The parameters for the query.
    *
    * @return \Drupal\Core\Entity\Query\QueryInterface
    *   A new query.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  protected function getCollectionCountQuery($entity_type_id, array $params) {
+  protected function getCollectionCountQuery(ResourceType $resource_type, array $params) {
     // Reset the range to get all the available results.
-    return $this->getCollectionQuery($entity_type_id, $params)->range()->count();
+    return $this->getCollectionQuery($resource_type, $params)->range()->count();
+  }
+
+  /**
+   * Loads the entity targeted by a resource identifier.
+   *
+   * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifier $resource_identifier
+   *   A resource identifier.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   *   The entity targeted by a resource identifier.
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   *   Thrown if the given resource identifier targets a resource type or
+   *   resource which does not exist.
+   */
+  protected function getEntityFromResourceIdentifier(ResourceIdentifier $resource_identifier) {
+    $resource_type_name = $resource_identifier->getTypeName();
+    if (!($target_resource_type = $this->resourceTypeRepository->getByTypeName($resource_type_name))) {
+      throw new BadRequestHttpException("The resource type `{$resource_type_name}` does not exist.");
+    }
+    $id = $resource_identifier->getId();
+    if (!($targeted_resource = $this->entityRepository->loadEntityByUuid($target_resource_type->getEntityTypeId(), $id))) {
+      throw new BadRequestHttpException("The targeted `{$resource_type_name}` resource with ID `{$id}` does not exist.");
+    }
+    return $targeted_resource;
+  }
+
+  /**
+   * Determines if the client needs to be updated with new relationship data.
+   *
+   * @param array $received_resource_identifiers
+   *   The array of resource identifiers given by the client.
+   * @param array $final_resource_identifiers
+   *   The final array of resource identifiers after applying the requested
+   *   changes.
+   *
+   * @return bool
+   *   Whether the final array of resource identifiers is different than the
+   *   client-sent data.
+   */
+  protected static function relationshipResponseRequiresBody(array $received_resource_identifiers, array $final_resource_identifiers) {
+    return !empty(array_udiff($final_resource_identifiers, $received_resource_identifiers, [ResourceIdentifier::class, 'compare']));
   }
 
   /**
@@ -824,92 +832,87 @@ class EntityResource {
    *
    * @param mixed $data
    *   The data to wrap.
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request object.
+   * @param \Drupal\jsonapi\JsonApiResource\EntityCollection $includes
+   *   The resources to be included in the document. Use NullEntityCollection if
+   *   there should be no included resources in the document.
    * @param int $response_code
    *   The response code.
    * @param array $headers
    *   An array of response headers.
+   * @param string[] $links
+   *   The URLs to which to link. A 'self' link is added automatically.
+   * @param array $meta
+   *   (optional) The top-level metadata.
    *
    * @return \Drupal\jsonapi\ResourceResponse
    *   The response.
    */
-  protected function buildWrappedResponse($data, $response_code = 200, array $headers = []) {
-    return new ResourceResponse(new JsonApiDocumentTopLevel($data), $response_code, $headers);
+  protected function buildWrappedResponse($data, Request $request, EntityCollection $includes, $response_code = 200, array $headers = [], array $links = [], array $meta = []) {
+    $links['self']['href'] = $this->linkManager->getRequestLink($request);
+    return new ResourceResponse(new JsonApiDocumentTopLevel($data, $includes, $links, $meta), $response_code, $headers);
   }
 
   /**
    * Respond with an entity collection.
    *
-   * @param \Drupal\jsonapi\Resource\EntityCollection $entity_collection
-   *   The collection of entites.
-   * @param string $entity_type_id
-   *   The entity type.
+   * @param \Drupal\jsonapi\JsonApiResource\EntityCollection $entity_collection
+   *   The collection of entities.
+   * @param \Drupal\jsonapi\JsonApiResource\EntityCollection $includes
+   *   The resources to be included in the document.
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request object.
+   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   *   The base JSON API resource type for the request to be served.
    *
    * @return \Drupal\jsonapi\ResourceResponse
    *   The response.
    */
-  protected function respondWithCollection(EntityCollection $entity_collection, $entity_type_id) {
-    $response = $this->buildWrappedResponse($entity_collection);
+  protected function respondWithCollection(EntityCollection $entity_collection, EntityCollection $includes, Request $request, ResourceType $resource_type) {
+    $link_context = [
+      'has_next_page' => $entity_collection->hasNextPage(),
+    ];
+    $meta = [];
+    if ($resource_type->includeCount()) {
+      $link_context['total_count'] = $meta['count'] = $entity_collection->getTotalCount();
+    }
+    $collection_links = $this->linkManager->getPagerLinks(\Drupal::request(), $link_context);
+    $response = $this->buildWrappedResponse($entity_collection, $request, $includes, 200, [], $collection_links, $meta);
 
     // When a new change to any entity in the resource happens, we cannot ensure
     // the validity of this cached list. Add the list tag to deal with that.
-    $list_tag = $this->entityTypeManager->getDefinition($entity_type_id)
+    $list_tag = $this->entityTypeManager->getDefinition($resource_type->getEntityTypeId())
       ->getListCacheTags();
     $response->getCacheableMetadata()->addCacheTags($list_tag);
+    foreach ($entity_collection as $entity) {
+      $response->addCacheableDependency($entity);
+    }
     return $response;
-  }
-
-  /**
-   * Check the access to update the entity and the presence of a relationship.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity.
-   * @param string $operation
-   *   The operation to test.
-   * @param string $related_field
-   *   The name of the field to check.
-   *
-   * @see \Drupal\Core\Access\AccessibleInterface
-   */
-  protected function relationshipAccess(EntityInterface $entity, $operation, $related_field) {
-    /* @var \Drupal\Core\Field\EntityReferenceFieldItemListInterface $parsed_field_list */
-    $field_access = $entity->{$related_field}->access($operation, NULL, TRUE);
-    $entity_access = $entity->access($operation, NULL, TRUE);
-    $combined_access = $entity_access->andIf($field_access);
-    if (!$combined_access->isAllowed()) {
-      // @todo Is this really the right path?
-      throw new EntityAccessDeniedHttpException($entity, $combined_access, $related_field, "The current user is not allowed to $operation this relationship.");
-    }
-    if (!($field_list = $entity->get($related_field)) || !$this->isRelationshipField($field_list)) {
-      throw new NotFoundHttpException(sprintf('The relationship %s is not present in this resource.', $related_field));
-    }
   }
 
   /**
    * Takes a field from the origin entity and puts it to the destination entity.
    *
+   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   *   The JSON API resource type of the entity to be updated.
    * @param \Drupal\Core\Entity\EntityInterface $origin
    *   The entity that contains the field values.
    * @param \Drupal\Core\Entity\EntityInterface $destination
    *   The entity that needs to be updated.
    * @param string $field_name
    *   The name of the field to extract and update.
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   *   Thrown when the serialized and destination entities are of different
+   *   types.
    */
-  protected function updateEntityField(EntityInterface $origin, EntityInterface $destination, $field_name) {
+  protected function updateEntityField(ResourceType $resource_type, EntityInterface $origin, EntityInterface $destination, $field_name) {
     // The update is different for configuration entities and content entities.
     if ($origin instanceof ContentEntityInterface && $destination instanceof ContentEntityInterface) {
       // First scenario: both are content entities.
-      try {
-        $field_name = $this->resourceType->getInternalName($field_name);
-        $destination_field_list = $destination->get($field_name);
-      }
-      catch (\InvalidArgumentException $e) {
-        $resource_type = $this->resourceTypeRepository->get($destination->getEntityTypeId(), $destination->bundle());
-        throw new UnprocessableEntityHttpException(sprintf(
-          'The attribute %s does not exist on the %s resource type.',
-          $field_name,
-          $resource_type->getTypeName()
-        ));
-      }
+      $field_name = $resource_type->getInternalName($field_name);
+      $destination_field_list = $destination->get($field_name);
 
       $origin_field_list = $origin->get($field_name);
       if ($this->checkPatchFieldAccess($destination_field_list, $origin_field_list)) {
@@ -926,6 +929,30 @@ class EntityResource {
   }
 
   /**
+   * Gets includes for the given response data.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request object.
+   * @param \Drupal\Core\Entity\EntityInterface|\Drupal\jsonapi\JsonApiResource\EntityCollection $data
+   *   The response data from which to resolve includes.
+   * @param string $related
+   *   (optional) The relationship field name to be given for getting includes
+   *   on a related route.
+   *
+   * @return \Drupal\jsonapi\JsonApiResource\EntityCollection
+   *   An EntityCollection to be included or a NullEntityCollection if the
+   *   request does not specify any include paths.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  public function getIncludes(Request $request, $data, $related = NULL) {
+    return $request->query->has('include') && ($include_parameter = $request->query->get('include')) && !empty($include_parameter)
+      ? $this->includeResolver->resolve($request->get(Routes::RESOURCE_TYPE_KEY), $data, $include_parameter, $related)
+      : new NullEntityCollection();
+  }
+
+  /**
    * Checks whether the given field should be PATCHed.
    *
    * @param \Drupal\Core\Field\FieldItemListInterface $original_field
@@ -936,7 +963,7 @@ class EntityResource {
    * @return bool
    *   Whether the field should be PATCHed or not.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   * @throws \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException
    *   Thrown when the user sending the request is not allowed to update the
    *   field. Only thrown when the user could not abuse this information to
    *   determine the stored value.
@@ -972,25 +999,6 @@ class EntityResource {
   }
 
   /**
-   * Checks if is a relationship field.
-   *
-   * @param \Drupal\Core\Field\FieldItemListInterface $entity_field
-   *   Entity field.
-   *
-   * @return bool
-   *   Returns TRUE if entity field is a relationship field with non-internal
-   *   target resource types, FALSE otherwise.
-   */
-  protected function isRelationshipField(FieldItemListInterface $entity_field) {
-    $resource_types = $this->resourceType->getRelatableResourceTypesByField(
-      $this->resourceType->getInternalName($entity_field->getName())
-    );
-    return !empty($resource_types) && array_reduce($resource_types, function ($has_external, $resource_type) {
-      return $has_external ? TRUE : !$resource_type->isInternal();
-    }, FALSE);
-  }
-
-  /**
    * Build a collection of the entities to respond with and access objects.
    *
    * @param \Drupal\Core\Entity\EntityStorageInterface $storage
@@ -999,16 +1007,14 @@ class EntityResource {
    *   Array of entity IDs.
    *
    * @return array
-   *   An array keyed by entity ID containing the keys:
-   *     - entity: the loaded entity or an access exception.
-   *     - access: the access object.
+   *   An array of loaded entities and/or an access exceptions.
    */
   protected function loadEntitiesWithAccess(EntityStorageInterface $storage, array $ids) {
     $output = [];
     foreach ($storage->loadMultiple($ids) as $entity) {
-      $output[$entity->id()] = static::getEntityAndAccess($entity);
+      $output[$entity->id()] = static::getAccessCheckedEntity($entity);
     }
-    return $output;
+    return array_values($output);
   }
 
   /**
@@ -1017,27 +1023,30 @@ class EntityResource {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity to test access for.
    *
-   * @return array
-   *   An array containing the keys:
-   *     - entity: the loaded entity or an access exception.
-   *     - access: the access object.
+   * @return \Drupal\Core\Entity\EntityInterface|\Drupal\jsonapi\LabelOnlyEntity|\Drupal\jsonapi\Exception\EntityAccessDeniedHttpException
+   *   The loaded entity, a label only version of that entity or an
+   *   EntityAccessDeniedHttpException object if neither is accessible. All
+   *   three possible return values carry the access result cacheability.
    */
-  public static function getEntityAndAccess(EntityInterface $entity) {
+  public static function getAccessCheckedEntity(EntityInterface $entity) {
     /** @var \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository */
     $entity_repository = \Drupal::service('entity.repository');
     $entity = $entity_repository->getTranslationFromContext($entity, NULL, ['operation' => 'entity_upcast']);
     $access = $entity->access('view', NULL, TRUE);
-    // Accumulate the cacheability metadata for the access.
-    $output = [
-      'access' => $access,
-      'entity' => $entity,
-    ];
-    if ($entity instanceof AccessibleInterface && !$access->isAllowed()) {
-      // Pass an exception to the list of things to normalize.
-      $output['entity'] = new EntityAccessDeniedHttpException($entity, $access, '/data', 'The current user is not allowed to GET the selected resource.');
+    $entity->addCacheableDependency($access);
+    if (!$access->isAllowed()) {
+      $label_access = $entity->access('view label', NULL, TRUE);
+      $entity->addCacheableDependency($label_access);
+      if ($label_access->isAllowed()) {
+        return new LabelOnlyEntity($entity);
+      }
+      else {
+        // Pass an exception to the list of things to normalize.
+        return new EntityAccessDeniedHttpException($entity, $access->orIf($label_access), '/data', 'The current user is not allowed to GET the selected resource.');
+      }
     }
 
-    return $output;
+    return $entity;
   }
 
   /**
@@ -1048,8 +1057,6 @@ class EntityResource {
    *
    * @return bool
    *   Whether the entity already has been created.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
   protected function entityExists(EntityInterface $entity) {
     $entity_storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());

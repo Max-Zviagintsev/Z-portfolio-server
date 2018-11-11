@@ -4,12 +4,14 @@ namespace Drupal\jsonapi_extras;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\jsonapi\Resource\JsonApiDocumentTopLevel;
+use Drupal\jsonapi\JsonApiResource\EntityCollection;
 use Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface;
 use Drupal\jsonapi\Routing\Routes;
 use Drupal\jsonapi\Serializer\Serializer;
+use Drupal\jsonapi_extras\ResourceType\ConfigurableResourceTypeRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Simplifies the process of generating a JSON API version of an entity.
@@ -56,7 +58,7 @@ class EntityToJsonApi {
   /**
    * EntityToJsonApi constructor.
    *
-   * @param \Drupal\jsonapi\Serializer\Serializer $serializer
+   * @param \Drupal\jsonapi\Serializer\Serializer|\Drupal\jsonapi_extras\SerializerDecorator $serializer
    *   The serializer.
    * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
    *   The resource type repository.
@@ -67,7 +69,8 @@ class EntityToJsonApi {
    * @param string $jsonapi_base_path
    *   The JSON API base path.
    */
-  public function __construct(Serializer $serializer, ResourceTypeRepositoryInterface $resource_type_repository, AccountInterface $current_user, RequestStack $request_stack, $jsonapi_base_path) {
+  public function __construct(SerializerInterface $serializer, ResourceTypeRepositoryInterface $resource_type_repository, AccountInterface $current_user, RequestStack $request_stack, $jsonapi_base_path) {
+    assert($serializer instanceof Serializer || $serializer instanceof SerializerDecorator);
     $this->serializer = $serializer;
     $this->resourceTypeRepository = $resource_type_repository;
     $this->currentUser = $current_user;
@@ -77,6 +80,9 @@ class EntityToJsonApi {
     assert(isset($jsonapi_base_path[1]));
     assert(substr($jsonapi_base_path, -1) !== '/');
     $this->jsonApiBasePath = $jsonapi_base_path;
+    $this->classToUse = ConfigurableResourceTypeRepository::isJsonApi2x()
+      ? '\Drupal\jsonapi\JsonApiResource\JsonApiDocumentTopLevel'
+      : '\Drupal\jsonapi\Resource\JsonApiDocumentTopLevel';
   }
 
   /**
@@ -91,7 +97,14 @@ class EntityToJsonApi {
    *   The raw JSON string of the requested resource.
    */
   public function serialize(EntityInterface $entity, array $includes = []) {
-    return $this->serializer->serialize(new JsonApiDocumentTopLevel($entity),
+    $referenced_entities = [];
+    foreach ($includes as $field_name) {
+      $referenced_entities = array_merge($referenced_entities, $entity->get($field_name)->referencedEntities());
+    }
+    $document = ConfigurableResourceTypeRepository::isJsonApi2x()
+      ? new $this->classToUse($entity, new EntityCollection($referenced_entities), [])
+      : new $this->classToUse($entity);
+    return $this->serializer->serialize($document,
       'api_json',
       $this->calculateContext($entity, $includes)
     );
@@ -109,7 +122,14 @@ class EntityToJsonApi {
    *   The JSON structure of the requested resource.
    */
   public function normalize(EntityInterface $entity, array $includes = []) {
-    return $this->serializer->normalize(new JsonApiDocumentTopLevel($entity),
+    $referenced_entities = [];
+    foreach ($includes as $field_name) {
+      $referenced_entities = array_merge($referenced_entities, $entity->get($field_name)->referencedEntities());
+    }
+    $document = ConfigurableResourceTypeRepository::isJsonApi2x()
+      ? new $this->classToUse($entity, new EntityCollection($referenced_entities), [])
+      : new $this->classToUse($entity);
+    return $this->serializer->normalize($document,
       'api_json',
       $this->calculateContext($entity, $includes)
     )->rasterizeValue();

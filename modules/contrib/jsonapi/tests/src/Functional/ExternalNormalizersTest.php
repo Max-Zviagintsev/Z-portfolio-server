@@ -10,6 +10,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use GuzzleHttp\RequestOptions;
 
 /**
  * Asserts external normalizers are handled as expected by the JSON API module.
@@ -57,9 +58,10 @@ class ExternalNormalizersTest extends BrowserTestBase {
     parent::setUp();
 
     // This test is not about access control at all, so allow anonymous users to
-    // view the test entities.
+    // view and create the test entities.
     Role::load(RoleInterface::ANONYMOUS_ID)
       ->grantPermission('view test entity')
+      ->grantPermission('create entity_test entity_test_with_bundle entities')
       ->save();
 
     FieldStorageConfig::create([
@@ -92,11 +94,16 @@ class ExternalNormalizersTest extends BrowserTestBase {
    *   The expected JSON API normalization of the tested field. Must be either
    *   - static::VALUE_ORIGINAL (normalizer IS NOT expected to override)
    *   - static::VALUE_OVERRIDDEN (normalizer IS expected to override)
+   * @param string $expected_value_jsonapi_denormalization
+   *   The expected JSON API denormalization of the tested field. Must be either
+   *   - static::VALUE_OVERRIDDEN (denormalizer IS NOT expected to override)
+   *   - static::VALUE_ORIGINAL (denormalizer IS expected to override)
    *
    * @dataProvider providerTestFormatAgnosticNormalizers
    */
-  public function testFormatAgnosticNormalizers($test_module, $expected_value_jsonapi_normalization) {
+  public function testFormatAgnosticNormalizers($test_module, $expected_value_jsonapi_normalization, $expected_value_jsonapi_denormalization) {
     assert(in_array($expected_value_jsonapi_normalization, [static::VALUE_ORIGINAL, static::VALUE_OVERRIDDEN], TRUE));
+    assert(in_array($expected_value_jsonapi_denormalization, [static::VALUE_ORIGINAL, static::VALUE_OVERRIDDEN], TRUE));
 
     // Asserts the entity contains the value we set.
     $this->assertSame(static::VALUE_ORIGINAL, $this->entity->field_test->value);
@@ -105,6 +112,13 @@ class ExternalNormalizersTest extends BrowserTestBase {
     // yield the value we set.
     $core_normalization = $this->container->get('serializer')->normalize($this->entity);
     $this->assertSame(static::VALUE_ORIGINAL, $core_normalization['field_test'][0]['value']);
+
+    // Asserts denormalizing the entity using core's 'serializer' service DOES
+    // yield the value we set.
+    $core_normalization['field_test'][0]['value'] = static::VALUE_OVERRIDDEN;
+    $denormalized_entity = $this->container->get('serializer')->denormalize($core_normalization, EntityTest::class, 'json', []);
+    $this->assertInstanceOf(EntityTest::class, $denormalized_entity);
+    $this->assertSame(static::VALUE_OVERRIDDEN, $denormalized_entity->field_test->value);
 
     // Install test module that contains a high-priority alternative normalizer.
     $this->container->get('module_installer')->install([$test_module]);
@@ -115,14 +129,45 @@ class ExternalNormalizersTest extends BrowserTestBase {
     $core_normalization = $this->container->get('serializer')->normalize($this->entity);
     $this->assertSame(static::VALUE_OVERRIDDEN, $core_normalization['field_test'][0]['value']);
 
-    // Asserts that this does NOT affect the JSON API normalization.
+    // Asserts denormalizing the entity using core's 'serializer' service DOES
+    // NOT ANYMORE yield the value we set.
+    $core_normalization = $this->container->get('serializer')->normalize($this->entity);
+    $core_normalization['field_test'][0]['value'] = static::VALUE_OVERRIDDEN;
+    $denormalized_entity = $this->container->get('serializer')->denormalize($core_normalization, EntityTest::class, 'json', []);
+    $this->assertInstanceOf(EntityTest::class, $denormalized_entity);
+    // @todo Make this unconditional once https://www.drupal.org/project/drupal/issues/2957385 lands — JSON API fixed denormalization of properties in https://www.drupal.org/project/jsonapi/issues/2955615, core's Serialization module still has to follow
+    if ($test_module === 'jsonapi_test_field_type') {
+      $this->assertSame(static::VALUE_ORIGINAL, $denormalized_entity->field_test->value);
+    }
+
+    // Asserts the expected JSON API normalization.
     // @todo Remove line below in favor of commented line in https://www.drupal.org/project/jsonapi/issues/2878463.
-    $url = Url::fromRoute('jsonapi.entity_test--entity_test.individual', ['entity_test' => $this->entity->uuid()]);
+    $url = Url::fromRoute('jsonapi.entity_test--entity_test.individual', ['entity' => $this->entity->uuid()]);
     /* $url = $this->entity->toUrl('jsonapi'); */
     $client = $this->getSession()->getDriver()->getClient()->getClient();
     $response = $client->request('GET', $url->setAbsolute(TRUE)->toString());
     $document = Json::decode((string) $response->getBody());
     $this->assertSame($expected_value_jsonapi_normalization, $document['data']['attributes']['field_test']);
+
+    // Asserts the expected JSON API denormalization.
+    $request_options = [];
+    $request_options[RequestOptions::BODY] = Json::encode([
+      'data' => [
+        'type' => 'entity_test--entity_test',
+        'attributes' => [
+          'field_test' => static::VALUE_OVERRIDDEN,
+        ],
+      ],
+    ]);
+    $request_options[RequestOptions::HEADERS]['Content-Type'] = 'application/vnd.api+json';
+    $response = $client->request('POST', Url::fromRoute('jsonapi.entity_test--entity_test.collection.post')->setAbsolute(TRUE)->toString(), $request_options);
+    $document = Json::decode((string) $response->getBody());
+    $this->assertSame(static::VALUE_OVERRIDDEN, $document['data']['attributes']['field_test']);
+    $entities = $this->container->get('entity_type.manager')
+      ->getStorage('entity_test')
+      ->loadByProperties(['uuid' => $document['data']['id']]);
+    $created_entity = reset($entities);
+    $this->assertSame($expected_value_jsonapi_denormalization, $created_entity->field_test->value);
   }
 
   /**
@@ -134,14 +179,18 @@ class ExternalNormalizersTest extends BrowserTestBase {
   public function providerTestFormatAgnosticNormalizers() {
     return [
       'Format-agnostic @FieldType-level normalizers SHOULD NOT be able to affect the JSON API normalization' => [
-        // \Drupal\jsonapi_test_field_type\Normalizer\StringNormalizer::normalize()
         'jsonapi_test_field_type',
+        // \Drupal\jsonapi_test_field_type\Normalizer\StringNormalizer::normalize()
         static::VALUE_ORIGINAL,
+        // \Drupal\jsonapi_test_field_type\Normalizer\StringNormalizer::denormalize()
+        static::VALUE_OVERRIDDEN,
       ],
       'Format-agnostic @DataType-level normalizers SHOULD be able to affect the JSON API normalization' => [
-        // \Drupal\jsonapi_test_data_type\Normalizer\StringNormalizer::normalize()
         'jsonapi_test_data_type',
+        // \Drupal\jsonapi_test_data_type\Normalizer\StringNormalizer::normalize()
         static::VALUE_OVERRIDDEN,
+        // \Drupal\jsonapi_test_data_type\Normalizer\StringNormalizer::denormalize()
+        static::VALUE_ORIGINAL,
       ],
     ];
   }

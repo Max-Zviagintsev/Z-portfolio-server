@@ -2,6 +2,9 @@
 
 namespace Drupal\Tests\jsonapi\Kernel\Normalizer;
 
+use Drupal\jsonapi\Normalizer\EntityConditionGroupNormalizer;
+use Drupal\jsonapi\Normalizer\EntityConditionNormalizer;
+use Drupal\jsonapi\Normalizer\FilterNormalizer;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\jsonapi\Query\Filter;
 use Drupal\jsonapi\Context\FieldResolver;
@@ -38,8 +41,11 @@ class FilterNormalizerTest extends KernelTestBase {
    */
   public function setUp() {
     parent::setUp();
-    $this->container->set('jsonapi.field_resolver', $this->getFieldResolver('foo', 'bar'));
-    $this->normalizer = $this->container->get('serializer.normalizer.filter.jsonapi');
+    $this->normalizer = new FilterNormalizer(
+      $this->getFieldResolver('foo', 'bar'),
+      new EntityConditionNormalizer(),
+      new EntityConditionGroupNormalizer()
+    );
   }
 
   /**

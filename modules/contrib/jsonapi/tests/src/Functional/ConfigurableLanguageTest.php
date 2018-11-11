@@ -67,30 +67,29 @@ class ConfigurableLanguageTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => 'http://jsonapi.org/format/1.0/',
+            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
           ],
         ],
         'version' => '1.0',
       ],
       'links' => [
-        'self' => $self_url,
+        'self' => ['href' => $self_url],
       ],
       'data' => [
         'id' => $this->entity->uuid(),
         'type' => 'configurable_language--configurable_language',
         'links' => [
-          'self' => $self_url,
+          'self' => ['href' => $self_url],
         ],
         'attributes' => [
           'dependencies' => [],
           'direction' => 'ltr',
-          'id' => 'll',
           'label' => 'Llama Language',
           'langcode' => 'en',
           'locked' => FALSE,
           'status' => TRUE,
-          'uuid' => $this->entity->uuid(),
           'weight' => 0,
+          'drupal_internal__id' => 'll',
         ],
       ],
     ];
@@ -117,7 +116,7 @@ class ConfigurableLanguageTest extends ResourceTestBase {
    */
   public function testGetIndividualDefaultConfig() {
     // @todo Remove line below in favor of commented line in https://www.drupal.org/project/jsonapi/issues/2878463.
-    $url = Url::fromRoute('jsonapi.configurable_language--configurable_language.individual', ['configurable_language' => ConfigurableLanguage::load('en')->uuid()]);
+    $url = Url::fromRoute('jsonapi.configurable_language--configurable_language.individual', ['entity' => ConfigurableLanguage::load('en')->uuid()]);
     /* $url = ConfigurableLanguage::load('en')->toUrl('jsonapi'); */
 
     $request_options = [];

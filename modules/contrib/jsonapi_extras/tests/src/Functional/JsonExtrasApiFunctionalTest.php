@@ -8,6 +8,7 @@ use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\jsonapi_extras\Entity\JsonapiResourceConfig;
+use Drupal\jsonapi_extras\ResourceType\ConfigurableResourceTypeRepository;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\jsonapi\Functional\JsonApiFunctionalTestBase;
@@ -66,7 +67,6 @@ class JsonExtrasApiFunctionalTest extends JsonApiFunctionalTestBase {
       'description' => '',
     ]);
     $field_config->save();
-
 
     $config = \Drupal::configFactory()->getEditable('jsonapi_extras.settings');
     $config->set('path_prefix', 'api');
@@ -178,8 +178,14 @@ class JsonExtrasApiFunctionalTest extends JsonApiFunctionalTestBase {
     // 13. Test a disabled related resource of single cardinality.
     $this->drupalGet('/api/taxonomy_term/tags/' . $this->tags[0]->uuid() . '/vid');
     $this->assertSession()->statusCodeEquals(404);
-    $this->drupalGet('/api/taxonomy_term/tags/' . $this->tags[0]->uuid() . '/relationships/vid');
-    $this->assertSession()->statusCodeEquals(404);
+    $output = Json::decode($this->drupalGet('/api/taxonomy_term/tags/' . $this->tags[0]->uuid() . '/relationships/vid'));
+    if (ConfigurableResourceTypeRepository::isJsonApi2x()) {
+      $this->assertSession()->statusCodeEquals(200);
+      $this->assertSame(NULL, $output['data']);
+    }
+    else {
+      $this->assertSession()->statusCodeEquals(404);
+    }
 
     // 14. Test a disabled related resource of multiple cardinality.
     $this->tags[1]->vocabs->set(0, 'tags');
@@ -265,7 +271,12 @@ class JsonExtrasApiFunctionalTest extends JsonApiFunctionalTestBase {
     $this->assertEquals(201, $response->getStatusCode());
     $this->assertArrayHasKey('internalId', $created_response['data']['attributes']);
     $this->assertCount(2, $created_response['data']['relationships']['tags']['data']);
-    $this->assertSame($created_response['data']['links']['self'], $response->getHeader('Location')[0]);
+    if (ConfigurableResourceTypeRepository::isJsonApi2x()) {
+      $this->assertSame($created_response['data']['links']['self']['href'], $response->getHeader('Location')[0]);
+    }
+    else {
+      $this->assertSame($created_response['data']['links']['self'], $response->getHeader('Location')[0]);
+    }
     $date = new \DateTime($body['data']['attributes']['timestamp']);
     $created_node = Node::load($created_response['data']['attributes']['internalId']);
     $this->assertSame((int) $date->format('U'), (int) $created_node->get('field_timestamp')->value);
@@ -275,7 +286,7 @@ class JsonExtrasApiFunctionalTest extends JsonApiFunctionalTestBase {
     $relationships_url = Url::fromUserInput('/api/articles/' . $uuid . '/relationships/tags');
     $body = [
       'data' => [
-        ['type' => 'taxonomy_term--tags', 'id' => $this->tags[2]->uuid()]
+        ['type' => 'taxonomy_term--tags', 'id' => $this->tags[2]->uuid()],
       ],
     ];
     $response = $this->request('POST', $relationships_url, [

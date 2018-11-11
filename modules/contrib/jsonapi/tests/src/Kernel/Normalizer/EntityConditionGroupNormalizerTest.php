@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\jsonapi\Kernel\Normalizer;
 
+use Drupal\jsonapi\Normalizer\EntityConditionGroupNormalizer;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\jsonapi\Query\EntityConditionGroup;
 
@@ -29,7 +30,7 @@ class EntityConditionGroupNormalizerTest extends KernelTestBase {
    * @dataProvider denormalizeProvider
    */
   public function testDenormalize($case) {
-    $normalizer = $this->container->get('serializer.normalizer.entity_condition_group.jsonapi');
+    $normalizer = new EntityConditionGroupNormalizer();
 
     $normalized = $normalizer->denormalize($case, EntityConditionGroup::class);
 
@@ -45,7 +46,7 @@ class EntityConditionGroupNormalizerTest extends KernelTestBase {
    * @covers ::denormalize
    */
   public function testDenormalizeException() {
-    $normalizer = $this->container->get('serializer.normalizer.entity_condition_group.jsonapi');
+    $normalizer = new EntityConditionGroupNormalizer();
     $data = ['conjunction' => 'NOT_ALLOWED', 'members' => []];
     $this->setExpectedException(\InvalidArgumentException::class);
     $normalized = $normalizer->denormalize($data, EntityConditionGroup::class);

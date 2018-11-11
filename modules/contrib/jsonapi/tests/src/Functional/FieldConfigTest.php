@@ -80,19 +80,19 @@ class FieldConfigTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => 'http://jsonapi.org/format/1.0/',
+            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
           ],
         ],
         'version' => '1.0',
       ],
       'links' => [
-        'self' => $self_url,
+        'self' => ['href' => $self_url],
       ],
       'data' => [
         'id' => $this->entity->uuid(),
         'type' => 'field_config--field_config',
         'links' => [
-          'self' => $self_url,
+          'self' => ['href' => $self_url],
         ],
         'attributes' => [
           'bundle' => 'camelids',
@@ -111,14 +111,13 @@ class FieldConfigTest extends ResourceTestBase {
           'entity_type' => 'node',
           'field_name' => 'field_llama',
           'field_type' => 'text',
-          'id' => 'node.camelids.field_llama',
           'label' => 'field_llama',
           'langcode' => 'en',
           'required' => FALSE,
           'settings' => [],
           'status' => TRUE,
           'translatable' => TRUE,
-          'uuid' => $this->entity->uuid(),
+          'drupal_internal__id' => 'node.camelids.field_llama',
         ],
       ],
     ];

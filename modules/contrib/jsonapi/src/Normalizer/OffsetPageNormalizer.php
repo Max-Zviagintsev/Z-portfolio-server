@@ -2,9 +2,10 @@
 
 namespace Drupal\jsonapi\Normalizer;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\jsonapi\Query\OffsetPage;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
 
 /**
  * The normalizer used for JSON API pagination.
@@ -40,7 +41,8 @@ class OffsetPageNormalizer implements DenormalizerInterface {
    */
   protected function expand($data) {
     if (!is_array($data)) {
-      throw new BadRequestHttpException('The page parameter needs to be an array.');
+      $cacheability = (new CacheableMetadata())->addCacheContexts(['url.query_args:page']);
+      throw new CacheableBadRequestHttpException($cacheability, 'The page parameter needs to be an array.');
     }
 
     $expanded = $data + [

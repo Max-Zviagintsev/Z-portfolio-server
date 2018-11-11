@@ -6,18 +6,20 @@ services:
       - '@entity_type.manager'
       - '@plugin.manager.resource_field_enhancer'
     tags:
-      - { name: jsonapi_normalizer_do_not_use_removal_imminent, priority: 25 }
+      - { name: normalizer, priority: 1025, format: api_json }
 
   serializer.normalizer.entity.jsonapi_extras:
     class: Drupal\jsonapi_extras\Normalizer\ContentEntityNormalizer
-    arguments: ['@jsonapi.link_manager', '@jsonapi.resource_type.repository', '@entity_type.manager']
+    parent: serializer.normalizer.entity.jsonapi
+    calls:
+      - [setSerializer, ['@jsonapi.serializer_do_not_use_removal_imminent']]
     tags:
-      - { name: jsonapi_normalizer_do_not_use_removal_imminent, priority: 22 }
+      - { name: normalizer, priority: 1022, format: api_json }
   serializer.normalizer.config_entity.jsonapi_extras:
     class: Drupal\jsonapi_extras\Normalizer\ConfigEntityNormalizer
-    arguments: ['@jsonapi.link_manager', '@jsonapi.resource_type.repository', '@entity_type.manager']
+    parent: serializer.normalizer.config_entity.jsonapi
     tags:
-      - { name: jsonapi_normalizer_do_not_use_removal_imminent, priority: 22 }
+      - { name: normalizer, priority: 1022, format: api_json }
 
   plugin.manager.resource_field_enhancer:
     class: Drupal\jsonapi_extras\Plugin\ResourceFieldEnhancerManager
@@ -33,3 +35,9 @@ services:
   jsonapi_extras.entity.to_jsonapi:
     class: Drupal\jsonapi_extras\EntityToJsonApi
     arguments: ['@jsonapi.serializer_do_not_use_removal_imminent', '@jsonapi.resource_type.repository', '@current_user', '@request_stack', '%jsonapi.base_path%']
+
+  jsonapi.serializer_do_not_use_removal_imminent.jsonapi_extras:
+    class: \Drupal\jsonapi_extras\SerializerDecorator
+    public: false
+    decorates: jsonapi.serializer_do_not_use_removal_imminent
+    arguments: ['@jsonapi.serializer_do_not_use_removal_imminent.jsonapi_extras.inner']
