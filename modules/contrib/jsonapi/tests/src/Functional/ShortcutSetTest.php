@@ -6,7 +6,7 @@ use Drupal\Core\Url;
 use Drupal\shortcut\Entity\ShortcutSet;
 
 /**
- * JSON API integration test for the "ShortcutSet" config entity type.
+ * JSON:API integration test for the "ShortcutSet" config entity type.
  *
  * @group jsonapi
  */

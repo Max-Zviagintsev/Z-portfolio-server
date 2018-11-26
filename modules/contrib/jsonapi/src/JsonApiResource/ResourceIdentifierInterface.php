@@ -23,10 +23,10 @@ interface ResourceIdentifierInterface {
   public function getId();
 
   /**
-   * Gets the resource identifier's JSON API resource type name.
+   * Gets the resource identifier's JSON:API resource type name.
    *
    * @return string
-   *   The JSON API resource type name.
+   *   The JSON:API resource type name.
    */
   public function getTypeName();
 

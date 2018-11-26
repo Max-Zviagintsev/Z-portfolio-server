@@ -8,7 +8,7 @@ use Drupal\Tests\rest\Functional\BcTimestampNormalizerUnixTestTrait;
 use Drupal\user\Entity\User;
 
 /**
- * JSON API integration test for the "EntityTest" content entity type.
+ * JSON:API integration test for the "EntityTest" content entity type.
  *
  * @group jsonapi
  */

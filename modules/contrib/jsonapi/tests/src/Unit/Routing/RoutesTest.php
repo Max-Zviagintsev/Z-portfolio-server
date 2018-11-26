@@ -74,7 +74,7 @@ class RoutesTest extends UnitTestCase {
     // - 12 relationship routes; 3 fields * 4 HTTP methods.
     //   `relationship` routes are generated even for internal target resource
     //   types (`related` routes are not).
-    // - 1 for the JSON API entry point.
+    // - 1 for the JSON:API entry point.
     $this->assertEquals(20, $routes->count());
 
     $iterator = $routes->getIterator();

@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface;
 
 /**
- * Normalizes the top-level document according to the JSON API specification.
+ * Normalizes the top-level document according to the JSON:API specification.
  *
  * @see \Drupal\jsonapi\JsonApiResource\JsonApiDocumentTopLevel
  *
@@ -50,7 +50,7 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
   protected $entityTypeManager;
 
   /**
-   * The JSON API resource type repository.
+   * The JSON:API resource type repository.
    *
    * @var \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface
    */
@@ -64,7 +64,7 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
-   *   The JSON API resource type repository.
+   *   The JSON:API resource type repository.
    */
   public function __construct(LinkManager $link_manager, EntityTypeManagerInterface $entity_type_manager, ResourceTypeRepositoryInterface $resource_type_repository) {
     $this->linkManager = $link_manager;
@@ -231,7 +231,7 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
     }
     // Ensure that the client provided ID is a valid UUID.
     if (isset($document['data']['id']) && !Uuid::isValid($document['data']['id'])) {
-      // This should be a 422 response, but the JSON API specification dictates
+      // This should be a 422 response, but the JSON:API specification dictates
       // a 403 Forbidden response. We follow the specification.
       throw new EntityAccessDeniedHttpException(NULL, AccessResult::forbidden(), '/data/id', 'IDs should be properly generated and formatted UUIDs as described in RFC 4122.');
     }

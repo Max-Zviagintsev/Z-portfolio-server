@@ -7,7 +7,7 @@ use Drupal\shortcut\Entity\Shortcut;
 use Drupal\shortcut\Entity\ShortcutSet;
 
 /**
- * JSON API integration test for the "Shortcut" content entity type.
+ * JSON:API integration test for the "Shortcut" content entity type.
  *
  * @group jsonapi
  */

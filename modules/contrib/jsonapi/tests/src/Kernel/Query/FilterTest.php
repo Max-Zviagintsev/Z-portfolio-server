@@ -3,11 +3,13 @@
 namespace Drupal\Tests\jsonapi\Kernel\Query;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
 use Drupal\jsonapi\Normalizer\EntityConditionGroupNormalizer;
 use Drupal\jsonapi\Normalizer\EntityConditionNormalizer;
 use Drupal\jsonapi\Normalizer\FilterNormalizer;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use Drupal\Tests\image\Kernel\ImageFieldCreationTrait;
 use Drupal\Tests\jsonapi\Kernel\JsonapiKernelTestBase;
 
 /**
@@ -20,11 +22,15 @@ use Drupal\Tests\jsonapi\Kernel\JsonapiKernelTestBase;
  */
 class FilterTest extends JsonapiKernelTestBase {
 
+  use ImageFieldCreationTrait;
+
   /**
    * {@inheritdoc}
    */
   public static $modules = [
     'field',
+    'file',
+    'image',
     'jsonapi',
     'node',
     'serialization',
@@ -78,9 +84,111 @@ class FilterTest extends JsonapiKernelTestBase {
   /**
    * @covers ::queryCondition
    */
+  public function testInvalidFilterPathDueToMissingPropertyName() {
+    $this->setExpectedException(CacheableBadRequestHttpException::class, 'Invalid nested filtering. The field `colors`, given in the path `colors` is incomplete, it must end with one of the following specifiers: `value`, `format`, `processed`.');
+    $normalized = [
+      'colors' => '',
+    ];
+    $this->normalizer->denormalize($normalized, Filter::class, NULL, [
+      'entity_type_id' => 'node',
+      'bundle' => 'painting',
+    ]);
+  }
+
+  /**
+   * @covers ::queryCondition
+   */
+  public function testInvalidFilterPathDueToMissingPropertyNameReferenceFieldWithMetaProperties() {
+    $this->setExpectedException(CacheableBadRequestHttpException::class, 'Invalid nested filtering. The field `photo`, given in the path `photo` is incomplete, it must end with one of the following specifiers: `id`, `meta.alt`, `meta.title`, `meta.width`, `meta.height`.');
+    $normalized = [
+      'photo' => '',
+    ];
+    $this->normalizer->denormalize($normalized, Filter::class, NULL, [
+      'entity_type_id' => 'node',
+      'bundle' => 'painting',
+    ]);
+  }
+
+  /**
+   * @covers ::queryCondition
+   */
+  public function testInvalidFilterPathDueMissingMetaPrefixReferenceFieldWithMetaProperties() {
+    $this->setExpectedException(CacheableBadRequestHttpException::class, 'Invalid nested filtering. The property `alt`, given in the path `photo.alt` belongs to the meta object of a relationship and must be preceded by `meta`.');
+    $normalized = [
+      'photo.alt' => '',
+    ];
+    $this->normalizer->denormalize($normalized, Filter::class, NULL, [
+      'entity_type_id' => 'node',
+      'bundle' => 'painting',
+    ]);
+  }
+
+  /**
+   * @covers ::queryCondition
+   */
+  public function testInvalidFilterPathDueToMissingPropertyNameReferenceFieldWithoutMetaProperties() {
+    $this->setExpectedException(CacheableBadRequestHttpException::class, 'Invalid nested filtering. The field `uid`, given in the path `uid` is incomplete, it must end with one of the following specifiers: `id`.');
+    $normalized = [
+      'uid' => '',
+    ];
+    $this->normalizer->denormalize($normalized, Filter::class, NULL, [
+      'entity_type_id' => 'node',
+      'bundle' => 'painting',
+    ]);
+  }
+
+  /**
+   * @covers ::queryCondition
+   */
+  public function testInvalidFilterPathDueToNonexistentProperty() {
+    $this->setExpectedException(CacheableBadRequestHttpException::class, 'Invalid nested filtering. The property `foobar`, given in the path `colors.foobar`, does not exist. Must be one of the following property names: `value`, `format`, `processed`.');
+    $normalized = [
+      'colors.foobar' => '',
+    ];
+    $this->normalizer->denormalize($normalized, Filter::class, NULL, [
+      'entity_type_id' => 'node',
+      'bundle' => 'painting',
+    ]);
+  }
+
+  /**
+   * @covers ::queryCondition
+   */
+  public function testInvalidFilterPathDueToElidedSoleProperty() {
+    $this->setExpectedException(CacheableBadRequestHttpException::class, 'Invalid nested filtering. The property `value`, given in the path `promote.value`, does not exist. Filter by `promote`, not `promote.value` (the JSON:API module elides property names from single-property fields).');
+    $normalized = [
+      'promote.value' => '',
+    ];
+    $this->normalizer->denormalize($normalized, Filter::class, NULL, [
+      'entity_type_id' => 'node',
+      'bundle' => 'painting',
+    ]);
+  }
+
+  /**
+   * @covers ::queryCondition
+   */
   public function testQueryCondition() {
     // Can't use a data provider because we need access to the container.
     $data = $this->queryConditionData();
+
+    $get_sql_query_for_entity_query = function ($entity_query) {
+      // Expose parts of \Drupal\Core\Entity\Query\Sql\Query::execute().
+      $o = new \ReflectionObject($entity_query);
+      $m1 = $o->getMethod('prepare');
+      $m1->setAccessible(TRUE);
+      $m2 = $o->getMethod('compile');
+      $m2->setAccessible(TRUE);
+
+      // The private property computed by the two previous private calls, whose
+      // value we need to inspect.
+      $p = $o->getProperty('sqlQuery');
+      $p->setAccessible(TRUE);
+
+      $m1->invoke($entity_query);
+      $m2->invoke($entity_query);
+      return (string) $p->getValue($entity_query);
+    };
 
     foreach ($data as $case) {
       $normalized = $case[0];
@@ -98,6 +206,11 @@ class FilterTest extends JsonapiKernelTestBase {
 
       // Apply it to the query.
       $query->condition($condition);
+
+      // Verify the SQL query is exactly the same.
+      $expected_sql_query = $get_sql_query_for_entity_query($expected_query);
+      $actual_sql_query = $get_sql_query_for_entity_query($query);
+      $this->assertSame($expected_sql_query, $actual_sql_query);
 
       // Compare the results.
       $this->assertEquals($expected_query->execute(), $query->execute());
@@ -121,6 +234,7 @@ class FilterTest extends JsonapiKernelTestBase {
     $nested_and_group = $query->andConditionGroup();
     $nested_and_group->condition('colors', 'yellow', 'CONTAINS');
     $nested_and_group->condition('shapes', 'square', 'CONTAINS');
+    $nested_and_group->notExists('photo.alt');
     $or_group->condition($nested_and_group);
 
     $query->condition($or_group);
@@ -133,7 +247,7 @@ class FilterTest extends JsonapiKernelTestBase {
           'nested-and-group' => ['group' => ['conjunction' => 'AND', 'memberOf' => 'or-group']],
           'condition-0' => [
             'condition' => [
-              'path' => 'colors',
+              'path' => 'colors.value',
               'value' => 'red',
               'operator' => 'CONTAINS',
               'memberOf' => 'nested-or-group',
@@ -141,7 +255,7 @@ class FilterTest extends JsonapiKernelTestBase {
           ],
           'condition-1' => [
             'condition' => [
-              'path' => 'shapes',
+              'path' => 'shapes.value',
               'value' => 'circle',
               'operator' => 'CONTAINS',
               'memberOf' => 'nested-or-group',
@@ -149,7 +263,7 @@ class FilterTest extends JsonapiKernelTestBase {
           ],
           'condition-2' => [
             'condition' => [
-              'path' => 'colors',
+              'path' => 'colors.value',
               'value' => 'yellow',
               'operator' =>
               'CONTAINS',
@@ -158,9 +272,16 @@ class FilterTest extends JsonapiKernelTestBase {
           ],
           'condition-3' => [
             'condition' => [
-              'path' => 'shapes',
+              'path' => 'shapes.value',
               'value' => 'square',
               'operator' => 'CONTAINS',
+              'memberOf' => 'nested-and-group',
+            ],
+          ],
+          'condition-4' => [
+            'condition' => [
+              'path' => 'photo.meta.alt',
+              'operator' => 'IS NULL',
               'memberOf' => 'nested-and-group',
             ],
           ],
@@ -201,6 +322,7 @@ class FilterTest extends JsonapiKernelTestBase {
       'shapes', 'Shapes',
       FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED
     );
+    $this->createImageField('photo', 'painting');
   }
 
   /**

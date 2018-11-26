@@ -18,7 +18,7 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 
 /**
- * Provides helper methods for the JSON API module's functional tests.
+ * Provides helper methods for the JSON:API module's functional tests.
  *
  * @internal
  */

@@ -7,7 +7,7 @@ use Drupal\jsonapi\Normalizer\Value\RelationshipItemNormalizerValue;
 use Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface;
 
 /**
- * Converts the Drupal entity reference item object to a JSON API structure.
+ * Converts the Drupal entity reference item object to a JSON:API structure.
  *
  * @internal
  */
@@ -21,7 +21,7 @@ class RelationshipItemNormalizer extends FieldItemNormalizer {
   protected $supportedInterfaceOrClass = RelationshipItem::class;
 
   /**
-   * The JSON API resource type repository.
+   * The JSON:API resource type repository.
    *
    * @var \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface
    */
@@ -31,7 +31,7 @@ class RelationshipItemNormalizer extends FieldItemNormalizer {
    * Instantiates a RelationshipItemNormalizer object.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
-   *   The JSON API resource type repository.
+   *   The JSON:API resource type repository.
    */
   public function __construct(ResourceTypeRepositoryInterface $resource_type_repository) {
     $this->resourceTypeRepository = $resource_type_repository;
@@ -44,7 +44,7 @@ class RelationshipItemNormalizer extends FieldItemNormalizer {
     /* @var $relationship_item \Drupal\jsonapi\Normalizer\RelationshipItem */
     // TODO: We are always loading the referenced entity. Even if it is not
     // going to be included. That may be a performance issue. We do it because
-    // we need to know the entity type and bundle to load the JSON API resource
+    // we need to know the entity type and bundle to load the JSON:API resource
     // type for the relationship item. We need a better way of finding about
     // this.
     $values = $relationship_item->getValue();

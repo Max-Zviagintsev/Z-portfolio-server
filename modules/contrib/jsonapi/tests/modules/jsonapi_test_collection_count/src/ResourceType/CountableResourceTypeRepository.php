@@ -6,7 +6,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\jsonapi\ResourceType\ResourceTypeRepository;
 
 /**
- * Provides a repository of JSON API configurable resource types.
+ * Provides a repository of JSON:API configurable resource types.
  */
 class CountableResourceTypeRepository extends ResourceTypeRepository {
 

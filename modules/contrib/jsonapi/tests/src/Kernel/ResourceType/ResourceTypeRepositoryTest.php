@@ -27,7 +27,7 @@ class ResourceTypeRepositoryTest extends KernelTestBase {
   ];
 
   /**
-   * The JSON API resource type repository under test.
+   * The JSON:API resource type repository under test.
    *
    * @var \Drupal\jsonapi\ResourceType\ResourceTypeRepository
    */

@@ -5,7 +5,7 @@ namespace Drupal\jsonapi\Normalizer;
 use Drupal\serialization\Normalizer\NormalizerBase as SerializationNormalizerBase;
 
 /**
- * Base normalizer used in all JSON API normalizers.
+ * Base normalizer used in all JSON:API normalizers.
  *
  * @internal
  */

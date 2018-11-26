@@ -6,7 +6,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Tests\BrowserTestBase;
 
 /**
- * Checks that all core content/config entity types have JSON API test coverage.
+ * Checks that all core content/config entity types have JSON:API test coverage.
  *
  * @group jsonapi
  */
@@ -42,7 +42,7 @@ class TestCoverageTest extends BrowserTestBase {
 
     $this->definitions = $this->container->get('entity_type.manager')->getDefinitions();
 
-    // Entity types marked as "internal" are not exposed by JSON API and hence
+    // Entity types marked as "internal" are not exposed by JSON:API and hence
     // also don't need test coverage.
     $this->definitions = array_filter($this->definitions, function (EntityTypeInterface $entity_type) {
       return !$entity_type->isInternal();
@@ -50,7 +50,7 @@ class TestCoverageTest extends BrowserTestBase {
   }
 
   /**
-   * Tests that all core entity types have JSON API test coverage.
+   * Tests that all core entity types have JSON:API test coverage.
    */
   public function testEntityTypeRestTestCoverage() {
     $problems = [];
@@ -100,7 +100,7 @@ class TestCoverageTest extends BrowserTestBase {
       _________________________
      /           Hi!           \\
     |  It's llame to not have   |
-    |  complete JSON API tests! |
+    |  complete JSON:API tests! |
     |                           |
     |     Progress: $g/$a.      |
     | _________________________/

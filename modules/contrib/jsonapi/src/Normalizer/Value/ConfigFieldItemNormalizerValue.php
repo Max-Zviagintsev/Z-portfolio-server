@@ -3,7 +3,7 @@
 namespace Drupal\jsonapi\Normalizer\Value;
 
 /**
- * Helps normalize config entity "fields" in compliance with the JSON API spec.
+ * Helps normalize config entity "fields" in compliance with the JSON:API spec.
  *
  * @internal
  */

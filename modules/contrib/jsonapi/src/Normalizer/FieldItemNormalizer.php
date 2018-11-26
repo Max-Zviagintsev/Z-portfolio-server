@@ -11,7 +11,7 @@ use Drupal\serialization\Normalizer\CacheableNormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
- * Converts the Drupal field item object to a JSON API array structure.
+ * Converts the Drupal field item object to a JSON:API array structure.
  *
  * @internal
  */
@@ -34,10 +34,10 @@ class FieldItemNormalizer extends NormalizerBase implements DenormalizerInterfac
   /**
    * {@inheritdoc}
    *
-   * This normalizer leaves JSON API normalizer land and enters the land of
+   * This normalizer leaves JSON:API normalizer land and enters the land of
    * Drupal core's serialization system. That system was never designed with
    * cacheability in mind, and hence bubbles cacheability out of band. This must
-   * catch it, and pass it to the value object that JSON API uses.
+   * catch it, and pass it to the value object that JSON:API uses.
    */
   public function normalize($field_item, $format = NULL, array $context = []) {
     /** @var \Drupal\Core\TypedData\TypedDataInterface $property */

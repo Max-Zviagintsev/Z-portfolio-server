@@ -10,7 +10,7 @@ namespace Drupal\jsonapi\Query;
 class OffsetPage {
 
   /**
-   * The JSON API pagination key name.
+   * The JSON:API pagination key name.
    *
    * @var string
    */

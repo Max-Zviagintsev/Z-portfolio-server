@@ -6,7 +6,7 @@ use Drupal\Core\Url;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 
 /**
- * JSON API integration test for the "MenuLinkContent" content entity type.
+ * JSON:API integration test for the "MenuLinkContent" content entity type.
  *
  * @group jsonapi
  */

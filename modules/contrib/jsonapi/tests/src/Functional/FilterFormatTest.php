@@ -6,7 +6,7 @@ use Drupal\Core\Url;
 use Drupal\filter\Entity\FilterFormat;
 
 /**
- * JSON API integration test for the "FilterFormat" config entity type.
+ * JSON:API integration test for the "FilterFormat" config entity type.
  *
  * @group jsonapi
  */

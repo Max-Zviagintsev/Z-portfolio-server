@@ -6,7 +6,7 @@ use Drupal\Core\Url;
 use Drupal\taxonomy\Entity\Vocabulary;
 
 /**
- * JSON API integration test for the "vocabulary" config entity type.
+ * JSON:API integration test for the "vocabulary" config entity type.
  *
  * @group jsonapi
  */
@@ -59,7 +59,7 @@ class VocabularyTest extends ResourceTestBase {
    */
   protected function getExpectedDocument() {
     $self_url = Url::fromUri('base:/jsonapi/taxonomy_vocabulary/taxonomy_vocabulary/' . $this->entity->uuid())->setAbsolute()->toString(TRUE)->getGeneratedUrl();
-    return [
+    $expected_document = [
       'jsonapi' => [
         'meta' => [
           'links' => [
@@ -83,12 +83,15 @@ class VocabularyTest extends ResourceTestBase {
           'dependencies' => [],
           'name' => 'Llama',
           'description' => NULL,
-          'hierarchy' => 0,
           'weight' => 0,
           'drupal_internal__vid' => 'llama',
         ],
       ],
     ];
+    if (floatval(\Drupal::VERSION) < 8.7) {
+      $expected_document['data']['attributes']['hierarchy'] = 0;
+    }
+    return $expected_document;
   }
 
   /**

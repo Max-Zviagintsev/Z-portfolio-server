@@ -6,7 +6,7 @@ use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\Url;
 
 /**
- * JSON API integration test for the "DateFormat" config entity type.
+ * JSON:API integration test for the "DateFormat" config entity type.
  *
  * @group jsonapi
  */

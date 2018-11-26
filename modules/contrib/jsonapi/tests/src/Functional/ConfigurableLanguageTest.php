@@ -10,7 +10,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use GuzzleHttp\RequestOptions;
 
 /**
- * JSON API integration test for the "ConfigurableLanguage" config entity type.
+ * JSON:API integration test for the "ConfigurableLanguage" config entity type.
  *
  * @group jsonapi
  */

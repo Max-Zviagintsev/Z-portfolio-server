@@ -6,7 +6,7 @@ use Drupal\Core\Entity\Entity\EntityFormMode;
 use Drupal\Core\Url;
 
 /**
- * JSON API integration test for the "EntityFormMode" config entity type.
+ * JSON:API integration test for the "EntityFormMode" config entity type.
  *
  * @group jsonapi
  */

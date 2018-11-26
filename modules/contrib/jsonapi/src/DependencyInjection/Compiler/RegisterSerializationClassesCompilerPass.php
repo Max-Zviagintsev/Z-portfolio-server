@@ -7,12 +7,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Adds services tagged JSON API-only normalizers to the Serializer.
+ * Adds services tagged JSON:API-only normalizers to the Serializer.
  *
  * Services tagged with 'jsonapi_normalizer_do_not_use_removal_imminent' will be
- * added to the JSON API serializer. As should be clear by the service tag,
+ * added to the JSON:API serializer. As should be clear by the service tag,
  * *no* extensions should provide these services. They will not work in the
- * future. The proper way to affect JSON API output is to implement DataType
+ * future. The proper way to affect JSON:API output is to implement DataType
  * level normalizers and/or implement computed entity fields.
  *
  * @see jsonapi.api.php
@@ -29,21 +29,21 @@ class RegisterSerializationClassesCompilerPass extends DrupalRegisterSerializati
   const OVERRIDDEN_SERVICE_ID = 'jsonapi.serializer_do_not_use_removal_imminent';
 
   /**
-   * The service tag that only JSON API normalizers should use.
+   * The service tag that only JSON:API normalizers should use.
    *
    * @const string
    */
   const OVERRIDDEN_SERVICE_TAG = 'jsonapi_normalizer_do_not_use_removal_imminent';
 
   /**
-   * The ID for the JSON API format.
+   * The ID for the JSON:API format.
    *
    * @const string
    */
   const FORMAT = 'api_json';
 
   /**
-   * Adds services to the JSON API Serializer.
+   * Adds services to the JSON:API Serializer.
    *
    * This code is copied from the class parent with two modifications. The
    * service id has been changed and the service tag has been updated.
@@ -87,7 +87,7 @@ class RegisterSerializationClassesCompilerPass extends DrupalRegisterSerializati
       $definition->replaceArgument(1, $this->sort($encoders));
     }
 
-    // Set the JSON API format and format_provider.
+    // Set the JSON:API format and format_provider.
     $container->setParameter(
       static::OVERRIDDEN_SERVICE_ID . '.formats',
       [static::FORMAT]

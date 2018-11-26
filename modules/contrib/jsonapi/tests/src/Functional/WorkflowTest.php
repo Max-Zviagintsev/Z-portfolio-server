@@ -6,7 +6,7 @@ use Drupal\Core\Url;
 use Drupal\workflows\Entity\Workflow;
 
 /**
- * JSON API integration test for the "Workflow" config entity type.
+ * JSON:API integration test for the "Workflow" config entity type.
  *
  * @group jsonapi
  */

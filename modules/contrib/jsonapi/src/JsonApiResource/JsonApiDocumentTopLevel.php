@@ -5,7 +5,7 @@ namespace Drupal\jsonapi\JsonApiResource;
 use Drupal\Component\Assertion\Inspector;
 
 /**
- * Represents a JSON API document's "top level".
+ * Represents a JSON:API document's "top level".
  *
  * @see http://jsonapi.org/format/#document-top-level
  *

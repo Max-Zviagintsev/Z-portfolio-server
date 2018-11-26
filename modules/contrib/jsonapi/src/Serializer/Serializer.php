@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 final class Serializer extends SymfonySerializer {
 
   /**
-   * A normalizer to fall back on when JSON API cannot normalize an object.
+   * A normalizer to fall back on when JSON:API cannot normalize an object.
    *
    * @var \Symfony\Component\Serializer\Normalizer\NormalizerInterface|\Symfony\Component\Serializer\Normalizer\DenormalizerInterface
    */
@@ -31,7 +31,7 @@ final class Serializer extends SymfonySerializer {
   public function __construct(array $normalizers = [], array $encoders = []) {
     foreach ($normalizers as $normalizer) {
       if (strpos(get_class($normalizer), 'Drupal\jsonapi\Normalizer') !== 0) {
-        throw new \LogicException('JSON API does not allow adding more normalizers!');
+        throw new \LogicException('JSON:API does not allow adding more normalizers!');
       }
     }
     parent::__construct($normalizers, $encoders);
@@ -40,7 +40,7 @@ final class Serializer extends SymfonySerializer {
   /**
    * Adds a secondary normalizer.
    *
-   * This normalizer will be attempted when JSON API has no applicable
+   * This normalizer will be attempted when JSON:API has no applicable
    * normalizer.
    *
    * @param \Symfony\Component\Serializer\Normalizer\NormalizerInterface $normalizer

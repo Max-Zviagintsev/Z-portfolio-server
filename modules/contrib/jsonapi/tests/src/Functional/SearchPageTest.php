@@ -6,7 +6,7 @@ use Drupal\Core\Url;
 use Drupal\search\Entity\SearchPage;
 
 /**
- * JSON API integration test for the "SearchPage" config entity type.
+ * JSON:API integration test for the "SearchPage" config entity type.
  *
  * @group jsonapi
  */

@@ -3,7 +3,7 @@
 namespace Drupal\jsonapi\ResourceType;
 
 /**
- * Value object containing all metadata for a JSON API resource type.
+ * Value object containing all metadata for a JSON:API resource type.
  *
  * Used to generate routes (collection, individual, etcetera), generate
  * relationship links, and so on.
@@ -313,7 +313,7 @@ class ResourceType {
    *   The public field name.
    *
    * @return \Drupal\jsonapi\ResourceType\ResourceType[]
-   *   The relatable JSON API resource types.
+   *   The relatable JSON:API resource types.
    *
    * @see self::getRelatableResourceTypes()
    */

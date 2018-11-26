@@ -46,7 +46,7 @@ class Relationship implements AccessibleInterface, CacheableDependencyInterface 
   protected $propertyName;
 
   /**
-   * The JSON API resource type repository.
+   * The JSON:API resource type repository.
    *
    * @var \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface
    */
@@ -63,7 +63,7 @@ class Relationship implements AccessibleInterface, CacheableDependencyInterface 
    * Relationship constructor.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
-   *   The JSON API resource type repository.
+   *   The JSON:API resource type repository.
    * @param string $field_name
    *   The name of the relationship.
    * @param \Drupal\jsonapi\JsonApiResource\EntityCollection $entities

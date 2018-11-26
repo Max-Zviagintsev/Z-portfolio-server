@@ -6,7 +6,7 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableDependencyTrait;
 
 /**
- * Helps normalize field items in compliance with the JSON API spec.
+ * Helps normalize field items in compliance with the JSON:API spec.
  *
  * @internal
  */

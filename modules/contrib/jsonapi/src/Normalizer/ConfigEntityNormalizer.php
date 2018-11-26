@@ -9,7 +9,7 @@ use Drupal\jsonapi\Normalizer\Value\FieldNormalizerValue;
 use Drupal\jsonapi\ResourceType\ResourceType;
 
 /**
- * Converts the Drupal config entity object to a JSON API array structure.
+ * Converts the Drupal config entity object to a JSON:API array structure.
  *
  * @internal
  */
@@ -49,7 +49,7 @@ class ConfigEntityNormalizer extends EntityNormalizer {
   protected function serializeField($field, array $context, $format) {
     return new FieldNormalizerValue(
       // Config entities have no concept of "fields", nor any concept of
-      // "field access". For practical reasons, JSON API uses the same value
+      // "field access". For practical reasons, JSON:API uses the same value
       // object that it uses for content entities (FieldNormalizerValue), and
       // that requires an access result. Therefore we can safely hardcode it.
       AccessResult::allowed(),

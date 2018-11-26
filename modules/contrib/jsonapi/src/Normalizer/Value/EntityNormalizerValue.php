@@ -7,7 +7,7 @@ use Drupal\Core\Cache\CacheableDependencyTrait;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
- * Helps normalize entities in compliance with the JSON API spec.
+ * Helps normalize entities in compliance with the JSON:API spec.
  *
  * @internal
  */

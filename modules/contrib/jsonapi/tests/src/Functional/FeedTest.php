@@ -6,7 +6,7 @@ use Drupal\aggregator\Entity\Feed;
 use Drupal\Core\Url;
 
 /**
- * JSON API integration test for the "Feed" content entity type.
+ * JSON:API integration test for the "Feed" content entity type.
  *
  * @group jsonapi
  */

@@ -35,7 +35,7 @@ class EntityReferenceFieldNormalizer extends FieldNormalizer {
    * Instantiates a EntityReferenceFieldNormalizer object.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
-   *   The JSON API resource type repository.
+   *   The JSON:API resource type repository.
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
    *   The entity repository.
    */
@@ -107,10 +107,10 @@ class EntityReferenceFieldNormalizer extends FieldNormalizer {
       /** @var \Drupal\Core\TypedData\TypedDataInterface[] $properties */
       $properties = TypedDataInternalPropertiesHelper::getNonInternalProperties($item);
 
-      // This normalizer leaves JSON API normalizer land and enters the land of
+      // This normalizer leaves JSON:API normalizer land and enters the land of
       // Drupal core's serialization system. That system was never designed with
       // cacheability in mind, and hence bubbles cacheability out of band. This
-      // must catch it, and pass it to the value object that JSON API uses.
+      // must catch it, and pass it to the value object that JSON:API uses.
       // @see \Drupal\jsonapi\Normalizer\FieldItemNormalizer::normalize()
       $context[CacheableNormalizerInterface::SERIALIZATION_CONTEXT_CACHEABILITY] = new CacheableMetadata();
       foreach ($properties as $property_key => $property) {

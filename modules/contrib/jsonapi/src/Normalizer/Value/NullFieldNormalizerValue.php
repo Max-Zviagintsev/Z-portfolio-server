@@ -6,7 +6,7 @@ use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\CacheableDependencyTrait;
 
 /**
- * Normalizes null fields in accordance with the JSON API specification.
+ * Normalizes null fields in accordance with the JSON:API specification.
  *
  * @internal
  */

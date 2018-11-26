@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  * 2. It has the @current_route_match service no longer injected
  * 3. It hardcodes the format to 'api_json'
  * 4. It adds the JsonApiDocumentTopLevelNormalizerValue value object returned
- *    by JSON API normalization to the response object.
+ *    by JSON:API normalization to the response object.
  * 5. It flattens only to a cacheable response if the HTTP method is cacheable.
  */
 class ResourceResponseSubscriber implements EventSubscriberInterface {
@@ -95,7 +95,7 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
    * @param \Drupal\jsonapi\ResourceResponse $response
-   *   The response from the JSON API resource.
+   *   The response from the JSON:API resource.
    * @param \Symfony\Component\Serializer\SerializerInterface $serializer
    *   The serializer to use.
    * @param string|null $format
@@ -119,7 +119,7 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
       // the response object.
       assert($jsonapi_doc_object instanceof JsonApiDocumentTopLevelNormalizerValue);
       $response->addCacheableDependency($jsonapi_doc_object);
-      // Finally, encode the normalized data (JSON API's encoder rasterizes it
+      // Finally, encode the normalized data (JSON:API's encoder rasterizes it
       // automatically).
       $response->setContent($serializer->encode($jsonapi_doc_object, $format));
       $response->headers->set('Content-Type', $request->getMimeType($format));
@@ -127,7 +127,7 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Generates a top-level JSON API normalization context.
+   * Generates a top-level JSON:API normalization context.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request from which the context can be derived.

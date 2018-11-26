@@ -8,7 +8,7 @@ use Drupal\Tests\rest\Functional\BcTimestampNormalizerUnixTestTrait;
 use Drupal\user\Entity\User;
 
 /**
- * JSON API integration test for the "File" content entity type.
+ * JSON:API integration test for the "File" content entity type.
  *
  * @group jsonapi
  */
@@ -198,7 +198,7 @@ class FileTest extends ResourceTestBase {
     if ($method === 'GET') {
       return "The 'access content' permission is required.";
     }
-    // @todo Make this unconditional when JSON API requires Drupal 8.6 or newer.
+    // @todo Make this unconditional when JSON:API requires Drupal 8.6 or newer.
     if (floatval(\Drupal::VERSION) >= 8.6 && ($method === 'PATCH' || $method === 'DELETE')) {
       return "Only the file owner can update or delete the file entity.";
     }

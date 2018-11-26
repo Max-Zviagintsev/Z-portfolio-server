@@ -10,7 +10,7 @@ use Drupal\user\Entity\User;
 use GuzzleHttp\RequestOptions;
 
 /**
- * JSON API integration test for the "User" content entity type.
+ * JSON:API integration test for the "User" content entity type.
  *
  * @group jsonapi
  */

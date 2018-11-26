@@ -194,7 +194,7 @@ class EntityResource {
    * Creates an individual entity.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
-   *   The JSON API resource type for the request to be served.
+   *   The JSON:API resource type for the request to be served.
    * @param \Drupal\Core\Entity\EntityInterface $parsed_entity
    *   The loaded entity.
    * @param \Symfony\Component\HttpFoundation\Request $request
@@ -237,7 +237,7 @@ class EntityResource {
 
     $this->validate($parsed_entity);
 
-    // Return a 409 Conflict response in accordance with the JSON API spec. See
+    // Return a 409 Conflict response in accordance with the JSON:API spec. See
     // http://jsonapi.org/format/#crud-creating-responses-409.
     if ($this->entityExists($parsed_entity)) {
       throw new ConflictHttpException('Conflict: Entity already exists.');
@@ -248,7 +248,7 @@ class EntityResource {
     // Build response object.
     $response = $this->buildWrappedResponse($parsed_entity, $request, new NullEntityCollection(), 201);
 
-    // According to JSON API specification, when a new entity was created
+    // According to JSON:API specification, when a new entity was created
     // we should send "Location" header to the frontend.
     $entity_url = $this->linkManager->getEntityLink(
       $parsed_entity->uuid(),
@@ -268,7 +268,7 @@ class EntityResource {
    * Patches an individual entity.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
-   *   The JSON API resource type for the request to be served.
+   *   The JSON:API resource type for the request to be served.
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The loaded entity.
    * @param \Drupal\Core\Entity\EntityInterface $parsed_entity
@@ -323,7 +323,7 @@ class EntityResource {
    * Gets the collection of entities.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
-   *   The JSON API resource type for the request to be served.
+   *   The JSON:API resource type for the request to be served.
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
    *
@@ -430,7 +430,7 @@ class EntityResource {
    * Gets the related resource.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
-   *   The JSON API resource type for the request to be served.
+   *   The JSON:API resource type for the request to be served.
    * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
    *   The requested entity.
    * @param string $related
@@ -476,7 +476,7 @@ class EntityResource {
    * Gets the relationship of an entity.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
-   *   The base JSON API resource type for the request to be served.
+   *   The base JSON:API resource type for the request to be served.
    * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
    *   The requested entity.
    * @param string $related
@@ -502,7 +502,7 @@ class EntityResource {
    * Adds a relationship to a to-many relationship.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
-   *   The base JSON API resource type for the request to be served.
+   *   The base JSON:API resource type for the request to be served.
    * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
    *   The requested entity.
    * @param string $related
@@ -570,7 +570,7 @@ class EntityResource {
    * Updates the relationship of an entity.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
-   *   The base JSON API resource type for the request to be served.
+   *   The base JSON:API resource type for the request to be served.
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The requested entity.
    * @param string $related
@@ -651,7 +651,7 @@ class EntityResource {
    * Deletes the relationship of an entity.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
-   *   The base JSON API resource type for the request to be served.
+   *   The base JSON:API resource type for the request to be served.
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The requested entity.
    * @param string $related
@@ -716,7 +716,7 @@ class EntityResource {
    * Gets a basic query for a collection.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
-   *   The base JSON API resource type for the query.
+   *   The base JSON:API resource type for the query.
    * @param array $params
    *   The parameters for the query.
    *
@@ -773,7 +773,7 @@ class EntityResource {
    * Gets a basic query for a collection count.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
-   *   The base JSON API resource type for the query.
+   *   The base JSON:API resource type for the query.
    * @param array $params
    *   The parameters for the query.
    *
@@ -864,7 +864,7 @@ class EntityResource {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
    * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
-   *   The base JSON API resource type for the request to be served.
+   *   The base JSON:API resource type for the request to be served.
    *
    * @return \Drupal\jsonapi\ResourceResponse
    *   The response.
@@ -895,7 +895,7 @@ class EntityResource {
    * Takes a field from the origin entity and puts it to the destination entity.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
-   *   The JSON API resource type of the entity to be updated.
+   *   The JSON:API resource type of the entity to be updated.
    * @param \Drupal\Core\Entity\EntityInterface $origin
    *   The entity that contains the field values.
    * @param \Drupal\Core\Entity\EntityInterface $destination

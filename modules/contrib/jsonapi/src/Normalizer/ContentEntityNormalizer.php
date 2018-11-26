@@ -3,7 +3,7 @@
 namespace Drupal\jsonapi\Normalizer;
 
 /**
- * Converts the Drupal content entity object to a JSON API array structure.
+ * Converts the Drupal content entity object to a JSON:API array structure.
  *
  * @internal
  */

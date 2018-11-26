@@ -13,7 +13,7 @@ use Drupal\taxonomy\Entity\Vocabulary;
 use GuzzleHttp\RequestOptions;
 
 /**
- * JSON API integration test for the "Term" content entity type.
+ * JSON:API integration test for the "Term" content entity type.
  *
  * @group jsonapi
  */
@@ -207,7 +207,7 @@ class TermTest extends ResourceTestBase {
         break;
     }
 
-    // @todo Remove this when JSON API requires Drupal 8.6 or newer.
+    // @todo Remove this when JSON:API requires Drupal 8.6 or newer.
     if (floatval(\Drupal::VERSION) < 8.6) {
       $expected_parent_normalization = [
         'data' => [],

@@ -5,7 +5,7 @@ namespace Drupal\jsonapi\Normalizer\Value;
 use Drupal\Core\Access\AccessResultInterface;
 
 /**
- * Helps normalize relationships in compliance with the JSON API spec.
+ * Helps normalize relationships in compliance with the JSON:API spec.
  *
  * @internal
  */
@@ -19,7 +19,7 @@ class RelationshipNormalizerValue extends FieldNormalizerValue {
   protected $linkManager;
 
   /**
-   * The JSON API resource type.
+   * The JSON:API resource type.
    *
    * @var \Drupal\jsonapi\ResourceType\ResourceType
    */
@@ -88,7 +88,7 @@ class RelationshipNormalizerValue extends FieldNormalizerValue {
   /**
    * Ensures each resource identifier object is unique.
    *
-   * The official JSON API JSON-Schema document requires that no two resource
+   * The official JSON:API JSON-Schema document requires that no two resource
    * identifier objects are duplicated.
    *
    * This adds an @code arity @endcode member to each object's
@@ -97,10 +97,10 @@ class RelationshipNormalizerValue extends FieldNormalizerValue {
    * sharing a common @code type @endcode and @code id @endcode.
    *
    * @param array $resource_identifier_objects
-   *   A list of JSON API resource identifier objects.
+   *   A list of JSON:API resource identifier objects.
    *
    * @return array
-   *   A set of JSON API resource identifier objects, with those having multiple
+   *   A set of JSON:API resource identifier objects, with those having multiple
    *   occurrences getting [meta][arity].
    *
    * @see http://jsonapi.org/format/#document-resource-object-relationships
@@ -175,7 +175,7 @@ class RelationshipNormalizerValue extends FieldNormalizerValue {
    * Determines if a given list of resource types contains a non-internal type.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceType[] $resource_types
-   *   The JSON API resource types to evaluate.
+   *   The JSON:API resource types to evaluate.
    *
    * @return bool
    *   FALSE if every resource type is internal, TRUE otherwise.

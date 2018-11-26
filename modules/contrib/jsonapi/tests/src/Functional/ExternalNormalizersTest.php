@@ -13,7 +13,7 @@ use Drupal\user\RoleInterface;
 use GuzzleHttp\RequestOptions;
 
 /**
- * Asserts external normalizers are handled as expected by the JSON API module.
+ * Asserts external normalizers are handled as expected by the JSON:API module.
  *
  * @see jsonapi.normalizers
  *
@@ -91,11 +91,11 @@ class ExternalNormalizersTest extends BrowserTestBase {
    * @param string $test_module
    *   The test module to install, which comes with a high-priority normalizer.
    * @param string $expected_value_jsonapi_normalization
-   *   The expected JSON API normalization of the tested field. Must be either
+   *   The expected JSON:API normalization of the tested field. Must be either
    *   - static::VALUE_ORIGINAL (normalizer IS NOT expected to override)
    *   - static::VALUE_OVERRIDDEN (normalizer IS expected to override)
    * @param string $expected_value_jsonapi_denormalization
-   *   The expected JSON API denormalization of the tested field. Must be either
+   *   The expected JSON:API denormalization of the tested field. Must be either
    *   - static::VALUE_OVERRIDDEN (denormalizer IS NOT expected to override)
    *   - static::VALUE_ORIGINAL (denormalizer IS expected to override)
    *
@@ -135,12 +135,12 @@ class ExternalNormalizersTest extends BrowserTestBase {
     $core_normalization['field_test'][0]['value'] = static::VALUE_OVERRIDDEN;
     $denormalized_entity = $this->container->get('serializer')->denormalize($core_normalization, EntityTest::class, 'json', []);
     $this->assertInstanceOf(EntityTest::class, $denormalized_entity);
-    // @todo Make this unconditional once https://www.drupal.org/project/drupal/issues/2957385 lands — JSON API fixed denormalization of properties in https://www.drupal.org/project/jsonapi/issues/2955615, core's Serialization module still has to follow
+    // @todo Make this unconditional once https://www.drupal.org/project/drupal/issues/2957385 lands — JSON:API fixed denormalization of properties in https://www.drupal.org/project/jsonapi/issues/2955615, core's Serialization module still has to follow
     if ($test_module === 'jsonapi_test_field_type') {
       $this->assertSame(static::VALUE_ORIGINAL, $denormalized_entity->field_test->value);
     }
 
-    // Asserts the expected JSON API normalization.
+    // Asserts the expected JSON:API normalization.
     // @todo Remove line below in favor of commented line in https://www.drupal.org/project/jsonapi/issues/2878463.
     $url = Url::fromRoute('jsonapi.entity_test--entity_test.individual', ['entity' => $this->entity->uuid()]);
     /* $url = $this->entity->toUrl('jsonapi'); */
@@ -149,7 +149,7 @@ class ExternalNormalizersTest extends BrowserTestBase {
     $document = Json::decode((string) $response->getBody());
     $this->assertSame($expected_value_jsonapi_normalization, $document['data']['attributes']['field_test']);
 
-    // Asserts the expected JSON API denormalization.
+    // Asserts the expected JSON:API denormalization.
     $request_options = [];
     $request_options[RequestOptions::BODY] = Json::encode([
       'data' => [
@@ -178,14 +178,14 @@ class ExternalNormalizersTest extends BrowserTestBase {
    */
   public function providerTestFormatAgnosticNormalizers() {
     return [
-      'Format-agnostic @FieldType-level normalizers SHOULD NOT be able to affect the JSON API normalization' => [
+      'Format-agnostic @FieldType-level normalizers SHOULD NOT be able to affect the JSON:API normalization' => [
         'jsonapi_test_field_type',
         // \Drupal\jsonapi_test_field_type\Normalizer\StringNormalizer::normalize()
         static::VALUE_ORIGINAL,
         // \Drupal\jsonapi_test_field_type\Normalizer\StringNormalizer::denormalize()
         static::VALUE_OVERRIDDEN,
       ],
-      'Format-agnostic @DataType-level normalizers SHOULD be able to affect the JSON API normalization' => [
+      'Format-agnostic @DataType-level normalizers SHOULD be able to affect the JSON:API normalization' => [
         'jsonapi_test_data_type',
         // \Drupal\jsonapi_test_data_type\Normalizer\StringNormalizer::normalize()
         static::VALUE_OVERRIDDEN,

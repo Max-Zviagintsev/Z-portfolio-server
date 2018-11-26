@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
- * Normalizes an HttpException in compliance with the JSON API specification.
+ * Normalizes an HttpException in compliance with the JSON:API specification.
  *
  * @see http://jsonapi.org/format/#error-objects
  *
@@ -65,7 +65,7 @@ class HttpExceptionNormalizer extends NormalizerBase {
   }
 
   /**
-   * Builds the normalized JSON API error objects for the response.
+   * Builds the normalized JSON:API error objects for the response.
    *
    * @param \Symfony\Component\HttpKernel\Exception\HttpException $exception
    *   The Exception.

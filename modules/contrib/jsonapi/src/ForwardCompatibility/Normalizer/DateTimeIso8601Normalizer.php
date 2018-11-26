@@ -10,7 +10,7 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
  *
  * @internal
  * @see \Drupal\serialization\Normalizer\DateTimeIso8601Normalizer
- * @todo Remove when JSON API requires Drupal 8.6.
+ * @todo Remove when JSON:API requires Drupal 8.6.
  */
 class DateTimeIso8601Normalizer extends DateTimeNormalizer {
 

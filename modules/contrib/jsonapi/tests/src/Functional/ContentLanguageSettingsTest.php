@@ -9,7 +9,7 @@ use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\node\Entity\NodeType;
 
 /**
- * JSON API integration test for "ContentLanguageSettings" config entity type.
+ * JSON:API integration test for "ContentLanguageSettings" config entity type.
  *
  * @group jsonapi
  */

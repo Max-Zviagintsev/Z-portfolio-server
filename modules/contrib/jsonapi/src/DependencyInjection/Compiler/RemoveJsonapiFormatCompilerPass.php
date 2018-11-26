@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * Removes 'api_json' format from the 'serializer.formats' container parameter.
  *
  * We want the 'api_json' format to not be supported in the REST module. But the
- * JSON API module also should not have to define al alternative 'serializer'
+ * JSON:API module also should not have to define al alternative 'serializer'
  * service.
  * This is achieved through removing the 'api_json' format from the
  * 'serializer.formats' container parameter. The consequences of doing that:

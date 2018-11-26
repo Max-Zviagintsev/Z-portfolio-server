@@ -43,7 +43,7 @@ class LinkManager {
    *   The entity ID to generate the link for. Note: Depending on the
    *   configuration this might be the UUID as well.
    * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
-   *   The JSON API resource type.
+   *   The JSON:API resource type.
    * @param array $route_parameters
    *   Parameters for the route generation.
    * @param string $key

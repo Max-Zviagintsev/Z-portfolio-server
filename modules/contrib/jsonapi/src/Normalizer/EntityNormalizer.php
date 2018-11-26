@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
- * Converts the Drupal entity object to a JSON API array structure.
+ * Converts the Drupal entity object to a JSON:API array structure.
  *
  * @internal
  */
@@ -45,7 +45,7 @@ class EntityNormalizer extends NormalizerBase implements DenormalizerInterface {
   protected $linkManager;
 
   /**
-   * The JSON API resource type repository.
+   * The JSON:API resource type repository.
    *
    * @var \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface
    */
@@ -78,7 +78,7 @@ class EntityNormalizer extends NormalizerBase implements DenormalizerInterface {
    * @param \Drupal\jsonapi\LinkManager\LinkManager $link_manager
    *   The link manager.
    * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
-   *   The JSON API resource type repository.
+   *   The JSON:API resource type repository.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager
@@ -116,14 +116,13 @@ class EntityNormalizer extends NormalizerBase implements DenormalizerInterface {
     /* @var Value\FieldNormalizerValueInterface[] $normalizer_values */
     $normalizer_values = [];
     foreach ($this->getFields($entity, $bundle, $resource_type) as $field_name => $field) {
-      $normalized_field = $this->serializeField($field, $context, $format);
-      assert($normalized_field instanceof FieldNormalizerValueInterface);
-
       $in_sparse_fieldset = in_array($field_name, $field_names);
       // Omit fields not listed in sparse fieldsets.
       if (!$in_sparse_fieldset) {
         continue;
       }
+      $normalized_field = $this->serializeField($field, $context, $format);
+      assert($normalized_field instanceof FieldNormalizerValueInterface);
       $normalizer_values[$field_name] = $normalized_field;
     }
 

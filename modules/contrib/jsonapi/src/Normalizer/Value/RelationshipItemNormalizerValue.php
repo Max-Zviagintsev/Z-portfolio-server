@@ -6,7 +6,7 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\jsonapi\ResourceType\ResourceType;
 
 /**
- * Helps normalize relationship items in compliance with the JSON API spec.
+ * Helps normalize relationship items in compliance with the JSON:API spec.
  *
  * @internal
  */

@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class EntryPoint extends ControllerBase {
 
   /**
-   * The JSON API resource type repository.
+   * The JSON:API resource type repository.
    *
    * @var \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface
    */

@@ -8,7 +8,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Url;
 
 /**
- * JSON API integration test for the "BlockContent" content entity type.
+ * JSON:API integration test for the "BlockContent" content entity type.
  *
  * @group jsonapi
  */

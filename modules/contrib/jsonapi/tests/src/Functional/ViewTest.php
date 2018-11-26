@@ -6,7 +6,7 @@ use Drupal\Core\Url;
 use Drupal\views\Entity\View;
 
 /**
- * JSON API integration test for the "View" config entity type.
+ * JSON:API integration test for the "View" config entity type.
  *
  * @group jsonapi
  */

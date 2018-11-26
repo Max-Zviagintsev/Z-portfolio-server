@@ -18,11 +18,11 @@ use Drupal\Core\TypedData\DataReferenceTargetDefinition;
 use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 
 /**
- * Provides a repository of all JSON API resource types.
+ * Provides a repository of all JSON:API resource types.
  *
  * Contains the complete set of ResourceType value objects, which are auto-
  * generated based on the Entity Type Manager and Entity Type Bundle Info: one
- * JSON API resource type per entity type bundle. So, for example:
+ * JSON:API resource type per entity type bundle. So, for example:
  * - node--article
  * - node--page
  * - node--…
@@ -109,12 +109,12 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
    * Creates a ResourceType value object for the given entity type + bundle.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type to create a JSON API resource type for.
+   *   The entity type to create a JSON:API resource type for.
    * @param string $bundle
-   *   The entity type bundle to create a JSON API resource type for.
+   *   The entity type bundle to create a JSON:API resource type for.
    *
    * @return \Drupal\jsonapi\ResourceType\ResourceType
-   *   A JSON API resource type.
+   *   A JSON:API resource type.
    */
   protected function createResourceType(EntityTypeInterface $entity_type, $bundle) {
     $raw_fields = $this->getAllFieldNames($entity_type, $bundle);
@@ -182,13 +182,13 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
 
     $mapping = [];
 
-    // JSON API resource identifier objects are sufficient to identify
+    // JSON:API resource identifier objects are sufficient to identify
     // entities. By exposing all fields as attributes, we expose unwanted,
     // confusing or duplicate information:
     // - exposing an entity's ID (which is not a UUID) is bad, but it's
     //   necessary for certain Drupal-coupled clients, so we alias it.
     // - exposing its UUID as an attribute is useless (it's already part of
-    //   the mandatory "id" attribute in JSON API)
+    //   the mandatory "id" attribute in JSON:API)
     // - exposing its revision ID as an attribute will compete with any profile
     //   defined meta members used for resource object versioning.
     // @see http://jsonapi.org/format/#document-resource-identifier-objects
@@ -209,13 +209,13 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
 
     // For all other fields,  use their internal field name also as their public
     // field name.  Unless they're called "id" or "type": those names are
-    // reserved by the JSON API spec.
+    // reserved by the JSON:API spec.
     // @see http://jsonapi.org/format/#document-resource-object-fields
     foreach (array_diff($field_names, array_keys($mapping)) as $field_name) {
       if ($field_name === 'id' || $field_name === 'type') {
         $alias = $entity_type->id() . '_' . $field_name;
         if (isset($field_name[$alias])) {
-          throw new \LogicException('The generated alias conflicts with an existing field. Please report this in the JSON API issue queue!');
+          throw new \LogicException('The generated alias conflicts with an existing field. Please report this in the JSON:API issue queue!');
         }
         $mapping[$field_name] = $alias;
         continue;
@@ -296,17 +296,17 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
   }
 
   /**
-   * Calculates relatable JSON API resource types for a given resource type.
+   * Calculates relatable JSON:API resource types for a given resource type.
    *
    * This method has no affect after being called once.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
    *   The resource type repository.
    * @param \Drupal\jsonapi\ResourceType\ResourceType[] $resource_types
-   *   A list of JSON API resource types.
+   *   A list of JSON:API resource types.
    *
    * @return array
-   *   The relatable JSON API resource types, keyed by field name.
+   *   The relatable JSON:API resource types, keyed by field name.
    */
   protected function calculateRelatableResourceTypes(ResourceType $resource_type, array $resource_types) {
     // For now, only fieldable entity types may contain relationships.
@@ -336,13 +336,13 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
    * Get relatable resource types from a field definition.
    *
    * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
-   *   The field definition from which to calculate relatable JSON API resource
+   *   The field definition from which to calculate relatable JSON:API resource
    *   types.
    * @param \Drupal\jsonapi\ResourceType\ResourceType[] $resource_types
-   *   A list of JSON API resource types.
+   *   A list of JSON:API resource types.
    *
    * @return \Drupal\jsonapi\ResourceType\ResourceType[]
-   *   The JSON API resource types with which the given field may have a
+   *   The JSON:API resource types with which the given field may have a
    *   relationship.
    */
   protected function getRelatableResourceTypesFromFieldDefinition(FieldDefinitionInterface $field_definition, array $resource_types) {

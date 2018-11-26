@@ -12,7 +12,7 @@ use Drupal\jsonapi\Normalizer\Value\NullFieldNormalizerValue;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
- * Converts the Drupal field structure to a JSON API array structure.
+ * Converts the Drupal field structure to a JSON:API array structure.
  *
  * @internal
  */
@@ -64,7 +64,7 @@ class FieldNormalizer extends NormalizerBase implements DenormalizerInterface {
    *   The field.
    *
    * @return bool
-   *   TRUE if it's a JSON API relationship.
+   *   TRUE if it's a JSON:API relationship.
    */
   protected static function isRelationship($field) {
     return $field instanceof EntityReferenceFieldItemList || $field instanceof Relationship;
@@ -79,7 +79,7 @@ class FieldNormalizer extends NormalizerBase implements DenormalizerInterface {
 
     // If $data contains items (recognizable by numerical array keys, which
     // Drupal's Field API calls "deltas"), then it already is itemized; it's not
-    // using the simplified JSON structure that JSON API generates.
+    // using the simplified JSON structure that JSON:API generates.
     $is_already_itemized = is_array($data) && array_reduce(array_keys($data), function ($carry, $index) {
       return $carry && is_numeric($index);
     }, TRUE);

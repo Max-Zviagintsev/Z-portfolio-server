@@ -9,7 +9,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
 
 /**
- * The normalizer used for JSON API sorts.
+ * The normalizer used for JSON:API sorts.
  *
  * @internal
  */
@@ -68,7 +68,7 @@ class SortNormalizer implements DenormalizerInterface {
       throw new CacheableBadRequestHttpException($cacheability, 'You need to provide a value for the sort parameter.');
     }
 
-    // Expand a JSON API compliant sort into a more expressive sort parameter.
+    // Expand a JSON:API compliant sort into a more expressive sort parameter.
     if (is_string($sort)) {
       $sort = $this->expandFieldString($sort);
     }

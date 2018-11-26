@@ -25,7 +25,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     // Unpublish the last entity, so we can check access.
     $this->nodes[60]->setUnpublished()->save();
 
-    // 0. HEAD request allows a client to verify that JSON API is installed.
+    // 0. HEAD request allows a client to verify that JSON:API is installed.
     $this->httpClient->request('HEAD', $this->buildUrl('/jsonapi/node/article'));
     $this->assertSession()->statusCodeEquals(200);
     // 1. Load all articles (1st page).
@@ -181,8 +181,8 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     $this->nodes[1]->save();
     // 13. Test filtering when using short syntax.
     $filter = [
-      'uid.uuid' => ['value' => $this->user->uuid()],
-      'field_tags.uuid' => ['value' => $this->tags[0]->uuid()],
+      'uid.id' => ['value' => $this->user->uuid()],
+      'field_tags.id' => ['value' => $this->tags[0]->uuid()],
     ];
     $single_output = Json::decode($this->drupalGet('/jsonapi/node/article', [
       'query' => ['filter' => $filter, 'include' => 'uid,field_tags'],
@@ -194,14 +194,14 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
       'and_group' => ['group' => ['conjunction' => 'AND']],
       'filter_user' => [
         'condition' => [
-          'path' => 'uid.uuid',
+          'path' => 'uid.id',
           'value' => $this->user->uuid(),
           'memberOf' => 'and_group',
         ],
       ],
       'filter_tags' => [
         'condition' => [
-          'path' => 'field_tags.uuid',
+          'path' => 'field_tags.id',
           'value' => $this->tags[0]->uuid(),
           'memberOf' => 'and_group',
         ],
@@ -217,7 +217,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
       'and_group' => ['group' => ['conjunction' => 'AND']],
       'filter_user' => [
         'condition' => [
-          'name-with-a-typo' => 'uid.uuid',
+          'name-with-a-typo' => 'uid.id',
           'value' => $this->user->uuid(),
           'memberOf' => 'and_group',
         ],
@@ -232,14 +232,14 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
       'or_group' => ['group' => ['conjunction' => 'OR']],
       'filter_tags_1' => [
         'condition' => [
-          'path' => 'field_tags.uuid',
+          'path' => 'field_tags.id',
           'value' => $this->tags[0]->uuid(),
           'memberOf' => 'or_group',
         ],
       ],
       'filter_tags_2' => [
         'condition' => [
-          'path' => 'field_tags.uuid',
+          'path' => 'field_tags.id',
           'value' => $this->tags[1]->uuid(),
           'memberOf' => 'or_group',
         ],
@@ -284,7 +284,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     // 19. Test non-existing route without 'Accept' header.
     $this->drupalGet('/jsonapi/node/article/broccoli');
     $this->assertSession()->statusCodeEquals(404);
-    // Even without the 'Accept' header the 404 error is formatted as JSON API.
+    // Even without the 'Accept' header the 404 error is formatted as JSON:API.
     $this->assertSession()->responseHeaderEquals('Content-Type', 'application/vnd.api+json');
     // 20. Test non-existing route with 'Accept' header.
     $single_output = Json::decode($this->drupalGet('/jsonapi/node/article/broccoli', [], [
@@ -293,7 +293,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     $this->assertEquals(404, $single_output['errors'][0]['status']);
     $this->assertSession()->statusCodeEquals(404);
     // With the 'Accept' header we can know we want the 404 error formatted as
-    // JSON API.
+    // JSON:API.
     $this->assertSession()->responseHeaderContains('Content-Type', 'application/vnd.api+json');
     // 22. Test sort criteria on multiple fields: both ASC.
     $output = Json::decode($this->drupalGet('/jsonapi/node/article', [

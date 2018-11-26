@@ -193,7 +193,7 @@ trait ResourceResponseTestTrait {
   }
 
   /**
-   * Maps an array of PSR responses to JSON API ResourceResponses.
+   * Maps an array of PSR responses to JSON:API ResourceResponses.
    *
    * @param \Psr\Http\Message\ResponseInterface[] $responses
    *   The PSR responses to be mapped.
@@ -206,10 +206,10 @@ trait ResourceResponseTestTrait {
   }
 
   /**
-   * Maps a response object to a JSON API ResourceResponse.
+   * Maps a response object to a JSON:API ResourceResponse.
    *
    * This helper can be used to ease comparing, recording and merging
-   * cacheable responses and to have easier access to the JSON API document as
+   * cacheable responses and to have easier access to the JSON:API document as
    * an array instead of a string.
    *
    * @param \Psr\Http\Message\ResponseInterface $response
@@ -324,7 +324,7 @@ trait ResourceResponseTestTrait {
    * @param array $link_paths
    *   A list of paths to link values keyed by a name.
    * @param array $document
-   *   A JSON API document.
+   *   A JSON:API document.
    *
    * @return array
    *   The extracted links, keyed by the original associated key name.
@@ -476,9 +476,9 @@ trait ResourceResponseTestTrait {
    *   (optional) The field name to which the forbidden result applies. Useful
    *   for testing related/relationship routes and includes.
    * @param string|null $detail
-   *   (optional) Details for the JSON API error object.
+   *   (optional) Details for the JSON:API error object.
    * @param string|bool|null $pointer
-   *   (optional) Document pointer for the JSON API error object. FALSE to omit
+   *   (optional) Document pointer for the JSON:API error object. FALSE to omit
    *   the pointer.
    *
    * @return \Drupal\jsonapi\ResourceResponse
@@ -538,7 +538,7 @@ trait ResourceResponseTestTrait {
    * Add the omitted object to the document or merges it if one already exists.
    *
    * @param array $document
-   *   The JSON API response document.
+   *   The JSON:API response document.
    * @param array $omitted
    *   The omitted object.
    */
@@ -608,7 +608,7 @@ trait ResourceResponseTestTrait {
    * Sorts an omitted link object array by href.
    *
    * @param array $omitted
-   *   An array of JSON API omitted link objects.
+   *   An array of JSON:API omitted link objects.
    */
   protected static function sortOmittedLinks(array &$omitted) {
     $help = $omitted['links']['help'];
@@ -627,7 +627,7 @@ trait ResourceResponseTestTrait {
    * these are random, we can't assert their value.
    *
    * @param array $omitted
-   *   An array of JSON API omitted link objects.
+   *   An array of JSON:API omitted link objects.
    */
   protected static function resetOmittedLinkKeys(array &$omitted) {
     $help = $omitted['links']['help'];

@@ -6,7 +6,7 @@ use Drupal\Core\Url;
 use Drupal\tour\Entity\Tour;
 
 /**
- * JSON API integration test for the "Tour" config entity type.
+ * JSON:API integration test for the "Tour" config entity type.
  *
  * @group jsonapi
  */

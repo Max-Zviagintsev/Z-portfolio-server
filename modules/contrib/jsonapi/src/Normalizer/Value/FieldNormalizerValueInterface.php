@@ -5,7 +5,7 @@ namespace Drupal\jsonapi\Normalizer\Value;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 
 /**
- * Interface to help normalize fields in compliance with the JSON API spec.
+ * Interface to help normalize fields in compliance with the JSON:API spec.
  *
  * @internal
  */

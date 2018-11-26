@@ -41,7 +41,7 @@ use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Subclass this for every JSON API resource type.
+ * Subclass this for every JSON:API resource type.
  */
 abstract class ResourceTestBase extends BrowserTestBase {
 
@@ -66,14 +66,14 @@ abstract class ResourceTestBase extends BrowserTestBase {
   protected static $entityTypeId = NULL;
 
   /**
-   * The name of the tested JSON API resource type.
+   * The name of the tested JSON:API resource type.
    *
    * @var string
    */
   protected static $resourceTypeName = NULL;
 
   /**
-   * The JSON API resource type for the tested entity type plus bundle.
+   * The JSON:API resource type for the tested entity type plus bundle.
    *
    * Necessary for looking up public (alias) or internal (actual) field names.
    *
@@ -334,15 +334,15 @@ abstract class ResourceTestBase extends BrowserTestBase {
   }
 
   /**
-   * Generates a JSON API normalization for the given entity.
+   * Generates a JSON:API normalization for the given entity.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity to generate a JSON API normalization for.
+   *   The entity to generate a JSON:API normalization for.
    * @param \Drupal\Core\Url $url
    *   The URL to use as the "self" link.
    *
    * @return array
-   *   The JSON API normalization for the given entity.
+   *   The JSON:API normalization for the given entity.
    */
   protected function normalize(EntityInterface $entity, Url $url) {
     $doc = new JsonApiDocumentTopLevel($entity, new NullEntityCollection(), [
@@ -402,27 +402,27 @@ abstract class ResourceTestBase extends BrowserTestBase {
   }
 
   /**
-   * Returns the expected JSON API document for the entity.
+   * Returns the expected JSON:API document for the entity.
    *
    * @see ::createEntity()
    *
    * @return array
-   *   A JSON API response document.
+   *   A JSON:API response document.
    */
   abstract protected function getExpectedDocument();
 
   /**
-   * Returns the JSON API POST document.
+   * Returns the JSON:API POST document.
    *
    * @see ::testPostIndividual()
    *
    * @return array
-   *   A JSON API request document.
+   *   A JSON:API request document.
    */
   abstract protected function getPostDocument();
 
   /**
-   * Returns the JSON API PATCH document.
+   * Returns the JSON:API PATCH document.
    *
    * By default, reuses ::getPostDocument(), which works fine for most entity
    * types. A counter example: the 'comment' entity type.
@@ -430,7 +430,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @see ::testPatchIndividual()
    *
    * @return array
-   *   A JSON API request document.
+   *   A JSON:API request document.
    */
   protected function getPatchDocument() {
     return NestedArray::mergeDeep(['data' => ['id' => $this->entity->uuid()]], $this->getPostDocument());
@@ -481,7 +481,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    */
   protected function getExpectedCacheContexts(array $sparse_fieldset = NULL) {
     return [
-      // Cache contexts for JSON API URL query parameters.
+      // Cache contexts for JSON:API URL query parameters.
       'url.query_args:fields',
       'url.query_args:filter',
       'url.query_args:include',
@@ -541,7 +541,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $cacheability->addCacheTags(['http_response']);
     $cacheability->addCacheTags(reset($collection)->getEntityType()->getListCacheTags());
     $cacheability->addCacheContexts([
-      // Cache contexts for JSON API URL query parameters.
+      // Cache contexts for JSON:API URL query parameters.
       'url.query_args:fields',
       'url.query_args:filter',
       'url.query_args:include',
@@ -719,7 +719,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * Asserts that an expected document matches the response body.
    *
    * @param array $expected_document
-   *   The expected JSON API document.
+   *   The expected JSON:API document.
    * @param array $actual_document
    *   The actual response document to assert.
    */
@@ -839,13 +839,13 @@ abstract class ResourceTestBase extends BrowserTestBase {
   }
 
   /**
-   * Makes the JSON API document violate the spec by omitting the resource type.
+   * Makes the JSON:API document violate the spec by omitting the resource type.
    *
    * @param array $document
-   *   A JSON API document.
+   *   A JSON:API document.
    *
    * @return array
-   *   The same JSON API document, without its resource type.
+   *   The same JSON:API document, without its resource type.
    */
   protected function removeResourceTypeFromDocument(array $document) {
     unset($document['data']['type']);
@@ -853,15 +853,15 @@ abstract class ResourceTestBase extends BrowserTestBase {
   }
 
   /**
-   * Makes the given JSON API document invalid.
+   * Makes the given JSON:API document invalid.
    *
    * @param array $document
-   *   A JSON API document.
+   *   A JSON:API document.
    * @param string $entity_key
    *   The entity key whose normalization to make invalid.
    *
    * @return array
-   *   The updated JSON API document, now invalid.
+   *   The updated JSON:API document, now invalid.
    */
   protected function makeNormalizationInvalid(array $document, $entity_key) {
     $entity_type = $this->entity->getEntityType();
@@ -953,7 +953,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
         [
           'title' => 'Bad Request',
           'status' => 400,
-          'detail' => "The following query parameters violate the JSON API spec: 'foo'.",
+          'detail' => "The following query parameters violate the JSON:API spec: 'foo'.",
           'links' => [
             'info' => ['href' => 'http://jsonapi.org/format/#query-parameters'],
             'via' => ['href' => $url_reserved_custom_query_parameter->toString()],
@@ -1110,8 +1110,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
         'ids' => [
           'condition' => [
             'operator' => '<>',
-            'path' => $removed->getEntityType()->getKey('id'),
-            'value' => $removed->id(),
+            'path' => 'id',
+            'value' => $removed->uuid(),
           ],
         ],
       ],
@@ -1166,15 +1166,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $sorted_entity_collection = $entity_collection;
     uasort($sorted_entity_collection, function (EntityInterface $a, EntityInterface $b) {
       // Sort by ID in reverse order.
-      return strcmp($b->id(), $a->id());
+      return strcmp($b->uuid(), $a->uuid());
     });
-    $id_key = reset($entity_collection)->getEntityType()->getKey('id');
-    if (!$id_key) {
-      // Can't sort without an ID.
-      return;
-    }
     $sorted_collection_include_url = clone $collection_url;
-    $sorted_collection_include_url->setOption('query', array_merge($include, ['sort' => "-{$id_key}"]));
+    $sorted_collection_include_url->setOption('query', array_merge($include, ['sort' => "-id"]));
     $expected_response = $this->getExpectedCollectionResponse($sorted_entity_collection, $sorted_collection_include_url->toString(), $request_options, $relationship_field_names);
     $expected_cacheability = $expected_response->getCacheableMetadata();
     $expected_cacheability->setCacheTags(array_values(array_diff($expected_cacheability->getCacheTags(), ['4xx-response'])));
@@ -1186,7 +1181,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   }
 
   /**
-   * Returns a JSON API collection document for the expected entities.
+   * Returns a JSON:API collection document for the expected entities.
    *
    * @param \Drupal\Core\Entity\EntityInterface[] $collection
    *   The entities for the collection.
@@ -1263,7 +1258,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * Tests CRUD of individual resource relationship data.
    *
    * Unlike the "related" routes, relationship routes only return information
-   * about the "relationship" itself, not the targeted resources. For JSON API
+   * about the "relationship" itself, not the targeted resources. For JSON:API
    * with Drupal, relationship routes are like looking at an entity reference
    * field without loading the entities. It only reveals the type of the
    * targeted resource and the target resource IDs. These type+ID combos are
@@ -1415,7 +1410,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $response = $this->request('POST', $url, $request_options);
     $this->assertSame(415, $response->getStatusCode());
 
-    // Set the JSON API media type header for all subsequent requests.
+    // Set the JSON:API media type header for all subsequent requests.
     $request_options[RequestOptions::HEADERS]['Content-Type'] = 'application/vnd.api+json';
 
     if ($update_access->isAllowed()) {
@@ -1843,7 +1838,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
     $request_options[RequestOptions::BODY] = $parseable_invalid_request_body_missing_type;
 
-    // DX: 400 when invalid JSON API request body.
+    // DX: 400 when invalid JSON:API request body.
     $response = $this->request('POST', $url, $request_options);
     $this->assertResourceErrorResponse(400, 'Resource object must include a "type".', $url, $response, FALSE);
 
@@ -2045,7 +2040,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $parseable_invalid_request_body = Json::encode($this->makeNormalizationInvalid($this->getPatchDocument(), 'label'));
     $parseable_invalid_request_body_2 = Json::encode(NestedArray::mergeDeep(['data' => ['attributes' => ['field_rest_test' => $this->randomString()]]], $this->getPatchDocument()));
     // The 'field_rest_test' field does not allow 'view' access, so does not end
-    // up in the JSON API document. Even when we explicitly add it to the JSON
+    // up in the JSON:API document. Even when we explicitly add it to the JSON
     // API document that we send in a PATCH request, it is considered invalid.
     $parseable_invalid_request_body_3 = Json::encode(NestedArray::mergeDeep(['data' => ['attributes' => ['field_rest_test' => $this->entity->get('field_rest_test')->getValue()]]], $this->getPatchDocument()));
     $parseable_invalid_request_body_4 = Json::encode(NestedArray::mergeDeep(['data' => ['attributes' => ['field_nonexistent' => $this->randomString()]]], $this->getPatchDocument()));

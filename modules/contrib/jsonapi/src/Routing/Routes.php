@@ -23,7 +23,7 @@ use Symfony\Component\Routing\RouteCollection;
 class Routes implements ContainerInjectionInterface {
 
   /**
-   * The service name for the primary JSON API controller.
+   * The service name for the primary JSON:API controller.
    *
    * All resources except the entrypoint are served by this controller.
    *
@@ -32,7 +32,7 @@ class Routes implements ContainerInjectionInterface {
   const CONTROLLER_SERVICE_NAME = 'jsonapi.entity_resource';
 
   /**
-   * A key with which to flag a route as belonging to the JSON API module.
+   * A key with which to flag a route as belonging to the JSON:API module.
    *
    * @var string
    */
@@ -46,7 +46,7 @@ class Routes implements ContainerInjectionInterface {
   const RESOURCE_TYPE_KEY = 'resource_type';
 
   /**
-   * The JSON API resource type repository.
+   * The JSON:API resource type repository.
    *
    * @var \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface
    */
@@ -60,7 +60,7 @@ class Routes implements ContainerInjectionInterface {
   protected $providerIds;
 
   /**
-   * The JSON API base path.
+   * The JSON:API base path.
    *
    * @var string
    */
@@ -70,11 +70,11 @@ class Routes implements ContainerInjectionInterface {
    * Instantiates a Routes object.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
-   *   The JSON API resource type repository.
+   *   The JSON:API resource type repository.
    * @param string[] $authentication_providers
    *   The authentication providers, keyed by ID.
    * @param string $jsonapi_base_path
-   *   The JSON API base path.
+   *   The JSON:API base path.
    */
   public function __construct(ResourceTypeRepositoryInterface $resource_type_repository, array $authentication_providers, $jsonapi_base_path) {
     $this->resourceTypeRepository = $resource_type_repository;
@@ -108,7 +108,7 @@ class Routes implements ContainerInjectionInterface {
   public function routes() {
     $routes = new RouteCollection();
 
-    // JSON API's routes: entry point + routes for every resource type.
+    // JSON:API's routes: entry point + routes for every resource type.
     foreach ($this->resourceTypeRepository->all() as $resource_type) {
       $routes->addCollection(static::getRoutesForResourceType($resource_type, $this->jsonApiBasePath));
     }
@@ -117,23 +117,23 @@ class Routes implements ContainerInjectionInterface {
     // Enable all available authentication providers.
     $routes->addOptions(['_auth' => $this->providerIds]);
 
-    // Flag every route as belonging to the JSON API module.
+    // Flag every route as belonging to the JSON:API module.
     $routes->addDefaults([static::JSON_API_ROUTE_FLAG_KEY => TRUE]);
 
-    // All routes serve only the JSON API media type.
+    // All routes serve only the JSON:API media type.
     $routes->addRequirements(['_format' => 'api_json']);
 
-    // Require the JSON API media type header on every route.
+    // Require the JSON:API media type header on every route.
     $routes->addRequirements(['_content_type_format' => 'api_json']);
 
     return $routes;
   }
 
   /**
-   * Gets applicable resource routes for a JSON API resource type.
+   * Gets applicable resource routes for a JSON:API resource type.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
-   *   The JSON API resource type for which to get the routes.
+   *   The JSON:API resource type for which to get the routes.
    * @param string $path_prefix
    *   The root path prefix.
    *
@@ -188,7 +188,7 @@ class Routes implements ContainerInjectionInterface {
   }
 
   /**
-   * Determines if the given request is for a JSON API generated route.
+   * Determines if the given request is for a JSON:API generated route.
    *
    * @param array $defaults
    *   The request's route defaults.
@@ -326,7 +326,7 @@ class Routes implements ContainerInjectionInterface {
   }
 
   /**
-   * Get a unique route name for the JSON API resource type and route type.
+   * Get a unique route name for the JSON:API resource type and route type.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
    *   The resource type for which the route collection should be created.
@@ -374,7 +374,7 @@ class Routes implements ContainerInjectionInterface {
   }
 
   /**
-   * Invalidates any JSON API resource type dependent responses and routes.
+   * Invalidates any JSON:API resource type dependent responses and routes.
    */
   public static function rebuild() {
     \Drupal::service('cache_tags.invalidator')->invalidateTags(['jsonapi_resource_types']);

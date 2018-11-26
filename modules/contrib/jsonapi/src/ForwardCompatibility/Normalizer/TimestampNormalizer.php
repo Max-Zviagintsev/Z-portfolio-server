@@ -10,7 +10,7 @@ use Drupal\Core\TypedData\Plugin\DataType\Timestamp;
  *
  * @internal
  * @see \Drupal\serialization\Normalizer\TimestampNormalizer
- * @todo Remove when JSON API requires Drupal 8.6.
+ * @todo Remove when JSON:API requires Drupal 8.6.
  */
 class TimestampNormalizer extends DateTimeNormalizer {
 

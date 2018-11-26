@@ -141,6 +141,14 @@ services:
     parent: logger.channel_base
     arguments: ['jsonapi']
 
+  # Middleware.
+  jsonapi.http_middleware.format_setter:
+    class: Drupal\jsonapi\StackMiddleware\FormatSetter
+    tags:
+      # Set priority to 201 so it happens right before the page cache
+      # middleware (priority 200) has the opportunity to respond.
+      - { name: http_middleware, priority: 201 }
+
   # Controller.
   jsonapi.entity_resource:
     class: \Drupal\jsonapi\Controller\EntityResource

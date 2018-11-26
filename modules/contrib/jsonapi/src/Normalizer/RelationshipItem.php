@@ -7,7 +7,7 @@ use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface;
 
 /**
- * Value object representing a JSON API relationship item.
+ * Value object representing a JSON:API relationship item.
  *
  * @internal
  */
@@ -28,7 +28,7 @@ class RelationshipItem {
   protected $targetEntity;
 
   /**
-   * The target JSON API resource type.
+   * The target JSON:API resource type.
    *
    * @var \Drupal\jsonapi\ResourceType\ResourceType
    */
@@ -52,7 +52,7 @@ class RelationshipItem {
    * Relationship item constructor.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
-   *   The JSON API resource type repository.
+   *   The JSON:API resource type repository.
    * @param \Drupal\Core\Entity\EntityInterface|null|false $target_entity
    *   The entity this relationship points to, if any. NULL if virtual resource.
    *   FALSE if missing resource (dangling entity reference).

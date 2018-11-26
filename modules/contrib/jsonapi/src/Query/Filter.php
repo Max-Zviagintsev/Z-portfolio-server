@@ -12,7 +12,7 @@ use Drupal\Core\Entity\Query\QueryInterface;
 class Filter {
 
   /**
-   * The JSON API filter key name.
+   * The JSON:API filter key name.
    *
    * @var string
    */

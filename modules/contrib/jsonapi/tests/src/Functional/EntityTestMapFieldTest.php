@@ -7,12 +7,12 @@ use Drupal\entity_test\Entity\EntityTestMapField;
 use Drupal\user\Entity\User;
 
 /**
- * JSON API integration test for the "EntityTestMapField" content entity type.
+ * JSON:API integration test for the "EntityTestMapField" content entity type.
  *
  * @group jsonapi
  * @requires function Drupal\entity_test\Entity\EntityTestMapField::baseFieldDefinitions
  *
- * @todo Remove the "@requires" annotation when JSON API requires Drupal >=8.6
+ * @todo Remove the "@requires" annotation when JSON:API requires Drupal >=8.6
  */
 class EntityTestMapFieldTest extends ResourceTestBase {
 

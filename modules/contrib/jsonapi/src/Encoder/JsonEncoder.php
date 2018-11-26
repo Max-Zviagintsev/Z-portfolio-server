@@ -6,7 +6,7 @@ use Drupal\jsonapi\Normalizer\Value\ValueExtractorInterface;
 use Drupal\serialization\Encoder\JsonEncoder as SerializationJsonEncoder;
 
 /**
- * Encodes JSON API data.
+ * Encodes JSON:API data.
  *
  * @internal
  */

@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * Response subscriber that validates a JSON API response.
+ * Response subscriber that validates a JSON:API response.
  *
  * This must run after ResourceResponseSubscriber.
  *
@@ -35,7 +35,7 @@ class ResourceResponseValidator implements EventSubscriberInterface {
   protected $serializer;
 
   /**
-   * The JSON API logger channel.
+   * The JSON:API logger channel.
    *
    * @var \Psr\Log\LoggerInterface
    */
@@ -79,7 +79,7 @@ class ResourceResponseValidator implements EventSubscriberInterface {
    * @param \Symfony\Component\Serializer\SerializerInterface $serializer
    *   The serializer.
    * @param \Psr\Log\LoggerInterface $logger
-   *   The JSON API logger channel.
+   *   The JSON:API logger channel.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
    * @param string $app_root
@@ -123,7 +123,7 @@ class ResourceResponseValidator implements EventSubscriberInterface {
   }
 
   /**
-   * Validates JSON API responses.
+   * Validates JSON:API responses.
    *
    * @param \Symfony\Component\HttpKernel\Event\FilterResponseEvent $event
    *   The event to process.
@@ -144,12 +144,12 @@ class ResourceResponseValidator implements EventSubscriberInterface {
    */
   public function doValidateResponse(Response $response, Request $request) {
     if (PHP_MAJOR_VERSION >= 7 || assert_options(ASSERT_ACTIVE)) {
-      assert($this->validateResponse($response, $request), 'A JSON API response failed validation (see the logs for details). Please report this in the issue queue on drupal.org');
+      assert($this->validateResponse($response, $request), 'A JSON:API response failed validation (see the logs for details). Please report this in the issue queue on drupal.org');
     }
   }
 
   /**
-   * Validates a response against the JSON API specification.
+   * Validates a response against the JSON:API specification.
    *
    * @param \Symfony\Component\HttpFoundation\Response $response
    *   The response to validate.

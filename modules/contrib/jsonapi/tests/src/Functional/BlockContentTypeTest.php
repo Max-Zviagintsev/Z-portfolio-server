@@ -6,7 +6,7 @@ use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Core\Url;
 
 /**
- * JSON API integration test for the "BlockContentType" config entity type.
+ * JSON:API integration test for the "BlockContentType" config entity type.
  *
  * @group jsonapi
  */

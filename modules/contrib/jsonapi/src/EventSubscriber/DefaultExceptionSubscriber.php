@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
- * Serializes exceptions in compliance with the  JSON API specification.
+ * Serializes exceptions in compliance with the  JSON:API specification.
  *
  * @internal
  */
@@ -59,16 +59,16 @@ class DefaultExceptionSubscriber extends SerializationDefaultExceptionSubscriber
   }
 
   /**
-   * Check if the error should be formatted using JSON API.
+   * Check if the error should be formatted using JSON:API.
    *
-   * The JSON API format is supported if the format is explicitly set or the
-   * request is for a known JSON API route.
+   * The JSON:API format is supported if the format is explicitly set or the
+   * request is for a known JSON:API route.
    *
    * @param \Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent $exception_event
    *   The exception event.
    *
    * @return bool
-   *   TRUE if it needs to be formatted using JSON API. FALSE otherwise.
+   *   TRUE if it needs to be formatted using JSON:API. FALSE otherwise.
    */
   protected function isJsonApiExceptionEvent(GetResponseForExceptionEvent $exception_event) {
     $request = $exception_event->getRequest();

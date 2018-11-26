@@ -7,7 +7,7 @@ use Drupal\node\Entity\NodeType;
 use Drupal\rdf\Entity\RdfMapping;
 
 /**
- * JSON API integration test for the "RdfMapping" config entity type.
+ * JSON:API integration test for the "RdfMapping" config entity type.
  *
  * @group jsonapi
  */

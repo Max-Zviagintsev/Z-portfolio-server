@@ -14,10 +14,10 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
- * Normalizes a Relationship according to the JSON API specification.
+ * Normalizes a Relationship according to the JSON:API specification.
  *
  * Normalizer class for relationship elements. A relationship can be anything
- * that points to an entity in a JSON API resource.
+ * that points to an entity in a JSON:API resource.
  *
  * @internal
  */
@@ -38,7 +38,7 @@ class RelationshipNormalizer extends NormalizerBase implements DenormalizerInter
   protected $formats = ['api_json'];
 
   /**
-   * The JSON API resource type repository.
+   * The JSON:API resource type repository.
    *
    * @var \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface
    */
@@ -69,7 +69,7 @@ class RelationshipNormalizer extends NormalizerBase implements DenormalizerInter
    * RelationshipNormalizer constructor.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
-   *   The JSON API resource type repository.
+   *   The JSON:API resource type repository.
    * @param \Drupal\jsonapi\LinkManager\LinkManager $link_manager
    *   The link manager.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager

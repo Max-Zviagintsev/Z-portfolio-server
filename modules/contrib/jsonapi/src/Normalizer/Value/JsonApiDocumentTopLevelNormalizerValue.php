@@ -10,7 +10,7 @@ use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\jsonapi\JsonApiSpec;
 
 /**
- * Helps normalize the top level document in compliance with the JSON API spec.
+ * Helps normalize the top level document in compliance with the JSON:API spec.
  *
  * @internal
  */
@@ -108,7 +108,7 @@ class JsonApiDocumentTopLevelNormalizerValue implements ValueExtractorInterface,
           return sprintf('url.query_args:%s', $query_parameter_name);
         }, JsonApiSpec::getReservedQueryParameters()));
       }
-      // Every JSON API document contains absolute URLs.
+      // Every JSON:API document contains absolute URLs.
       $this->addCacheContexts(['url.site']);
 
       $this->cardinality = $cardinality;
@@ -178,7 +178,7 @@ class JsonApiDocumentTopLevelNormalizerValue implements ValueExtractorInterface,
         }
         // Add the errors to the pre-existing errors.
         foreach ($normalizer_value->rasterizeValue() as $error) {
-          // JSON API links cannot be arrays and the spec generally favors link
+          // JSON:API links cannot be arrays and the spec generally favors link
           // relation types as keys. 'item' is the right link relation type, but
           // we need multiple values. To do that, we generate a meaningless,
           // random value to use as a unique key. That value is a hash of a

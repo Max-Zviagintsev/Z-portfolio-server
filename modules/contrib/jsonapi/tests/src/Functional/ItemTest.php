@@ -7,7 +7,7 @@ use Drupal\aggregator\Entity\Item;
 use Drupal\Tests\rest\Functional\BcTimestampNormalizerUnixTestTrait;
 
 /**
- * JSON API integration test for the "Item" content entity type.
+ * JSON:API integration test for the "Item" content entity type.
  *
  * @group jsonapi
  */

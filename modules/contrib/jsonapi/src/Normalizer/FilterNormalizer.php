@@ -8,7 +8,7 @@ use Drupal\jsonapi\Query\Filter;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
- * The normalizer used for JSON API filters.
+ * The normalizer used for JSON:API filters.
  *
  * @internal
  */

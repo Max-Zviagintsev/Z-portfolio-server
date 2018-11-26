@@ -7,7 +7,7 @@ use Drupal\Core\Url;
 use Drupal\node\Entity\NodeType;
 
 /**
- * JSON API integration test for the "BaseFieldOverride" config entity type.
+ * JSON:API integration test for the "BaseFieldOverride" config entity type.
  *
  * @group jsonapi
  */

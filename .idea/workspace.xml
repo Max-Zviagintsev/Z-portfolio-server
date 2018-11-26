@@ -2,18 +2,137 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ccf11eb9-af24-41b3-9d82-444ec8d002bd" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/z-portfolio.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/z-portfolio.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi_extras/LICENSE.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi_extras/jsonapi_extras.info.yml" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi_extras/jsonapi_extras.info.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi_extras/src/Entity/JsonapiResourceConfig.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi_extras/src/Entity/JsonapiResourceConfig.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi_extras/src/JsonapiResourceConfigHtmlRouteProvider.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi_extras/src/ResourceType/ConfigurableResourceTypeRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi_extras/src/ResourceType/ConfigurableResourceTypeRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi_extras/tests/src/Kernel/EntityResourceTest.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/jsonapi.api.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/jsonapi.api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/jsonapi.info.yml" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/jsonapi.info.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/jsonapi.services.yml" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/jsonapi.services.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/BackwardCompatibility/tests/Traits/EntityReferenceTestTrait.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/BackwardCompatibility/tests/Traits/EntityReferenceTestTrait.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Context/FieldResolver.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Context/FieldResolver.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Controller/EntityResource.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Controller/EntityResource.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Controller/EntryPoint.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Controller/EntryPoint.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/DependencyInjection/Compiler/RegisterSerializationClassesCompilerPass.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/DependencyInjection/Compiler/RegisterSerializationClassesCompilerPass.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/DependencyInjection/Compiler/RemoveJsonapiFormatCompilerPass.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/DependencyInjection/Compiler/RemoveJsonapiFormatCompilerPass.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Encoder/JsonEncoder.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Encoder/JsonEncoder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/EventSubscriber/DefaultExceptionSubscriber.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/EventSubscriber/DefaultExceptionSubscriber.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/EventSubscriber/JsonApiRequestValidator.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/EventSubscriber/JsonApiRequestValidator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/EventSubscriber/ResourceResponseSubscriber.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/EventSubscriber/ResourceResponseSubscriber.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/EventSubscriber/ResourceResponseValidator.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/EventSubscriber/ResourceResponseValidator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Exception/EntityAccessDeniedHttpException.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Exception/EntityAccessDeniedHttpException.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/ForwardCompatibility/Normalizer/DateTimeIso8601Normalizer.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/ForwardCompatibility/Normalizer/DateTimeIso8601Normalizer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/ForwardCompatibility/Normalizer/DateTimeNormalizer.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/ForwardCompatibility/Normalizer/DateTimeNormalizer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/ForwardCompatibility/Normalizer/TimestampNormalizer.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/ForwardCompatibility/Normalizer/TimestampNormalizer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/JsonApiResource/JsonApiDocumentTopLevel.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/JsonApiResource/JsonApiDocumentTopLevel.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/JsonApiResource/ResourceIdentifier.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/JsonApiResource/ResourceIdentifier.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/JsonApiResource/ResourceIdentifierInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/JsonApiResource/ResourceIdentifierInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/JsonApiSpec.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/JsonApiSpec.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/LinkManager/LinkManager.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/LinkManager/LinkManager.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/ConfigEntityNormalizer.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/ConfigEntityNormalizer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/ContentEntityNormalizer.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/ContentEntityNormalizer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/EntityAccessDeniedHttpExceptionNormalizer.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/EntityAccessDeniedHttpExceptionNormalizer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/EntityNormalizer.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/EntityNormalizer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/EntityReferenceFieldNormalizer.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/EntityReferenceFieldNormalizer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/FieldItemNormalizer.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/FieldItemNormalizer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/FieldNormalizer.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/FieldNormalizer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/FilterNormalizer.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/FilterNormalizer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/HttpExceptionNormalizer.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/HttpExceptionNormalizer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/JsonApiDocumentTopLevelNormalizer.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/JsonApiDocumentTopLevelNormalizer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/LabelOnlyEntityNormalizer.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/LabelOnlyEntityNormalizer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/NormalizerBase.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/NormalizerBase.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/OffsetPageNormalizer.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/OffsetPageNormalizer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Relationship.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Relationship.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/RelationshipItem.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/RelationshipItem.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/RelationshipItemNormalizer.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/RelationshipItemNormalizer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/RelationshipNormalizer.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/RelationshipNormalizer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/SortNormalizer.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/SortNormalizer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/ConfigFieldItemNormalizerValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/ConfigFieldItemNormalizerValue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/EntityNormalizerValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/EntityNormalizerValue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/FieldItemNormalizerValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/FieldItemNormalizerValue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/FieldNormalizerValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/FieldNormalizerValue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/FieldNormalizerValueInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/FieldNormalizerValueInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/HttpExceptionNormalizerValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/HttpExceptionNormalizerValue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/JsonApiDocumentTopLevelNormalizerValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/JsonApiDocumentTopLevelNormalizerValue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/NullFieldNormalizerValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/NullFieldNormalizerValue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/RelationshipItemNormalizerValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/RelationshipItemNormalizerValue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/RelationshipNormalizerValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/RelationshipNormalizerValue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/ValueExtractorInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Normalizer/Value/ValueExtractorInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/ParamConverter/ResourceTypeConverter.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/ParamConverter/ResourceTypeConverter.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Query/Filter.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Query/Filter.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Query/OffsetPage.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Query/OffsetPage.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Query/Sort.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Query/Sort.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/ResourceType/ResourceType.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/ResourceType/ResourceType.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/ResourceType/ResourceTypeRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/ResourceType/ResourceTypeRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/ResourceType/ResourceTypeRepositoryInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/ResourceType/ResourceTypeRepositoryInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Routing/JsonApiParamEnhancer.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Routing/JsonApiParamEnhancer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Routing/Routes.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Routing/Routes.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Serializer/Serializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/src/Serializer/Serializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/modules/jsonapi_test_collection_count/jsonapi_test_collection_count.info.yml" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/modules/jsonapi_test_collection_count/jsonapi_test_collection_count.info.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/modules/jsonapi_test_collection_count/src/ResourceType/CountableResourceTypeRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/modules/jsonapi_test_collection_count/src/ResourceType/CountableResourceTypeRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/modules/jsonapi_test_data_type/jsonapi_test_data_type.info.yml" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/modules/jsonapi_test_data_type/jsonapi_test_data_type.info.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/modules/jsonapi_test_field_access/jsonapi_test_field_access.info.yml" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/modules/jsonapi_test_field_access/jsonapi_test_field_access.info.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/modules/jsonapi_test_field_type/jsonapi_test_field_type.info.yml" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/modules/jsonapi_test_field_type/jsonapi_test_field_type.info.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/modules/jsonapi_test_normalizers_kernel/jsonapi_test_normalizers_kernel.info.yml" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/modules/jsonapi_test_normalizers_kernel/jsonapi_test_normalizers_kernel.info.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ActionTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ActionTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/BaseFieldOverrideTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/BaseFieldOverrideTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/BlockContentTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/BlockContentTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/BlockContentTypeTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/BlockContentTypeTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/BlockTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/BlockTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/CommentTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/CommentTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/CommentTypeTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/CommentTypeTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ConfigTestTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ConfigTestTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ConfigurableLanguageTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ConfigurableLanguageTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ContactFormTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ContactFormTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ContentLanguageSettingsTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ContentLanguageSettingsTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/DateFormatTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/DateFormatTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/EditorTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/EditorTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/EntityFormDisplayTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/EntityFormDisplayTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/EntityFormModeTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/EntityFormModeTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/EntityTestMapFieldTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/EntityTestMapFieldTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/EntityTestTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/EntityTestTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/EntityViewDisplayTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/EntityViewDisplayTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/EntityViewModeTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/EntityViewModeTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ExternalNormalizersTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ExternalNormalizersTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/FeedTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/FeedTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/FieldConfigTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/FieldConfigTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/FieldStorageConfigTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/FieldStorageConfigTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/FileTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/FileTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/FilterFormatTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/FilterFormatTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ImageStyleTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ImageStyleTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/InternalEntitiesTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/InternalEntitiesTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ItemTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ItemTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/JsonApiFunctionalMultilingualTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/JsonApiFunctionalMultilingualTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/JsonApiFunctionalTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/JsonApiFunctionalTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/JsonApiFunctionalTestBase.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/JsonApiFunctionalTestBase.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/JsonApiRegressionTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/JsonApiRegressionTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/MediaTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/MediaTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/MediaTypeTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/MediaTypeTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/MenuLinkContentTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/MenuLinkContentTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/MenuTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/MenuTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/MessageTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/MessageTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/NodeTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/NodeTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/NodeTypeTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/NodeTypeTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/RdfMappingTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/RdfMappingTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ResourceResponseTestTrait.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ResourceResponseTestTrait.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ResourceTestBase.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ResourceTestBase.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ResponsiveImageStyleTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ResponsiveImageStyleTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/RestResourceConfigTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/RestResourceConfigTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/RoleTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/RoleTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/SearchPageTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/SearchPageTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ShortcutSetTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ShortcutSetTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ShortcutTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ShortcutTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/TermTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/TermTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/TestCoverageTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/TestCoverageTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/TourTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/TourTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/UserTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/UserTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ViewTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/ViewTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/VocabularyTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/VocabularyTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/WorkflowTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Functional/WorkflowTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Kernel/Context/FieldResolverTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Kernel/Context/FieldResolverTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Kernel/Query/FilterTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Kernel/Query/FilterTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Kernel/ResourceType/RelatedResourceTypesTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Kernel/ResourceType/RelatedResourceTypesTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Kernel/ResourceType/ResourceTypeRepositoryTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Kernel/ResourceType/ResourceTypeRepositoryTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Kernel/Serializer/SerializerTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Kernel/Serializer/SerializerTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Unit/Routing/RoutesTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/modules/contrib/jsonapi/tests/src/Unit/Routing/RoutesTest.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/vendor/composer/installed.json" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/composer/installed.json" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -32,23 +151,23 @@
     <session id="666651899">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="2" />
+          <entry key="project.closed" value="3" />
           <entry key="project.open.time.0" value="1" />
-          <entry key="project.open.time.1" value="1" />
-          <entry key="project.opened" value="2" />
+          <entry key="project.open.time.1" value="2" />
+          <entry key="project.opened" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="gitignore" value="3" />
-          <entry key="json" value="2" />
+          <entry key="json" value="3" />
           <entry key="yml" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="Git file" value="3" />
-          <entry key="JSON" value="2" />
+          <entry key="JSON" value="3" />
           <entry key="YAML" value="3" />
         </counts>
       </usages-collector>
@@ -68,6 +187,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf />
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>admin</find>
+    </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -175,7 +299,7 @@
       <path value="$PROJECT_DIR$/vendor/justinrainbow/json-schema" />
     </include_path>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="1912" />
     <option name="y" value="-8" />
     <option name="width" value="1936" />
@@ -230,16 +354,17 @@
       <updated>1537548389343</updated>
       <workItem from="1537548390697" duration="4478000" />
       <workItem from="1537961009313" duration="2474000" />
+      <workItem from="1542974650112" duration="720000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="6952000" />
+    <option name="totallyTimeSpent" value="7672000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1912" y="-8" width="1936" height="1056" extended-state="7" />
+    <frame x="1912" y="-8" width="1936" height="1056" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25266525" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -254,7 +379,7 @@
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="RNConsole" order="10" />
       <window_info anchor="bottom" id="Terminal" order="11" />
-      <window_info active="true" anchor="bottom" id="Event Log" order="12" side_tool="true" visible="true" weight="0.1860215" />
+      <window_info anchor="bottom" id="Event Log" order="12" side_tool="true" visible="true" weight="0.18502203" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -268,13 +393,7 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://F:/Projects/Z-portfolio/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1166">
-          <caret line="53" column="20" selection-start-line="53" selection-start-column="20" selection-end-line="53" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://F:/Projects/Z-portfolio/.gitignore" />
     <entry file="file://$PROJECT_DIR$/../maxs-z-web-developer-portfolio/pantheon.yml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="88">
@@ -298,8 +417,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/composer.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="329">
-          <caret line="72" column="20" selection-start-line="72" selection-start-column="20" selection-end-line="72" selection-end-column="20" />
+        <state relative-caret-position="484">
+          <caret line="22" column="40" selection-start-line="22" selection-start-column="40" selection-end-line="22" selection-end-column="40" />
         </state>
       </provider>
     </entry>

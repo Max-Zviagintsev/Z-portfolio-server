@@ -12,7 +12,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  *
  * @internal
  * @see \Drupal\serialization\Normalizer\DateTimeNormalizer
- * @todo Remove when JSON API requires Drupal 8.6.
+ * @todo Remove when JSON:API requires Drupal 8.6.
  */
 class DateTimeNormalizer extends NormalizerBase implements DenormalizerInterface {
 

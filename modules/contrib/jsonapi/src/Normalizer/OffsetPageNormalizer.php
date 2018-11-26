@@ -8,7 +8,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
 
 /**
- * The normalizer used for JSON API pagination.
+ * The normalizer used for JSON:API pagination.
  *
  * @internal
  */

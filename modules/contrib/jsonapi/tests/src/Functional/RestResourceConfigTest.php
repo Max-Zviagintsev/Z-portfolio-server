@@ -6,7 +6,7 @@ use Drupal\Core\Url;
 use Drupal\rest\Entity\RestResourceConfig;
 
 /**
- * JSON API integration test for the "RestResourceConfig" config entity type.
+ * JSON:API integration test for the "RestResourceConfig" config entity type.
  *
  * @group jsonapi
  */

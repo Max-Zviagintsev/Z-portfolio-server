@@ -7,7 +7,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 
 /**
- * JSON API integration test for the "Block" config entity type.
+ * JSON:API integration test for the "Block" config entity type.
  *
  * @group jsonapi
  */

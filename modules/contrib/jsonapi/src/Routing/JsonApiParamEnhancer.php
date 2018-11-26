@@ -25,17 +25,17 @@ class JsonApiParamEnhancer implements EnhancerInterface, ContainerAwareInterface
   use ContainerAwareTrait;
 
   /**
-   * The JSON API serializer.
+   * The JSON:API serializer.
    *
    * @var \Symfony\Component\Serializer\SerializerInterface|\Symfony\Component\Serializer\Normalizer\DenormalizerInterface
    */
   protected $serializer;
 
   /**
-   * Lazily loads the JSON API serializer.
+   * Lazily loads the JSON:API serializer.
    *
    * @return \Symfony\Component\Serializer\SerializerInterface|\Symfony\Component\Serializer\Normalizer\DenormalizerInterface
-   *   The JSON API serializer.
+   *   The JSON:API serializer.
    */
   protected function serializer() {
     if (!$this->serializer) {
@@ -97,7 +97,7 @@ class JsonApiParamEnhancer implements EnhancerInterface, ContainerAwareInterface
    * Deserializes request body, if any.
    *
    * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
-   *   The JSON API resource type for the current request.
+   *   The JSON:API resource type for the current request.
    * @param string $received
    *   The request body.
    * @param array $defaults

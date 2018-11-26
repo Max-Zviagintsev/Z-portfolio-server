@@ -16,7 +16,7 @@ use Drupal\user\Entity\User;
 use GuzzleHttp\RequestOptions;
 
 /**
- * JSON API integration test for the "Comment" content entity type.
+ * JSON:API integration test for the "Comment" content entity type.
  *
  * @group jsonapi
  */
@@ -273,7 +273,7 @@ class CommentTest extends ResourceTestBase {
         return "The 'post comments' permission is required.";
 
       case 'PATCH':
-        // @todo Make this unconditional when JSON API requires Drupal 8.6 or newer.
+        // @todo Make this unconditional when JSON:API requires Drupal 8.6 or newer.
         if (floatval(\Drupal::VERSION) >= 8.6) {
           return "The 'edit own comments' permission is required, the user must be the comment author, and the comment must be published.";
         }

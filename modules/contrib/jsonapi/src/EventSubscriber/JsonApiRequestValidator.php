@@ -11,14 +11,14 @@ use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Request subscriber that validates a JSON API request.
+ * Request subscriber that validates a JSON:API request.
  *
  * @internal
  */
 class JsonApiRequestValidator implements EventSubscriberInterface {
 
   /**
-   * Validates JSON API requests.
+   * Validates JSON:API requests.
    *
    * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
    *   The event to process.
@@ -36,10 +36,10 @@ class JsonApiRequestValidator implements EventSubscriberInterface {
    * Validates custom (implementation-specific) query parameter names.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The request for which to validate JSON API query parameters.
+   *   The request for which to validate JSON:API query parameters.
    *
    * @return \Drupal\jsonapi\ResourceResponse|null
-   *   A JSON API resource response.
+   *   A JSON:API resource response.
    *
    * @see http://jsonapi.org/format/#query-parameters
    */
@@ -57,11 +57,11 @@ class JsonApiRequestValidator implements EventSubscriberInterface {
     }
 
     // Drupal uses the `_format` query parameter for Content-Type negotiation.
-    // Using it violates the JSON API spec. Nudge people nicely in the correct
+    // Using it violates the JSON:API spec. Nudge people nicely in the correct
     // direction. (This is special cased because using it is pretty common.)
     if (in_array('_format', $invalid_query_params, TRUE)) {
       $uri_without_query_string = $request->getSchemeAndHttpHost() . $request->getBaseUrl() . $request->getPathInfo();
-      $exception = new CacheableBadRequestHttpException((new CacheableMetadata())->addCacheContexts(['url.query_args:_format']), 'JSON API does not need that ugly \'_format\' query string! 🤘 Use the URL provided in \'links\' 🙏');
+      $exception = new CacheableBadRequestHttpException((new CacheableMetadata())->addCacheContexts(['url.query_args:_format']), 'JSON:API does not need that ugly \'_format\' query string! 🤘 Use the URL provided in \'links\' 🙏');
       $exception->setHeaders(['Link' => $uri_without_query_string]);
       throw $exception;
     }
@@ -70,7 +70,7 @@ class JsonApiRequestValidator implements EventSubscriberInterface {
       return NULL;
     }
 
-    $message = sprintf('The following query parameters violate the JSON API spec: \'%s\'.', implode("', '", $invalid_query_params));
+    $message = sprintf('The following query parameters violate the JSON:API spec: \'%s\'.', implode("', '", $invalid_query_params));
     $exception = new CacheableBadRequestHttpException((new CacheableMetadata())->addCacheContexts(['url.query_args']), $message);
     $exception->setHeaders(['Link' => 'http://jsonapi.org/format/#query-parameters']);
     throw $exception;

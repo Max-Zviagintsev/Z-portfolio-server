@@ -6,7 +6,7 @@ use Drupal\Core\Url;
 use Drupal\field\Entity\FieldStorageConfig;
 
 /**
- * JSON API integration test for the "FieldStorageConfig" config entity type.
+ * JSON:API integration test for the "FieldStorageConfig" config entity type.
  *
  * @group jsonapi
  */

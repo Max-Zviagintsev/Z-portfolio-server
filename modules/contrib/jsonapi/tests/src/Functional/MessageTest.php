@@ -10,7 +10,7 @@ use GuzzleHttp\RequestOptions;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
- * JSON API integration test for the "Message" content entity type.
+ * JSON:API integration test for the "Message" content entity type.
  *
  * @group jsonapi
  */

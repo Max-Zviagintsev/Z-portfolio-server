@@ -9,7 +9,7 @@ use Drupal\field\Entity\FieldStorageConfig;
  * Provides common functionality for the EntityReference test classes.
  *
  * @see \Drupal\Tests\field\Traits\EntityReferenceTestTrait
- * @todo Remove when JSON API requires Drupal >=8.6
+ * @todo Remove when JSON:API requires Drupal >=8.6
  */
 trait EntityReferenceTestTrait {
 

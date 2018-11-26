@@ -6,7 +6,7 @@ use Drupal\contact\Entity\ContactForm;
 use Drupal\Core\Url;
 
 /**
- * JSON API integration test for the "ContactForm" config entity type.
+ * JSON:API integration test for the "ContactForm" config entity type.
  *
  * @group jsonapi
  */

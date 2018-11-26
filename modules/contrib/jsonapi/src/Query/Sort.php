@@ -10,7 +10,7 @@ namespace Drupal\jsonapi\Query;
 class Sort {
 
   /**
-   * The JSON API sort key name.
+   * The JSON:API sort key name.
    *
    * @var string
    */

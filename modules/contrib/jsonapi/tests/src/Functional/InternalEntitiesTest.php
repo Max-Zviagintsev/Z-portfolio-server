@@ -11,7 +11,7 @@ use Drupal\jsonapi\BackwardCompatibility\tests\Traits\EntityReferenceTestTrait;
 use Drupal\Tests\BrowserTestBase;
 
 /**
- * Makes assertions about the JSON API behavior for internal entities.
+ * Makes assertions about the JSON:API behavior for internal entities.
  *
  * @group jsonapi
  *
@@ -138,7 +138,7 @@ class InternalEntitiesTest extends BrowserTestBase {
   }
 
   /**
-   * Returns the decoded JSON API document for the for the given entity.
+   * Returns the decoded JSON:API document for the for the given entity.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity to request.

@@ -3,7 +3,7 @@
 namespace Drupal\jsonapi\Normalizer\Value;
 
 /**
- * Helps normalize exceptions in compliance with the JSON API spec.
+ * Helps normalize exceptions in compliance with the JSON:API spec.
  *
  * @internal
  */

@@ -35,7 +35,7 @@ class LabelOnlyEntityNormalizer extends NormalizerBase {
   protected $linkManager;
 
   /**
-   * The JSON API resource type repository.
+   * The JSON:API resource type repository.
    *
    * @var \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface
    */
@@ -47,7 +47,7 @@ class LabelOnlyEntityNormalizer extends NormalizerBase {
    * @param \Drupal\jsonapi\LinkManager\LinkManager $link_manager
    *   The link manager.
    * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
-   *   The JSON API resource type repository.
+   *   The JSON:API resource type repository.
    */
   public function __construct(LinkManager $link_manager, ResourceTypeRepositoryInterface $resource_type_repository) {
     $this->linkManager = $link_manager;

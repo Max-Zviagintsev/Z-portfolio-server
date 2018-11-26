@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 /**
  * Normalizes an EntityAccessDeniedException.
  *
- * Normalizes an EntityAccessDeniedException in compliance with the JSON API
+ * Normalizes an EntityAccessDeniedException in compliance with the JSON:API
  * specification. A source pointer is added to help client applications report
  * which entity was access denied.
  *

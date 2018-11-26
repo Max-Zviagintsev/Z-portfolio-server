@@ -6,7 +6,7 @@ use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\Core\Url;
 
 /**
- * JSON API integration test for the "EntityViewMode" config entity type.
+ * JSON:API integration test for the "EntityViewMode" config entity type.
  *
  * @group jsonapi
  */

@@ -8,7 +8,7 @@ use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\TypedData\DataReferenceDefinitionInterface;
 
 /**
- * Represents a JSON API resource identifier object.
+ * Represents a JSON:API resource identifier object.
  *
  * @internal
  */
@@ -17,7 +17,7 @@ class ResourceIdentifier implements ResourceIdentifierInterface {
   const ARITY_KEY = 'arity';
 
   /**
-   * The JSON API resource type name.
+   * The JSON:API resource type name.
    *
    * @var string
    */
@@ -41,7 +41,7 @@ class ResourceIdentifier implements ResourceIdentifierInterface {
    * ResourceIdentifier constructor.
    *
    * @param string $resource_type_name
-   *   The JSON API resource type name.
+   *   The JSON:API resource type name.
    * @param string $id
    *   The resource ID.
    * @param array $meta
@@ -55,10 +55,10 @@ class ResourceIdentifier implements ResourceIdentifierInterface {
   }
 
   /**
-   * Gets the ResourceIdentifier's JSON API resource type name.
+   * Gets the ResourceIdentifier's JSON:API resource type name.
    *
    * @return string
-   *   The JSON API resource type name.
+   *   The JSON:API resource type name.
    */
   public function getTypeName() {
     return $this->resourceTypeName;
